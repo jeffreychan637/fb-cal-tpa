@@ -1,134 +1,185 @@
 <div class="loading" ng-cloak="">
-	<h3 style="text-align: center">Loading Settings</h3>
+  <h3 style="text-align: center">Loading Settings</h3>
 </div>
 
 <div ng-controller="SettingsCtrl">
-	<div class="box">
-		<img class="logo" width="86" src="images/wix_icon.png">
-		<div class="notloggedin-container" ng-hide="provider">
-			<p class="description">Conneclwegfle;wkwlndwaasdas irwith your Google Drive or Dropbox account. This process is secure and completely private. Wix will not have access to your account name or password. 
-			</p>
-            <a ng-href="/views/storage.html?compId={{compId}}&amp;instance={{instance}}" target="_blank">
-            	<button class="submit uilib-btn connect-button floatright">Connect account</button>
-            </a>
-            <!--</a>-->
-	    </div>
-	    <div class="loggedin-container connect" ng-show="provider">
-	    	<img class="mark-icon" ng-src="../images/checkmark.png" />
-			<span class="connect">You are currently connected with your account:</span>
-				<p><a class="floatright" ng-click="logout()" target="_blank|_parent">Disconnect Account</a></p>
-				<a href="views/verified.html" style="font-size: 1px">_</a><!-- formatting -->
-		</div>
-	</div>
-	<div wix-ctrl="Accordion">
-	    <div class="acc-pane">
-	        <h3>Content Settings</h3>
-	        <div class="acc-content">
-	        	<ul class="list">
-	        		<li wix-label="Title">
-			        	<div wix-model="title" wix-ctrl="Input" wix-options="{placeholder: 'This is my title.'}"></div>
-			        </li>
-			        <li wix-label="Description">
-			        	<div wix-model="description" wix-ctrl="Input" wix-options="{placeholder: 'This is my description.'}"></div>
-			        </li>
-			        <li wix-label="Add Button Text">
-			        	<div wix-model="addButtonText" wix-ctrl="Input" wix-options="{placeholder: '+ Add Files'}"></div>
-			        </li>
-	        		<li wix-label="Your Name">
-			        	<div wix-model="yourNameText" wix-ctrl="Input" wix-options="{placeholder: 'Your name'}"></div>
-			        </li>
-		        	<li wix-label="Email Address">
-			        	<div wix-model="emailAddressText" wix-ctrl="Input" wix-options="{placeholder: 'Your email address'}"></div>
-			        </li>
-			        <li wix-label="Message">
-			        	<div wix-model="messageText" wix-ctrl="Input" wix-options="{placeholder: 'You can add a message to site owner'}"></div>
-			        </li>
-			        <li wix-label="Submit Button Text">
-			        	<div wix-model="submitButtonText" wix-ctrl="Input" wix-options="{placeholder: 'Submit'}"></div>
-			        </li>
-		        </ul>
-	        </div>
-	    </div>
-	    <div class="acc-pane">
-	        <h3>Design Settings</h3> 
-	        <div class="acc-content">
-	        	<ul class="list">
-	        		<li wix-label="Widget Corners">
-		        		<div wix-model="widgetCorners" wix-ctrl="ButtonGroup">
-						    <button value="0">Sharp</button>
-						    <button value="5">Semi-Sharp</button>
-						    <button value="10">Semi-Round</button>
-						    <button value="20">Round</button>
-						</div>
-		        	</li>
-		        	<li wix-label="Fill Color &amp; Opacity">
-		        		<div wix-param="fillColor" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-8', startWithOpacity:100}"></div>
-		        	</li>
-		        	<li wix-label="Border Color &amp; Opacity">
-		        		<div wix-param="borderColor" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-3', startWithOpacity:90}"></div>
-		        	</li>
-		        	<li wix-label="Border Width">
-		        		<div wix-model="borderWidth" wix-ctrl="ButtonGroup">
-						    <button value="1">Tiny</button>
-						    <button value="3">Small</button>
-						    <button value="5">Medium</button>
-						    <button value="8">Large</button>
-						</div>
-		        	</li>
-			        <li wix-label="Title">
-		        		<div wix-param="titleColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
-			        	<div wix-param="titleFont" wix-ctrl="FontStylePicker"></div>
-			        </li>
-			        <li wix-label="Description">
-		        		<div wix-param="descriptionColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
-			        	<div wix-param="descriptionFont" wix-ctrl="FontStylePicker"></div>
-			        </li>
-			        <li wix-label="Body Font">
-		        		<div wix-param="bodyColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
-			        	<div wix-param="bodyFont" wix-ctrl="FontStylePicker"></div>
-			        </li>
-			        <li wix-label="Background &amp; Opacity">
-		        		<div wix-param="backgroundColor" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-3', startWithOpacity:90}"></div>
-		        	</li>
-		        	<li wix-label="Button Corners">
-		        		<div wix-model="buttonCorners" wix-ctrl="ButtonGroup">
-						    <button value="0">Sharp</button>
-						    <button value="5">Semi-Sharp</button>
-						    <button value="10">Semi-Round</button>
-						    <button value="20">Round</button>
-						</div>
-		        	</li>
-			        <li wix-label="Button Color">
-		        		<div wix-param="buttonColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-17'}"></div>
-		        	</li>
-			        <li wix-label="Button Text Color">
-		        		<div wix-param="buttonTextColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-25'}"></div>
-		        		<div wix-param="buttonFont" wix-ctrl="FontStylePicker"></div>
-		        	</li>
-	        	</ul>
-	        </div>
-	    </div>
-	    <!-- Below is commented out because we are no longer letting site visitors send email messages. Instead messages will be sent through Wix dashboard -->
-	    <!--<div class="acc-pane" ng-show="provider">
-			<h3>Configuration Settings</h3>
-			<div class="acc-content">
-				<ul class="list">
-					<li wix-label="Messages To">
-						<div class="configuration-email">
-							<form name="ownerForm" novalidate>
-				            	<span class="site-owner-email"></span><a href="views/verified.html" target="_blank"></a>
-					            <input wix-model="userReceiveEmail" name="userReceiveEmail" type="email" class="userReceiveEmail" placeholder=" WebsiteMaker@Wix.com" required ng-model="userReceiveEmail" ng-blur="putSettingsDebounced()">
-					            <span class="mark-icon-container" wix-tooltip=" {placement:'bottom', text:'When visitors of your website upload files, their message will be sent to this email. If you would like the message to be sent to the email attached to your Drive account, you can leave this field empty.'}">
-									<img ng-show="ownerForm.userReceiveEmail.$invalid" class="mark-icon" ng-src="images/question_mark.png">
-								</span>
-								<span class="mark-icon-container" wix-tooltip=" {placement:'bottom', text:' Messages will be sent to this email.'}">
-									<img ng-show="ownerForm.userReceiveEmail.$valid" class="mark-icon" ng-src="images/email_checkmark.png">
-								</span>
-							</form>
-						</div>
-					</li>
-				</ul>
-			</div>
-		</div>-->
-	</div>
+  <header class="box">
+    <div class="logo">
+      <img width="86" src="images/wix_icon.png">
+    </div>
+    <div ng-hide="true || false">
+      <p>
+        Connect your Facebook account. This process is secure and completely private. Wix will not have access to your Facebook password.
+      </p>
+      <div class="login-panel">
+        <p class="create-account">
+          Don't have an account?
+          <br>
+          <strong>
+            <a class="link" href="http://www.facebook.com" target="_blank">Create one</a>
+          </strong>
+        </p>
+        <button class="uilib-btn connect">
+          Connect account
+        </button>
+      </div>
+    </div>
+    <div ng-show="true || false">
+      <p>
+        <span class="icon-check-mark-circle checkmark" data-icon="a"></span>
+        You are now connected to Jeffrey Chan's Facebook account.
+      </p>
+        <a class="disconnect-account" target="_blank|_parent">
+          Disconnect Account
+        </a>
+    </div>
+  </header>
+  <div wix-ctrl="Accordion">
+      <div class="acc-pane">
+          <h3>Settings</h3>
+          <div class="acc-content">
+            <ul class="list">
+              <li wix-label="Events on Calendar">
+                <div wix-model="event1" wix-ctrl="Checkbox" wix-options="{postLabel:'Wimbledon'}"></div><br>
+                <div class="non-first-events" wix-model="event2" wix-ctrl="Checkbox" wix-options="{postLabel:'Super Bowl'}"></div><br>
+                <div class="non-first-events" wix-model="event3" wix-ctrl="Checkbox" wix-options="{postLabel:'World Cup'}"></div>
+              </li>
+              <li wix-label="Calendar View" class="toggle-label">
+                <div class="onoffswitch">
+                  <input type="checkbox" name="calendarView" class="onoffswitch-checkbox" id="calendarView" checked>
+                  <label class="onoffswitch-label" for="calendarView">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                  </label>
+                </div>
+              </li>
+              <li wix-label="Commenting" class="toggle-label">
+                <div class="onoffswitch">
+                  <input type="checkbox" name="commentSwitch" class="onoffswitch-checkbox" id="commentSwitch" checked>
+                  <label class="onoffswitch-label" for="commentSwitch">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                  </label>
+                </div>
+              </li>
+              <li wix-label="Comment Moderation" class="toggle-label">
+                <div class="onoffswitch">
+                  <input type="checkbox" name="modSwitch" class="onoffswitch-checkbox" id="modSwitch" checked>
+                  <label class="onoffswitch-label" for="modSwitch">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                  </label>
+                </div>
+              </li>
+              <li wix-label="Show 'Hosted by'" class="toggle-label">
+                <div class="onoffswitch">
+                  <input type="checkbox" name="hostedSwitch" class="onoffswitch-checkbox" id="hostedSwitch" checked>
+                  <label class="onoffswitch-label" for="hostedSwitch">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                  </label>
+                </div>
+              </li>
+              <li wix-label="Heading">
+                <div wix-model="heading" wix-ctrl="Input" wix-options="{placeholder: 'My Calendar'}"></div>
+              </li>
+              <li wix-label="Description">
+                <div wix-model="description" wix-ctrl="Input" wix-options="{placeholder: 'These are my events.'}"></div>
+              </li>
+            </ul>
+          </div>
+      </div>
+      <div class="acc-pane">
+          <h3>Design Settings</h3> 
+          <div class="acc-content">
+            <ul class="list">
+              <li wix-label="Heading Font">
+                <div wix-param="headingColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
+                <div wix-param="headingFont" wix-ctrl="FontStylePicker"></div>
+              </li>
+              <li wix-label="Secondary Font">
+                <div wix-param="secondaryColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
+                <div wix-param="secondaryFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
+              </li>
+              <li wix-label="Tertiary Font">
+                <div wix-param="tertiaryColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
+                <div wix-param="tertiaryFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
+              </li>
+              <li wix-label="Corners">
+                <span class="uilib-text slider-before">Sharp</span>
+                <div  wix-model="myValue" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 10}">
+                </div>
+                <span class="uilib-text slider-after">Round</span>
+              </li>
+              <li wix-label="Border Color &amp; Opacity">
+                <div wix-param="borderColor" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-3', startWithOpacity:100}"></div>
+                <span class="uilib-text slider-before second-slider">Sharp</span>
+                <div  wix-model="myValue" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 10}">
+                </div>
+                <span class="uilib-text slider-after">Round</span>
+              </li>
+              <li wix-label="Border Width">
+                <div wix-model="borderWidth" wix-ctrl="ButtonGroup">
+                <button value="1">Tiny</button>
+                <button value="3">Small</button>
+                <button value="5">Medium</button>
+                <button value="8">Large</button>
+            </div>
+              </li>
+              <li wix-label="Title">
+                <div wix-param="titleColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
+                <div wix-param="titleFont" wix-ctrl="FontStylePicker"></div>
+              </li>
+              <li wix-label="Description">
+                <div wix-param="descriptionColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
+                <div wix-param="descriptionFont" wix-ctrl="FontStylePicker"></div>
+              </li>
+              <li wix-label="Body Font">
+                <div wix-param="bodyColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
+                <div wix-param="bodyFont" wix-ctrl="FontStylePicker"></div>
+              </li>
+              <li wix-label="Background &amp; Opacity">
+                <div wix-param="backgroundColor" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-3', startWithOpacity:90}"></div>
+              </li>
+              <li wix-label="Button Corners">
+                <div wix-model="buttonCorners" wix-ctrl="ButtonGroup">
+                <button value="0">Sharp</button>
+                <button value="5">Semi-Sharp</button>
+                <button value="10">Semi-Round</button>
+                <button value="20">Round</button>
+            </div>
+              </li>
+              <li wix-label="Button Color">
+                <div wix-param="buttonColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-17'}"></div>
+              </li>
+              <li wix-label="Button Text Color">
+                <div wix-param="buttonTextColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-25'}"></div>
+                <div wix-param="buttonFont" wix-ctrl="FontStylePicker"></div>
+              </li>
+            </ul>
+          </div>
+      </div>
+      <!-- Below is commented out because we are no longer letting site visitors send email messages. Instead messages will be sent through Wix dashboard -->
+      <!--<div class="acc-pane" ng-show="provider">
+      <h3>Configuration Settings</h3>
+      <div class="acc-content">
+        <ul class="list">
+          <li wix-label="Messages To">
+            <div class="configuration-email">
+              <form name="ownerForm" novalidate>
+                      <span class="site-owner-email"></span><a href="views/verified.html" target="_blank"></a>
+                      <input wix-model="userReceiveEmail" name="userReceiveEmail" type="email" class="userReceiveEmail" placeholder=" WebsiteMaker@Wix.com" required ng-model="userReceiveEmail" ng-blur="putSettingsDebounced()">
+                      <span class="mark-icon-container" wix-tooltip=" {placement:'bottom', text:'When visitors of your website upload files, their message will be sent to this email. If you would like the message to be sent to the email attached to your Drive account, you can leave this field empty.'}">
+                  <img ng-show="ownerForm.userReceiveEmail.$invalid" class="mark-icon" ng-src="images/question_mark.png">
+                </span>
+                <span class="mark-icon-container" wix-tooltip=" {placement:'bottom', text:' Messages will be sent to this email.'}">
+                  <img ng-show="ownerForm.userReceiveEmail.$valid" class="mark-icon" ng-src="images/email_checkmark.png">
+                </span>
+              </form>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>-->
+  </div>
 </div>

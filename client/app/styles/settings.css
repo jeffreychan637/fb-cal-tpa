@@ -6,109 +6,18 @@
   display: none;
 }
 
-.logo {
-	float: left;
-	margin-right: 15px;
-	border-right: 1px solid #ccc;
-	padding-right: 15px;
-}
-
-.description {
-	vertical-align: top;
-  font-size: 12px;
-	padding-left: 30px;
-}
-
-.description-box {
-	padding: 10px 10px 20px 10px;
-}
-
-.site-owner-email {
-  font-size: 12px;
-}
-
-.account-drive {
-	display: inline;
-	vertical-align: middle;
-	margin-left: 120px;
-}
-
-.floatright {
-  float: right;
-}
-
-.connect {
-	font-size: 12px;
-  color: black;
-}
-
-.connect-button {
-  margin-top: -25px;
-  z-index: 2;
-}
-
-.mark-icon-container {
-  height: 21px;
-  width: 21px;
-}
-
-.mark-icon {
-	width: 20px;
-	height: 20px;
-	margin-bottom: -5px;
-}
-
 .checkmark {
-  width:20px;
-  height: 20px;
-  margin-bottom: -5px;
+  color: green;
+  background-image: none;
+  font-size: 20px;
+  vertical-align: middle;
 }
 
-.userReceiveEmail.ng-invalid {
-
-}
-
-.align-with-above {
-  margin-left: 120px;
-}
-
-.tool-tip-container {
-  width: 90%;
-  margin: 0 auto;
-  position: relative;
-}
-
-.tool-tip {
-  display: block;
-  border: 1px solid blue;
-  padding: 3px;
-  padding-left: 4px;
-  padding-right: 4px;
-  z-index: 1;
-  background-color: white;
-  color: blue;
-}
-.tool-tip::before {
-  z-index: 2;
-  content: '';
-  top: 0;
-  left: 5px;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 10px solid blue; 
-}
-.tool-tip::after {
-  z-index: 3;
-  content: '';
-  top: 2px;
-  left: 5px;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 10px solid white; 
+.disconnect-account {
+  position: absolute;
+  top: 96px;
+  right: 12px;
+  font-size: 12px;
 }
 
 .configuration-email {
@@ -116,38 +25,26 @@
   width: 300px;
 }
 
+.non-first-events {
+  margin-left: 9em;
+}
+
+.toggle-label:before {
+  vertical-align: super;
+}
+
 input[type="text"].uilib-input {
-	width: 210px;
+	width: 250px;
 }
 
-.storage-body {
-  padding: 10px;
+.slider-before {
+  margin-right: 0.5em; 
 }
 
-.no-style-list {
-  list-style-type: none;
+.slider-after {
+  margin-left: -3.5em;
 }
 
-.name-logo {
-  border-radius: 4px;
-  padding: 2px;
-  margin-bottom: -13px;
-}
-
-.name-logo:hover {
-  box-shadow: 0 0 8px #888888;
-}
-
-.google-name-logo {
-  margin-right: 50px;
-  border: 1px solid green;
-}
-
-.dropbox-name-logo {
-  border: 1px solid blue;
-}
-
-.service-favicon {
-  margin-bottom: -6px;
-  margin-right: 2px;
+.second-slider {
+  margin-left: 4em;
 }
