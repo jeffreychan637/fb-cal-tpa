@@ -5,3 +5,4 @@ client/test/coverage
 server/tmp
 *.log
 .tmp
+wireframes/*.ai
