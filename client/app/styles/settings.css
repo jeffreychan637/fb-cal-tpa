@@ -20,9 +20,9 @@
   font-size: 12px;
 }
 
-.configuration-email {
-  display: inline;
-  width: 300px;
+.question {
+  color: #09F;
+  margin-left: 1em;
 }
 
 .non-first-events {
@@ -31,6 +31,16 @@
 
 .toggle-label:before {
   vertical-align: super;
+}
+
+.toggle-question {
+  vertical-align: super;
+  color: #09F;
+  margin-left: 1.5em;
+}
+
+.short-toggle-question {
+  margin-left: 2.5em;
 }
 
 input[type="text"].uilib-input {
@@ -47,8 +57,4 @@ input[type="text"].uilib-input {
 
 .second-slider {
   margin-left: 4em;
-}
-
-.event-color {
-  float: right;
 }
