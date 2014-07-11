@@ -7,7 +7,7 @@
     <div class="logo">
       <img width="86" src="images/wix_icon.png">
     </div>
-    <div ng-hide="true || false">
+    <div ng-hide="false">
       <p>
         Connect your Facebook account. This process is secure and completely private. Wix will not have access to your Facebook password.
       </p>
@@ -24,7 +24,7 @@
         </button>
       </div>
     </div>
-    <div ng-show="true || false">
+    <div ng-show="false">
       <p>
         <span class="icon-check-mark-circle checkmark" data-icon="a"></span>
         You are now connected to Jeffrey Chan's Facebook account.
@@ -39,15 +39,18 @@
       <h3>Events</h3>
       <div class="acc-content">
         <ul class="list">
-          <li wix-label="Events on Calendar">
-            <div wix-model="event1" wix-ctrl="Checkbox" wix-options="{postLabel:'Wimbledon'}"></div>
-            <div wix-param="eventColor1" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" style="float: right"></div>
+          <li>
+            <div wix-model="event1" wix-ctrl="Checkbox"></div>
+            <div wix-param="eventColor1" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
+            <span class="uilib-text">Wimbledon Concert</span>
             <br>
-            <div wix-model="event2" wix-ctrl="Checkbox" wix-options="{postLabel:'Super Bowl'}" class="non-first-events"></div>
-            <div wix-param="eventColor2" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" style="float: right; margin-top: 0.5em"></div>
+            <div wix-model="event2" wix-ctrl="Checkbox" class="non-first-events"></div>
+            <div wix-param="eventColor2" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
+            <span class="uilib-text">Super Bowl Gathering</span>
             <br>
-            <div wix-model="event3" wix-ctrl="Checkbox" wix-options="{postLabel:'World Cup'}" class="non-first-events"></div>
-            <div wix-param="eventColor3" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" style="float: right; margin-top: 0.5em"></div>
+            <div wix-model="event3" wix-ctrl="Checkbox" class="non-first-events"></div>
+            <div wix-param="eventColor3" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
+            <span class="uilib-text">World Cup Showing</span>
           </li>
           </ul>
       </div>
@@ -57,11 +60,11 @@
       <div class="acc-content">
         <ul class="list">
           <li wix-label="Calendar View" class="toggle-label">
-            <div class="onoffswitch">
+            <div class="onoffswitch calendar-switch">
               <input type="checkbox" name="calendarView" class="onoffswitch-checkbox" id="calendarView" checked>
               <label class="onoffswitch-label" for="calendarView">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner calendar-switch-inner"></span>
+                <span class="onoffswitch-switch calendar-switch-switch"></span>
               </label>
             </div>
           </li>
