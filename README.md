@@ -1,6 +1,6 @@
 #Facebook Calendar - Wix Market Application
 
-###Note: All designs here except for those of the settings are not final. These are meant to be simple wireframes to show the functionality and general layout of the app. A good analogy for these designs would be to say the HTML is done but the CSS hasn't been added yet.
+#####Note: All designs here except for those of the settings are not final. These are meant to be simple wireframes to show the functionality and general layout of the app. A good analogy for these designs would be to say the HTML is done but the CSS hasn't been added yet.
 
 This Wix app allows users to share public events they have created on Facebook with visitors to their website.
 
