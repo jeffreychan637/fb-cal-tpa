@@ -25,6 +25,7 @@ Site owners can display their events using two different views - List and Month.
 ![Modal View](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/WixFacebookWireframeModal.jpg "Modal View")
 
 ###Settings:
+- In the settings, users can connect their Facebook account with the app to get their Facebook events for their calendar.
 ![Overall Settings](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/SettingsOverall.png "Overall Settings")
 
 1. Events Accordian
