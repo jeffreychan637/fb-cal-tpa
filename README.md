@@ -25,7 +25,7 @@ Site owners can display their events using two different views - List and Month.
 ![Modal View](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/WixFacebookWireframeModal.jpg "Modal View")
 
 ###Settings:
-![Overall Settings](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/SettingsOverall.png "Overall Settings")
+![Overall Settings](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/SettingsOverall2.png "Overall Settings")
 
 1. Events Accordian
   - In the Events accordian, users can pick which of their public Facebook events they want on their calendar.
