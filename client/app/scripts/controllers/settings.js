@@ -2,9 +2,10 @@
 
 angular.module('fbCal')
   .controller('SettingsCtrl', function ($scope, $wix, api, $http) {
-
+    $scope.settings = {};
     $wix.UI.onChange('*', function (value, key) {
-      if (key === 'widgetCorners' || key === 'buttonCorners' || key === 'borderWidth') { // if the settings changed is a button etc
+      if (key === 'corners') {
+        console.log(Math.ceil(value));//browser will round
         $scope.settings[key] = value.value;
       } else {
         $scope.settings[key] = value;

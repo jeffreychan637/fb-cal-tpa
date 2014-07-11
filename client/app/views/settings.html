@@ -36,7 +36,16 @@
   </header>
   <div wix-ctrl="Accordion">
     <div class="acc-pane">
-      <h3>Events</h3>
+      <h3 class="events">
+        Events
+        <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'In the Events settings, check your Facebook events that you want to share on your calendar. If you are using month mode, you can choose the color of the dot representing each event on the calendar.'}">
+          <strong>
+            <a class="question">
+              ?
+            </a>
+          </strong>
+        </div>
+      </h3>
       <div class="acc-content">
         <ul class="list">
           <li>
@@ -67,6 +76,13 @@
                 <span class="onoffswitch-switch calendar-switch-switch"></span>
               </label>
             </div>
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'Choose between using a list or a calendar to display your upcoming events.'}">
+              <strong>
+                <a class="uilib-text toggle-question">
+                  ?
+                </a>
+              </strong>
+            </div>
           </li>
           <li wix-label="Commenting" class="toggle-label">
             <div class="onoffswitch">
@@ -85,6 +101,13 @@
                 <span class="onoffswitch-switch"></span>
               </label>
             </div>
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'Turning this means no posts from site visitors become public until you approve them from the editor. Even if you turn this off, you can still remove public posts from the event.'}">
+              <strong>
+                <a class="uilib-text toggle-question short-toggle-question">
+                  ?
+                </a>
+              </strong>
+            </div>
           </li>
           <li wix-label="Show 'Hosted by'" class="toggle-label">
             <div class="onoffswitch">
@@ -93,6 +116,13 @@
                 <span class="onoffswitch-inner"></span>
                 <span class="onoffswitch-switch"></span>
               </label>
+            </div>
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'Show visitors who is hosting this event. Remember that if you are hosting this event from your personal account, you are sharing your Facebook profile with all your visitors.'}">
+              <strong>
+                <a class="uilib-text toggle-question short-toggle-question">
+                  ?
+                </a>
+              </strong>
             </div>
           </li>
           <li wix-label="Heading">
@@ -115,10 +145,24 @@
           <li wix-label="Secondary Font">
             <div wix-param="secondaryColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
             <div wix-param="secondaryFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'This is the font that will be used for the calendar and event names.'}">
+              <strong>
+                <a class="uilib-text question">
+                  ?
+                </a>
+              </strong>
+            </div>
           </li>
           <li wix-label="Tertiary Font">
             <div wix-param="tertiaryColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
             <div wix-param="tertiaryFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'This is the font that will be used for the Facebook popup.'}">
+              <strong>
+                <a class="uilib-text question">
+                  ?
+                </a>
+              </strong>
+            </div>
           </li>
           <li wix-label="Calendar">
               <div wix-param="calendar" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
