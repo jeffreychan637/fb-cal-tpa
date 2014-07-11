@@ -27,6 +27,7 @@
 
 .non-first-events {
   margin-left: 9em;
+  margin-top: 0.5em;
 }
 
 .toggle-label:before {
@@ -38,7 +39,7 @@ input[type="text"].uilib-input {
 }
 
 .slider-before {
-  margin-right: 0.5em; 
+  margin-right: 0.5em;
 }
 
 .slider-after {
@@ -47,4 +48,8 @@ input[type="text"].uilib-input {
 
 .second-slider {
   margin-left: 4em;
+}
+
+.event-color {
+  float: right;
 }
