@@ -24,9 +24,9 @@ Site owners can display their events using two different views - List and Month.
 ![Month View Events - Desktop](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthViewEvents.gif "Month View Events - Desktop")
 
 ###Mobile:
-![Month View - Mobile](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileMonthView22.gif "Month View - Mobile")
+![Month View - Mobile](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileMonthView.gif "Month View - Mobile")
 ####Clicking on a colored day:
-![Month View Events - Mobile](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileMonthViewEvents22.gif "Month View Events - Mobile")
+![Month View Events - Mobile](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileMonthViewEvents.gif "Month View Events - Mobile")
 
 
 ##Modal:
