@@ -25,7 +25,7 @@ Site owners can display their events using two different views - List and Month.
 
 ###Mobile:
 ![Month View - Mobile](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileMonthView.gif "Month View - Mobile")
-####Clicking on a colored day causes a sweep to the left revealing this list:
+####Clicking on a colored day causes the calendar to be swept to the left revealing this list:
 ![Month View Events - Mobile](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileMonthViewEvents.gif "Month View Events - Mobile")
 
 
