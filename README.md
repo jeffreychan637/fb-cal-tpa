@@ -1,8 +1,6 @@
 #Facebook Calendar - Wix Market Application
 
-#####Note: All designs here except for those of the settings are not final. These are meant to be simple wireframes to show the functionality and general layout of the app. A good analogy for these designs would be to say the HTML is done but the CSS hasn't been added yet.
-
-This Wix app allows users to share public events they have created on Facebook with visitors to their website.
+This Wix app allows users to share public events they have created on Facebook with visitors to their website. There will be a desktop and a mobile version. 
 
 Visitors can view the event details as well as RVSP through their Facebook accounts. They can also contribute to the event wall on Facebook by posting through the app or simply liking the comments that are already there.
 
@@ -10,13 +8,18 @@ Site owners can display their events using two different views - List and Month.
 
 ###List View:
 - Events are simply listed with their dates/times on the right.
-![List View](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/WixFacebookWireframeListView.jpg "List View")
+
+######Desktop & Mobile: 
+![List View](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/WixFacebookWireframeListView.gif "List View")
 
 ###Month View:
 - Visitors are shown a current calendar and can click around to find events.
-- Events are marked with a colored dot. Clicking on the day of an event provides a mini list view of that day's event.
+- Events are marked with a colored dot in desktop view and indicated with a colored box in mobile view. Clicking on the day of an event provides a mini list view of that day's event.
 
-![Month View](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/WixFacebookWireframeMonthView.jpg "Month View")
+######Desktop:
+![Month View - Desktop](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthView.gif "Month View - Desktop")
+![Month View Hover - Desktop](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthViewHover.gif "Month View Hover - Desktop")
+![Month View Events - Desktop](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthViewEvents.gif "Month View Events - Desktop")
 
 ###Modal:
 - A modal appears when a user clicks on an events name.
