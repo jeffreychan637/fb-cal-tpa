@@ -10,7 +10,7 @@ Site owners can display their events using two different views - List and Month.
 - Events are simply listed with their dates/times on the right.
 
 ####Desktop & Mobile: 
-![List View](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/WixFacebookWirefr3ameListView.gif "List View")
+![List View](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/WixFacebookWireframeListView.gif "List View")
 
 ###Month View:
 - Visitors are shown a current calendar and can click around to find events.
