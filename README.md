@@ -20,12 +20,12 @@ Site owners can display their events using two different views - List and Month.
 ![Month View - Desktop](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthView.gif "Month View - Desktop")
 ####Hovering over a dot:
 ![Month View Hover - Desktop](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthViewHover.gif "Month View Hover - Desktop")
-####Clicking on a day with events causes a sweep to the left revealing this list:
+####Clicking on a day with events:
 ![Month View Events - Desktop](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthViewEvents.gif "Month View Events - Desktop")
 
 ###Mobile:
 ![Month View - Mobile](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileMonthView.gif "Month View - Mobile")
-####Clicking on a colored day:
+####Clicking on a colored day causes a sweep to the left revealing this list:
 ![Month View Events - Mobile](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileMonthViewEvents.gif "Month View Events - Mobile")
 
 
