@@ -9,14 +9,14 @@ Site owners can display their events using two different views - List and Month.
 ###List View:
 - Events are simply listed with their dates/times on the right.
 
-######Desktop & Mobile: 
+####Desktop & Mobile: 
 ![List View](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/WixFacebookWireframeListView.gif "List View")
 
 ###Month View:
 - Visitors are shown a current calendar and can click around to find events.
 - Events are marked with a colored dot in desktop view and indicated with a colored box in mobile view. Clicking on the day of an event provides a mini list view of that day's event.
 
-######Desktop:
+####Desktop:
 ![Month View - Desktop](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthView.gif "Month View - Desktop")
 ![Month View Hover - Desktop](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthViewHover.gif "Month View Hover - Desktop")
 ![Month View Events - Desktop](http://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopMonthViewEvents.gif "Month View Events - Desktop")
