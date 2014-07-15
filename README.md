@@ -33,7 +33,11 @@ Site owners can display their events using two different views - List and Month.
 - A modal appears when a user clicks on an events name.
 - In the modal, the user (after granting permissions to their Facebook account) can do the typical things they would do if they were on an actual Facebook event page.
 
+###Desktop:
 ![Modal View - Desktop](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/DesktopModal.gif "Modal View - Desktop")
+
+###Mobile
+![Modal View - Mobile](https://www.github.com/jeffreywix/fb-cal-tpa/raw/master/wireframes/MobileModal.gif "Modal View - Mobile")
 
 ##Settings:
 - In the settings, users can connect their Facebook account with the app to get their Facebook events for their calendar.
