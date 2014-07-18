@@ -4,13 +4,15 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Send Files</title>
+    <title>Wix Facebook Calendar App</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.31.0/js/Wix.js"></script>
     <!-- build:css({.tmp,app}) styles/app.css -->
-    <link rel="stylesheet" href="bower_components/normalize-css/normalize.css">
-    <link rel="stylesheet" href="styles/app.css">
+    <link rel="stylesheet" href="client/bower_components/normalize-css/normalize.css">
+
+    <!-- bower_components/normalize-css/normalize.css" -->
+    <link rel="stylesheet" href="client/styles/app.css">
     <!-- endbuild -->
     <style wix-style></style>
   </head>
@@ -28,31 +30,32 @@
     <!-- endbuild -->
 
     <!-- Add your site or application content here -->
-    <div ng-include="'views/index.html'"></div>
+    <div ng-include="'client/views/index.html'"></div>
 
     <!-- build:js scripts/plugins.js -->
-    <script src="bower_components/angular/angular.js"></script>
+    <script src="client/bower_components/angular/angular.js"></script>
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/index.js -->
-    <script src="scripts/app.js"></script>
-    <script src="scripts/services/api.js"></script>
-    <script src="scripts/services/wix.js"></script>
-    <script src="scripts/services/internals.js"></script>
+    <script src="client/scripts/app.js"></script>
+    <script src="client/scripts/services/init.js"></script>
+    <script src="client/scripts/services/api.js"></script>
+    <script src="client/scripts/services/wix.js"></script>
+    <script src="client/scripts/controllers/widget.js"></script>
     <!-- endbuild -->
 
     <!-- process:remove -->
     <script>
-      var testMode = true;
+      var testMode = false;
       var parent = window.parent;
       try {
         window.scenario = p && p.angular && p.angular.scenario;
       } catch (e) {
       }
       if (testMode || window.scenario) {
-        document.write('<scri' + 'pt src="mock/wix.js"></scr' + 'ipt>');
-        document.write('<scr'+'ipt src="bower_components/angular-mocks/angular-mocks.js"></scr'+'ipt>');
-        document.write('<scri' + 'pt src="mock/api.js"></scr' + 'ipt>');
+        document.write('<scri' + 'pt src="app/mock/wix.js"></scr' + 'ipt>');
+        document.write('<scr'+'ipt src="app/bower_components/angular-mocks/angular-mocks.js"></scr'+'ipt>');
+        document.write('<scri' + 'pt src="app/mock/api.js"></scr' + 'ipt>');
         angular.module('fbCal').requires.push('apiMock');
       }
     </script>
