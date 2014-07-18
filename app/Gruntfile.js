@@ -14,7 +14,7 @@ module.exports = function (grunt) {
     // Project settings
     yeoman: {
       // configurable paths
-      app: require('./bower.json').appPath || 'app',
+      app: require('./bower.json').appPath || 'client',
       dist: 'dist'
     },
 
@@ -178,6 +178,7 @@ module.exports = function (grunt) {
     useminPrepare: {
       html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/settings.html'],
       options: {
+        root: 'client',
         dest: '<%= yeoman.dist %>'
       }
     },
@@ -277,7 +278,7 @@ module.exports = function (grunt) {
     bower: {
       install: {
         options: {
-          targetDir: 'app/bower_components',
+          targetDir: 'client/bower_components',
           install: true,
           verbose: false,
           cleanTargetDir: false,

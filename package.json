@@ -7,11 +7,11 @@
   "scripts": {
     "start": "node server/server.js",
     "postinstall": "npm run build",
-    "build": "./node_modules/.bin/grunt --base client/ --gruntfile client/Gruntfile.js build",
+    "build": "./node_modules/.bin/grunt --base app/ --gruntfile app/Gruntfile.js build",
     "develop-server": "./node_modules/.bin/grunt --base server/ --gruntfile server/Gruntfile.js",
-    "develop-client": "./node_modules/.bin/grunt --base client/ --gruntfile client/Gruntfile.js serve",
+    "develop-client": "./node_modules/.bin/grunt --base app/ --gruntfile app/Gruntfile.js serve",
     "test-server": "./node_modules/.bin/grunt --base server/ --gruntfile server/Gruntfile.js mochaTest",
-    "test-client": "./node_modules/.bin/grunt --base client/ --gruntfile client/Gruntfile.js karma:unit",
+    "test-client": "./node_modules/.bin/grunt --base app/ --gruntfile app/Gruntfile.js karma:unit",
     "test-client-e2e": "./node_modules/.bin/grunt --base client/ --gruntfile client/Gruntfile.js karma:e2e"
   },
   "dependencies": {

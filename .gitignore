@@ -1,9 +1,14 @@
 node_modules
 bower_components
-client/dist
-client/test/coverage
-server/tmp
+app/dist
+app/test/coverage
 *.log
 .tmp
 wireframes/*.ai
 wireframes/*.psd
+app/server/secrets.py
+*.pyc
+*.Python
+bin/
+lib/
+include/

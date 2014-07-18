@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fbCal')
-  .controller('SettingsCtrl', function ($scope, $wix, api, $http) {
+  .controller('SettingsCtrl', function ($scope, $wix, api, $http, init) {
     $scope.settings = {};
     $wix.UI.onChange('*', function (value, key) {
       if (key === 'corners') {
