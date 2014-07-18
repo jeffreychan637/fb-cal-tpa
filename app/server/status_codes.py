@@ -1,4 +1,4 @@
-status = {
+STATUS = {
   "OK" : 200,
   "Bad_Request" : 400,
   "Unauthorized" : 401,
