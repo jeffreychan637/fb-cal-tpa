@@ -1,3 +1,58 @@
-<div ng-controller="WidgetCtrl">
+<div ng-controller="WidgetCtrl" class="app">
+  <div class="page-header">
+    <h1>My Concerts</h1>
+    <div>
+      <div class="btn-group nav-btn">
+        <button class="btn btn-primary" data-calendar-nav="prev">&lt;&lt; Prev</button>
+        <button class="btn" data-calendar-nav="today">Today</button>
+        <button class="btn btn-primary" data-calendar-nav="next">Next &gt;&gt;</button>
+      </div>
+      <h3 id="current-view" class="current-view"></h3>
+    </div>
+    <span>Please rvsp</span>
+  </div>
+  <div id="calendar" class="desktop-calendar"></div>
+  <ul id="eventlist" class="nav nav-list"></ul>
+  <script type="text/javascript">
+    var calendar = $("#calendar").calendar(
+        {
+           tmpl_path: "client/bower_components/bootstrap-calendar/tmpls/",
+           events_source: 
+           [
+              {
+                "id": 293,
+                "title": "Event 1",
+                "url": "http://example.com",
+                "start": 1405811799000, // Milliseconds
+                "end": 1405943911000, // Milliseconds
+                "color": "#00FF00"
+              }
+            ],
+            onAfterEventsLoad: function(events) {
+              if(!events) {
+                return;
+              }
+              var list = $('#eventlist');
+              list.html('');
+
+              $.each(events, function(key, val) {
+                $(document.createElement('li'))
+                  .html('<a href="' + val.url + '">' + val.title + '</a>')
+                  .appendTo(list);
+              });
+            },
+            onAfterViewLoad: function(view) {
+              $('#current-view').text(this.getTitle());
+              $('.btn-group button').removeClass('active');
+              $('button[data-calendar-view="' + view + '"]').addClass('active');
+            }
+         });
+    $('.btn-group button[data-calendar-nav]').each(function() {
+      var $this = $(this);
+      $this.click(function() {
+        calendar.navigate($this.data('calendar-nav'));
+    });
+  });
+  </script>
   Facebook Calendar App
 </div>
