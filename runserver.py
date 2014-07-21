@@ -6,7 +6,7 @@ extra_files = extra_dirs[:]
 for extra_dir in extra_dirs:
     for dirname, dirs, files in walk(extra_dir):
         if 'bower_components' in dirs:
-          dirs.remove('bower_components')
+            dirs.remove('bower_components')
         for filename in files:
             filename = path.join(dirname, filename)
             if path.isfile(filename):
