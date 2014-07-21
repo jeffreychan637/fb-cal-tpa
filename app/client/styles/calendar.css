@@ -119,6 +119,7 @@
   min-height: auto;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 .cal-events-num {
   margin-top: 20px;
