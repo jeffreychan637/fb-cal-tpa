@@ -1125,7 +1125,6 @@ if(!String.prototype.formatNum) {
 																						hexToR(colorHex) + ', ' +
 																						hexToG(colorHex) + ', ' +
 																						hexToB(colorHex) + ', 0.4)'};
-			console.log(hoverClass);
 			$('a[data-event-id="' + $(this).data('event-id') + '"]').closest('.cal-cell1').css(hoverClass);
 		});
 		$('a.event').mouseleave(function() {
@@ -1190,7 +1189,6 @@ if(!String.prototype.formatNum) {
 	};
 
 	function showEventsList(event, that, slider, self) {
-
 		event.stopPropagation();
 
 		var that = $(that);
@@ -1210,17 +1208,23 @@ if(!String.prototype.formatNum) {
 			self.activecell = $('[data-cal-date]', cell).text();
 			$('#cal-slide-tick').addClass('tick' + tick_position).show();
 			slider.slideDown('fast', function() {
+				
+				Wix.setHeight($('#desktop').outerHeight());
+				
 				$('body').one('click', function() {
 					slider.slideUp('fast');
 					self.activecell = 0;
+					
+					setTimeout(function() {
+						Wix.setHeight($('#desktop').outerHeight());
+					}, 400);
+				
 				});
 			});
 		});
 
 		$('a.event-item').mouseenter(function() {
-			console.log(this);
 			var colorHex = $(this).data('event-color');
-			console.log(colorHex);
 			var hoverClass = {'background-color' : 'rgba(' + 
 																						hexToR(colorHex) + ', ' +
 																						hexToG(colorHex) + ', ' +
