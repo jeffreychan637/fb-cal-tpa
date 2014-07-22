@@ -1,9 +1,11 @@
 'use strict';
+/*global $:false */
 
 angular.module('fbCal')
-  .controller('DesktopCtrl', function ($scope, $wix, api, $http, init, $log) {
+  .controller('DesktopCtrl', function ($scope, $wix, api, $http, init, $log, $window) {
     $scope.settings = api.defaults;
-    
+
+    var curHeight = $($window).height();
 
 
     $log.log('hello world!!!!');
@@ -63,6 +65,11 @@ angular.module('fbCal')
         var $this = $(this);
         $this.click(function() {
           calendar.navigate($this.data('calendar-nav'));
+          $log.log($('#calendar').height());
+          $log.log($('#desktop').height());
+          $wix.setHeight($('#desktop').outerHeight());
+
+
         });
       });
     }

@@ -477,7 +477,6 @@ if(!String.prototype.formatNum) {
 		end.setMinutes(time_end[1]);
 
 		$.each(data.events, function(k, e) {
-			console.log('hello world');
 			var s = new Date(parseInt(e.start));
 			var f = new Date(parseInt(e.end));
 
@@ -492,7 +491,6 @@ if(!String.prototype.formatNum) {
 		var event_hours = event_time.getHours();
 		if (event_hours > 12) {
 			event_hours -= 12;
-			console.log(event_hours);
 			AM_PM = 'PM';
 		} else {
 			AM_PM = 'AM';

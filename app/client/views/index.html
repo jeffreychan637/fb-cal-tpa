@@ -1,8 +1,8 @@
-<div ng-controller="DesktopCtrl" class="app" style="min-width: 285px">
+<div ng-controller="DesktopCtrl" id="desktop" class="app" style="min-width: 285px">
   <div class="page-header">
     <h1>{{settings.title}}</h1>
     <div>
-      <div ng-if="settings.view === 'Month'">
+      <div ng-show="settings.view === 'Month'">
         <div class="btn-group nav-btn">
           <button class="btn btn-primary" data-calendar-nav="prev">&lt;&lt; Prev</button>
           <button class="btn" data-calendar-nav="today">Today</button>
