@@ -8,16 +8,6 @@
   float: right;
 }
 
-.current-view {
-  vertical-align: super;
-}
-
-/*@media all and (max-width: 400px) {
-  .desktop-calendar {
-    display: none !important;
-  }
-}*/
-
 #calendar {
   z-index: 2;
   background-color: white;
