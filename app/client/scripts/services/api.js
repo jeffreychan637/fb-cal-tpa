@@ -4,14 +4,9 @@ angular.module('fbCal').factory('api', function ($wix, $location) {
   var defaults = {
     title: 'This is my title.',
     description: 'This is my description.',
-    addButtonText: '+ Add Files',
-    yourNameText: 'Your name',
-    emailAddressText: 'Your email address',
-    messageText: 'You can add a message to site owner',
-    submitButtonText: 'Submit',
+    view: 'Month',
     widgetCorners: '20',
-    borderWidth: '1',
-    buttonCorners: '20'
+    borderWidth: '1'
   };
 
   var getInstance = function() {
@@ -28,8 +23,8 @@ angular.module('fbCal').factory('api', function ($wix, $location) {
     return instanceId; //returns the unparsed instance
   };
 
-  var getOrigCompId = 2;//$wix.Utils.getOrigCompId;
-  var getCompId = 2;///$wix.Utils.getCompId;
+  var getOrigCompId = $wix.Utils.getOrigCompId;
+  var getCompId = $wix.Utils.getCompId;
 
   return {
     defaults: defaults,
