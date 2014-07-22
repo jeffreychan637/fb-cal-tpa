@@ -92,8 +92,8 @@ def get_data(request, compID, request_from_widget):
         if not db_entry:
             empty_settings = {"settings" : "", "eventIDs" : "", \
                               "fb_event_data" : ""}
-            if request_from_widget:
-                empty_settings["app_key"] = fb_keys.app
+            # if request_from_widget:
+            #     empty_settings["app_key"] = fb_keys.app
             empty_json = json.dumps(empty_settings)
             return empty_json
         else:
@@ -107,8 +107,8 @@ def get_data(request, compID, request_from_widget):
                       message="Couldn't receive data from Facebook")
             full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
                        "fb_event_data" : fb_event_data}
-            if request_from_widget:
-                full_settings["app_key"] = fb_keys.app
+            # if request_from_widget:
+            #     full_settings["app_key"] = fb_keys.app
             json.dumps(full_settings)
             return full_settings
 
