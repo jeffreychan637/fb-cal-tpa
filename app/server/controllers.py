@@ -4,6 +4,7 @@ from status_codes import STATUS
 from wix_verifications import instance_parser
 from fb import get_long_term_token, get_event_data
 from models import save_settings, get_settings
+from secrets import fb_keys
 from flask.ext.restful import Resource, Api, abort
 import json
 
@@ -89,8 +90,11 @@ def get_data(request, compID, request_from_widget):
             abort(STATUS["Internal_Server_Error"], \
                   message="Could Not Get Settings")
         if not db_entry:
-            empty_json = json.dumps({"settings" : "", "eventIDs" : "", \
-                                     "fb_event_data" : ""})
+            empty_settings = {"settings" : "", "eventIDs" : "", \
+                              "fb_event_data" : ""}
+            if request_from_widget:
+                empty_settings["app_key"] = fb_keys.app
+            empty_json = json.dumps(empty_settings)
             return empty_json
         else:
             settings = json.loads(db_entry.settings)
@@ -101,9 +105,13 @@ def get_data(request, compID, request_from_widget):
             if not fb_event_data:
                 abort(STATUS["Bad_Gateway"], 
                       message="Couldn't receive data from Facebook")
-            full_json = json.dumps({"settings" : settings, "eventIDs" : eventIDs, \
-                                    "fb_event_data" : fb_event_data})
-            return full_json
+            full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
+                       "fb_event_data" : fb_event_data}
+            if request_from_widget:
+                full_settings["app_key"] = fb_keys.app
+            json.dumps(full_settings)
+            return full_settings
+
 
 
 
