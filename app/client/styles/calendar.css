@@ -119,6 +119,7 @@
   min-height: auto;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 .cal-events-num {
   margin-top: 20px;
@@ -402,6 +403,7 @@
   border-right: 1px solid #e1e1e1;
   position: relative;
 }
+
 .cal-year-box [class*="span"] {
   min-height: 60px;
 }
@@ -511,4 +513,66 @@ a.cal-event-week {
 }
 .badge-important {
   background-color: #b94a48;
+}
+
+@media all and (min-width: 950px) {
+  .cal-month-day {
+    height: 120px;
+  }
+  .cal-year-box [class*="span"],
+  .cal-month-box [class*="cal-cell"] {
+    min-height: 120px;
+  }
+}
+
+@media all and (min-width: 1175px) {
+  .cal-month-day {
+    height: 150px;
+  }
+  .cal-year-box [class*="span"],
+  .cal-month-box [class*="cal-cell"] {
+    min-height: 150px;
+  }
+}
+
+@media all and (max-width: 680px) {
+  .cal-month-day {
+    height: 80px;
+  }
+  .cal-year-box [class*="span"],
+  .cal-month-box [class*="cal-cell"] {
+    min-height: 80px;
+  }
+}
+
+@media all and (max-width: 525px) {
+  .cal-month-day {
+    height: 60px;
+  }
+  .cal-year-box [class*="span"],
+  .cal-month-box [class*="cal-cell"] {
+    min-height: 60px;
+  }
+  span[data-cal-date] {
+    margin-top: 5px;
+  }
+}
+
+@media all and (max-width: 475px) {
+  .cal-month-box .cal-day-today span[data-cal-date] {
+    font-size: 1.2em;
+  }
+}
+
+@media all and (max-width: 375px) {
+  .cal-month-day {
+    height: 50px;
+  }
+  .cal-year-box [class*="span"],
+  .cal-month-box [class*="cal-cell"] {
+    min-height: 50px;
+  }
+  span[data-cal-date] {
+    margin-top: 2px;
+  }
 }
