@@ -18,8 +18,8 @@
   </div>
   <ul ng-if="settings.view === 'List'" class="event-list ">
     <li ng-repeat="event in eventList" class="events">
-      <span class="event-details">{{event.title}}</span>
-      <span class="event-details">{{event.day}} | {{event.time}}</span>
+      <a class="event-details event-title" ng-click="openModal($index)">{{event.title}}</a>
+      <a class="event-details event-time" ng-click="openModal($index)">{{event.day}} | {{event.time}}</a>
       <div class="clear" ng-style="listStyle($last)"></div>
     </li>
   </ul>
