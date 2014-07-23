@@ -19,11 +19,6 @@ angular.module('fbCal')
       desktopCalendar.setup();
     } else {
       list.setup($scope.settings.borderWidth, $scope.settings.borderColor);
-      $scope.$watch('eventList', function() {
-        $timeout(function() {
-          $wix.setHeight($('#desktop').outerHeight());
-        }, 3000);
-      });
     }
 
     $scope.listStyle = function(last) {

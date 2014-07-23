@@ -4,7 +4,7 @@ angular.module('fbCal').factory('api', function ($wix, $location) {
   var defaults = {
     title: 'This is my title.',
     description: 'This is my description.',
-    view: 'Month',
+    view: 'List',
     widgetCorners: '20',
     borderWidth: '5',
     borderColor: 'black'
