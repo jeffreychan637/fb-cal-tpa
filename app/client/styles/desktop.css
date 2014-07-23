@@ -1,0 +1,44 @@
+.app {
+  border: 5px solid black;
+  border-radius: 5px;
+}
+
+.nav-btn {
+  float: right;
+}
+
+#calendar {
+  z-index: 2;
+  background-color: white;
+  padding: 3px;
+}
+
+.page-header {
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding: 3px; 
+}
+
+.title {
+  margin-top: 5px;
+}
+
+.event-list {
+  text-decoration: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.event-list li {
+  display: inline;
+}
+
+.event-details {
+  float: left;
+  padding: 0.7em;
+}
+
+.clear {
+  clear: both;
+  border-bottom: 5px solid black;
+}
