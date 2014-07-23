@@ -7,7 +7,7 @@ angular.module('fbCal')
     $scope.settings = api.defaults;
 
     //things to prepare for events: order them by time and day & get time/day out
-    var temp1 = {'title' : 'Concert asds duper awesome eve dfsdf  fsdfsd more things that are teally important baraberque nt come to omg this is the longest event ever my event to have an awesome adventure', 'time' : 'June 17th, 7:30pm', 'day' : 'Wednesday'};
+    var temp1 = {'title' : 'Concert asds duper awesome ereallt can you make it longer ve dfsdf  fsdfsd more things that are teally important baraberque nt come to omg this is the longest event ever my event to have an awesome adventure', 'time' : 'June 17th, 7:30pm', 'day' : 'Wednesday'};
     var temp2 = {'title' : 'Concert', 'time' : 'June 17th, 9pm', 'day' : 'Wednesday'};
     var temp3 = {'title' : 'Concert', 'time' : 'June 17th, 8pm', 'day' : 'Wednesday'};
     var temp4 = {'title' : 'Concertdas', 'time' : 'June 17th, 8pm', 'day' : 'Wednesday'};

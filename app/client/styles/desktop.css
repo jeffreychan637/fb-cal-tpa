@@ -93,3 +93,15 @@
     max-width: 80%;
   }
 }
+
+@media all and (min-width: 1300px) {
+  .event-title {
+    max-width: 82%;
+  }
+}
+
+@media all and (min-width: 1400px) {
+  .event-title {
+    max-width: 84%;
+  }
+}
