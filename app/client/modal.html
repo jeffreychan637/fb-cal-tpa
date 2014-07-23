@@ -1,0 +1,66 @@
+<!doctype html>
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Wix Facebook Calendar App</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.31.0/js/Wix.js"></script>
+    <!-- build:css({.tmp,app}) styles/app.css -->
+    <link rel="stylesheet" href="client/bower_components/normalize-css/normalize.css">
+    <link rel="stylesheet" href="client/bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="client/styles/calendar.css">
+    <link rel="stylesheet" href="client/styles/modal.css">
+    <!-- endbuild -->
+    <style wix-style></style>
+  </head>
+  <body ng-app="fbCal">
+    <!--[if lt IE 8]>
+        <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!-- build:js scripts/compat.js -->
+    <!--[if lt IE 9]>
+    <script src="bower_components/html5shiv/dist/html5shiv.js"></script>
+    <script src="bower_components/es5-shim/es5-shim.js"></script>
+    <script src="bower_components/json3/lib/json3.min.js"></script>
+    <![endif]-->
+    <!-- endbuild -->
+
+    <!-- Add your site or application content here -->
+    <div ng-include="'client/views/modal.html'"></div>
+
+    <!-- build:js scripts/plugins.js -->
+    <script src="client/bower_components/jquery/dist/jquery.js"></script>
+    <script src="client/bower_components/angular/angular.js"></script>
+    <script src="client/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="client/bower_components/moment/moment.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js({.tmp,app}) scripts/index.js -->
+    <script src="client/scripts/app.js"></script>
+    <script src="client/scripts/services/api.js"></script>
+    <script src="client/scripts/services/wix.js"></script>
+    <script src="client/scripts/controllers/modal.js"></script>
+    <!-- endbuild -->
+
+    <!-- process:remove -->
+    <script>
+      var testMode = false;
+      var parent = window.parent;
+      try {
+        window.scenario = p && p.angular && p.angular.scenario;
+      } catch (e) {
+      }
+      if (testMode || window.scenario) {
+        document.write('<scri' + 'pt src="app/mock/wix.js"></scr' + 'ipt>');
+        document.write('<scr'+'ipt src="app/bower_components/angular-mocks/angular-mocks.js"></scr'+'ipt>');
+        document.write('<scri' + 'pt src="app/mock/api.js"></scr' + 'ipt>');
+        angular.module('fbCal').requires.push('apiMock');
+      }
+    </script>
+    <!-- /process -->
+</body>
+</html>
