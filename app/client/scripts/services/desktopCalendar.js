@@ -49,8 +49,7 @@ angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
             },
             onAfterViewLoad: function(view) {
               $('#current-view').text(this.getTitle());
-              $('.btn-group button').removeClass('active');
-              $('button[data-calendar-view="' + view + '"]').addClass('active');
+              //using ng-click to open modal instead of href here
             }
           });
     $('.btn-group button[data-calendar-nav]').each(function() {
