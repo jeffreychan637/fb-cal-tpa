@@ -12,3 +12,4 @@ app/server/secrets.py
 bin/
 lib/
 include/
+app/client/scripts/libraries/wix.js
