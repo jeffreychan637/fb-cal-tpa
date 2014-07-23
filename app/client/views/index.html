@@ -4,14 +4,14 @@
     <div>
       <div ng-show="settings.view === 'Month'">
         <div class="btn-group nav-btn">
-          <button class="btn btn-primary" data-calendar-nav="prev">&lt;&lt; Prev</button>
-          <button class="btn btn-default" data-calendar-nav="today">Today</button>
-          <button class="btn btn-primary" data-calendar-nav="next">Next &gt;&gt;</button>
+          <button class="btn btn-default direction" data-calendar-nav="prev">&lt;&lt; Prev</button>
+          <button class="btn btn-default today" data-calendar-nav="today">Today</button>
+          <button class="btn btn-default direction" data-calendar-nav="next">Next &gt;&gt;</button>
         </div>
         <h3 id="current-view" class="current-view"></h3>
       </div>
     </div>
-    <span>{{settings.description}}</span>
+    <span class="description">{{settings.description}}</span>
   </div>
   <div ng-show="settings.view === 'Month'">
     <div id="calendar" class="desktop-calendar"></div>

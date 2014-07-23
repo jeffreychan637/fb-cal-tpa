@@ -7,10 +7,20 @@
   float: right;
 }
 
+.btn:hover {
+  opacity: 0.4;
+}
+
+.btn:focus {
+  border-color: #ccc;
+}
+
 #calendar {
-  z-index: 2;
-  background-color: white;
   padding: 3px;
+}
+
+.glyphicon {
+  font-size: 14px !important;
 }
 
 .page-header {

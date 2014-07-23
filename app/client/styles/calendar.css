@@ -449,9 +449,9 @@ span[data-cal-date]:hover {
   opacity: 0.1;
   cursor: default;
 }
-.cal-day-today {
+/*.cal-day-today {
   background-color: #e8fde7;
-}
+}*/
 .cal-day-today span[data-cal-date] {
   color: darkgreen;
 }

@@ -17,7 +17,51 @@
     <link rel="stylesheet" href="client/styles/calendar.css">
     <link rel="stylesheet" href="client/styles/desktop.css">
     <!-- endbuild -->
-    <style wix-style></style>
+    <style wix-style>
+        .app {
+          border-color: {{style.border color-3}};
+          background-color: {{style.background color-8}};
+        }
+        .title {
+          color: {{style.titleColor color-15}};
+          {{style.titleFont Heading-L}}
+        }
+        .current-view {
+          color: {{style.secondaryColor color-15}};
+          {{style.secondaryFont Heading-M}}
+        }
+        .description {
+          color: {{style.tertiaryColor color-15}};
+          {{style.tertiaryFont Body-M}}
+        }
+        #calendar {
+          color: {{style.tertiaryColor color-15}};
+          {{style.tertiaryFont Body-M}}
+        }
+        .direction {
+          color: {{style.buttonColor color-15}};
+          {{style.buttonFont Body-M}}
+          background-color: {{style.outerButtons color-8}} !important;
+        }
+        .direction:focus {
+          color: {{style.buttonColor color-15}};
+        }
+        .today {
+          background-color: {{style.background color-8}} !important;
+          {{style.buttonFont Body-M}}
+          color: {{style.tertiaryColor color-15}};
+        }
+        .today:focus {
+          color: {{style.tertiaryColor color-15}};
+        }
+        .event-details {
+          color: {{style.secondaryColor color-15}};
+          {{style.secondaryFont Body-M}}
+        }
+        .clear {
+          border-color: {{style.border color-3}};
+        }
+    </style>
   </head>
   <body ng-app="fbCal">
     <!--[if lt IE 8]>

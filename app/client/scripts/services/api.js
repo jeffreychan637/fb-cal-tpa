@@ -19,6 +19,7 @@ angular.module('fbCal').factory('api', function ($wix, $location) {
     } else {
       console.log('All hell has broken loose.');
       //BREAK STUFF! THIS SHOULD NEVER HAPPEN.
+      //Probably in a hacker situation - disable functions and display error message
       var instanceId;
     }
     return instanceId; //returns the unparsed instance

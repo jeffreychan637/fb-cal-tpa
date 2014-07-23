@@ -11,6 +11,9 @@ def get_long_term_token(short_token):
   else:
     return long_token
 
+#If request from widget, just get event titles/time from the event IDs.
+#If from settings, don't need eventIDs. Just get all the event titles
+#that the user has on FB accounts
 def get_event_data(eventIDs, access_token, request_from_widget):
   try:
     graph = facebook.GraphAPI(access_token)

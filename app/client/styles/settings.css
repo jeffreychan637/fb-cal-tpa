@@ -47,6 +47,11 @@ input[type="text"].uilib-input {
 	width: 250px;
 }
 
+.button-question {
+  margin-left: 4em;
+  vertical-align: text-bottom;
+}
+
 .slider-before {
   margin-right: 0.5em;
 }
