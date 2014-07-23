@@ -10,3 +10,8 @@ def index():
 def settings():
     # return make_response(open('app/client/settings.html').read())
     return send_file('client/settings.html')
+
+@flask_app.route('/modal.html')
+def modal():
+    # return make_response(open('app/client/modal.html').read())
+    return send_file('client/modal.html')
