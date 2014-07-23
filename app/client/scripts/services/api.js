@@ -27,10 +27,13 @@ angular.module('fbCal').factory('api', function ($wix, $location) {
   var getOrigCompId = $wix.Utils.getOrigCompId;
   var getCompId = $wix.Utils.getCompId;
 
+  var modalEvent = undefined;
+
   return {
     defaults: defaults,
     getInstance: getInstance,
     getOrigCompId: getOrigCompId,
-    getCompId: getCompId
+    getCompId: getCompId,
+    modalEvent: modalEvent
   };
 });
