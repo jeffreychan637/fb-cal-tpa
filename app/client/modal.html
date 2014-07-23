@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="client/bower_components/normalize-css/normalize.css">
     <link rel="stylesheet" href="client/bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="client/styles/calendar.css">
-    <link rel="stylesheet" href="client/styles/desktop.css">
+    <link rel="stylesheet" href="client/styles/modal.css">
     <!-- endbuild -->
     <style wix-style></style>
   </head>
@@ -33,25 +33,20 @@
     <!-- endbuild -->
 
     <!-- Add your site or application content here -->
-    <div ng-include="'client/views/index.html'"></div>
+    <div ng-include="'client/views/modal.html'"></div>
 
     <!-- build:js scripts/plugins.js -->
     <script src="client/bower_components/jquery/dist/jquery.js"></script>
     <script src="client/bower_components/angular/angular.js"></script>
     <script src="client/bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="client/bower_components/underscore/underscore-min.js"></script>
-    <script src="client/scripts/libraries/calendar.js"></script>
     <script src="client/bower_components/moment/moment.js"></script>
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/index.js -->
     <script src="client/scripts/app.js"></script>
-    <script src="client/scripts/services/init.js"></script>
     <script src="client/scripts/services/api.js"></script>
     <script src="client/scripts/services/wix.js"></script>
-    <script src="client/scripts/services/desktopCalendar.js"></script>
-    <script src="client/scripts/services/list.js"></script>
-    <script src="client/scripts/controllers/desktop.js"></script>
+    <script src="client/scripts/controllers/modal.js"></script>
     <!-- endbuild -->
 
     <!-- process:remove -->

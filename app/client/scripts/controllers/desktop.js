@@ -3,11 +3,11 @@
 
 angular.module('fbCal')
   .controller('DesktopCtrl', function ($scope, $wix, api, $http, init, $log,
-                                       desktopCalendar, list, $timeout) {
+                                       desktopCalendar, list) {
     $scope.settings = api.defaults;
 
     //things to prepare for events: order them by time and day & get time/day out
-    var temp1 = {'title' : 'Concert asds duper awesome event come to my event to have an awesome adventure', 'time' : 'June 17th, 7:30pm', 'day' : 'Wednesday'};
+    var temp1 = {'title' : 'Concert asds duper awesome eve dfsdf  fsdfsd more things that are teally important baraberque nt come to omg this is the longest event ever my event to have an awesome adventure', 'time' : 'June 17th, 7:30pm', 'day' : 'Wednesday'};
     var temp2 = {'title' : 'Concert', 'time' : 'June 17th, 9pm', 'day' : 'Wednesday'};
     var temp3 = {'title' : 'Concert', 'time' : 'June 17th, 8pm', 'day' : 'Wednesday'};
     var temp4 = {'title' : 'Concertdas', 'time' : 'June 17th, 8pm', 'day' : 'Wednesday'};
@@ -19,15 +19,20 @@ angular.module('fbCal')
       desktopCalendar.setup();
     } else {
       list.setup($scope.settings.borderWidth, $scope.settings.borderColor);
-      $scope.$watch('eventList', function() {
-        $timeout(function() {
-          $wix.setHeight($('#desktop').outerHeight());
-        }, 3000);
-      });
     }
 
     $scope.listStyle = function(last) {
       return list.listStyle(last);
+    };
+
+    $scope.openModal = function(index) {
+      api.modalEvent = $scope.eventList[index];
+      var onClose = function(message) { 
+        console.log("modal closed", message);
+        api.modalEvent = undefined;
+      };
+      console.log('hello open modal');
+      $wix.openModal("http://localhost:5000/modal.html", 400, 400, onClose);
     };
 
     /** 
