@@ -1,6 +1,6 @@
 <div ng-controller="DesktopCtrl" id="desktop" class="app" style="min-width: 285px">
-  <div class="page-header">
-    <h1>{{settings.title}}</h1>
+  <div id="header" class="page-header">
+    <h1 class="title">{{settings.title}}</h1>
     <div>
       <div ng-show="settings.view === 'Month'">
         <div class="btn-group nav-btn">
@@ -16,5 +16,12 @@
   <div ng-show="settings.view === 'Month'">
     <div id="calendar" class="desktop-calendar"></div>
   </div>
+  <ul ng-if="settings.view === 'List'" class="event-list ">
+    <li ng-repeat="event in eventList" class="events">
+      <span class="event-details">{{event.title}}</span>
+      <span class="event-details">{{event.day}} | {{event.time}}</span>
+      <div class="clear" ng-style="listStyle($last)"></div>
+    </li>
+  </ul>
   <!-- <ul id="eventlist" class="nav nav-list"></ul> -->
 </div>

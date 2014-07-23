@@ -2,81 +2,33 @@
 /*global $:false */
 
 angular.module('fbCal')
-  .controller('DesktopCtrl', function ($scope, $wix, api, $http, init, $log, $window) {
+  .controller('DesktopCtrl', function ($scope, $wix, api, $http, init, $log,
+                                       desktopCalendar, list, $timeout) {
     $scope.settings = api.defaults;
 
-    var curHeight = $($window).height();
+    //things to prepare for events: order them by time and day & get time/day out
+    var temp1 = {'title' : 'Concert asds duper awesome event come to my event to have an awesome adventure', 'time' : 'June 17th, 7:30pm', 'day' : 'Wednesday'};
+    var temp2 = {'title' : 'Concert', 'time' : 'June 17th, 9pm', 'day' : 'Wednesday'};
+    var temp3 = {'title' : 'Concert', 'time' : 'June 17th, 8pm', 'day' : 'Wednesday'};
+    var temp4 = {'title' : 'Concertdas', 'time' : 'June 17th, 8pm', 'day' : 'Wednesday'};
+    $scope.eventList = [temp1, temp2, temp3, temp4];
 
-
-    $log.log('hello world!!!!');
 
     /* PUT THIS IN SETTINGS CALLBACK WHEN WRITTEN */
     if ($scope.settings.view === "Month") {
-      var calendar = $("#calendar").calendar(
-        {
-           tmpl_path: "client/bower_components/bootstrap-calendar/tmpls/",
-           events_source: 
-           [
-              {
-                "id": 293,
-                "title": "Concert",
-                "url": "http://example.com",
-                "start": 1405811799000, // Milliseconds
-                "end": 1405943911000, // Milliseconds
-                "color": "#00FF00"
-              },
-              {
-                "id": 293,
-                "title": "Concert",
-                "url": "http://example.com",
-                "start": 1405811799000, // Milliseconds
-                "end": 1405943911000, // Milliseconds
-                "color": "#00FF00"
-              },
-              {
-                "id": 293,
-                "title": "Concert",
-                "url": "http://example.com",
-                "start": 1405811799000, // Milliseconds
-                "end": 1405943911000, // Milliseconds
-                "color": "#00FF00"
-              }
-            ],
-            onAfterEventsLoad: function(events) {
-              if(!events) {
-                return;
-              }
-              var list = $('#eventlist');
-              list.html('');
-
-              $.each(events, function(key, val) {
-                $(document.createElement('li'))
-                  .html('<a href="' + val.url + '">' + val.title + '</a>')
-                  .appendTo(list);
-              });
-            },
-            onAfterViewLoad: function(view) {
-              $('#current-view').text(this.getTitle());
-              $('.btn-group button').removeClass('active');
-              $('button[data-calendar-view="' + view + '"]').addClass('active');
-            }
-          });
-      $('.btn-group button[data-calendar-nav]').each(function() {
-        var $this = $(this);
-        $this.click(function() {
-          calendar.navigate($this.data('calendar-nav'));
-          $log.log($('#calendar').height());
-          $log.log($('#desktop').height());
+      desktopCalendar.setup();
+    } else {
+      list.setup($scope.settings.borderWidth, $scope.settings.borderColor);
+      $scope.$watch('eventList', function() {
+        $timeout(function() {
           $wix.setHeight($('#desktop').outerHeight());
-
-
-        });
+        }, 3000);
       });
     }
 
-
-
-
+    $scope.listStyle = function(last) {
+      return list.listStyle(last);
+    };
 
     /** 
      * When the site owner updates the settings, this added event listener

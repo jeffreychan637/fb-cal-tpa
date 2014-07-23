@@ -6,7 +6,8 @@ angular.module('fbCal').factory('api', function ($wix, $location) {
     description: 'This is my description.',
     view: 'Month',
     widgetCorners: '20',
-    borderWidth: '1'
+    borderWidth: '5',
+    borderColor: 'black'
   };
 
   var getInstance = function() {
