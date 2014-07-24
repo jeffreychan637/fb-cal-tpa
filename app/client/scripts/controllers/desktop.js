@@ -27,6 +27,7 @@ angular.module('fbCal')
 
     $scope.openModal = function(index) {
       api.modalEvent = $scope.eventList[index];
+      console.log(api.modalEvent);
       var onClose = function(message) { 
         console.log("modal closed", message);
         api.modalEvent = undefined;

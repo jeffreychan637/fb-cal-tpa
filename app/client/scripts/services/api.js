@@ -28,11 +28,11 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
     return instanceId; //returns the unparsed instance
   };
 
-  var modalEvent;
+  // var modalEvent;
 
   return {
     defaults: defaults,
-    getInstance: getInstance,
-    modalEvent: modalEvent
+    getInstance: getInstance
+    // modalEvent: modalEvent
   };
 });
