@@ -63,10 +63,10 @@
     <div class="acc-pane">
       <h3>Settings</h3>
       <div class="acc-content">
-        <ul class="list" ng-model="settings">
+        <ul class="list">
           <li wix-label="Calendar View" class="toggle-label">
             <div class="onoffswitch calendar-switch">
-              <input type="checkbox" name="calendarView" class="onoffswitch-checkbox" id="calendarView" checked>
+              <input type="checkbox" name="calendarView" class="onoffswitch-checkbox" id="calendarView"ng-change="handleToggles('view')" ng-model="view" ng-checked="true">
               <label class="onoffswitch-label" for="calendarView">
                 <span class="onoffswitch-inner calendar-switch-inner"></span>
                 <span class="onoffswitch-switch calendar-switch-switch"></span>
@@ -82,7 +82,7 @@
           </li>
           <li wix-label="Commenting" class="toggle-label">
             <div class="onoffswitch">
-              <input type="checkbox" name="commentSwitch" class="onoffswitch-checkbox" id="commentSwitch" checked>
+              <input type="checkbox" name="commentSwitch" class="onoffswitch-checkbox" id="commentSwitch" ng-change="handleToggles('commenting')" ng-model="commenting" ng-checked="true">
               <label class="onoffswitch-label" for="commentSwitch">
                 <span class="onoffswitch-inner"></span>
                 <span class="onoffswitch-switch"></span>
@@ -91,7 +91,7 @@
           </li>
           <li wix-label="Comment Moderation" class="toggle-label">
             <div class="onoffswitch">
-              <input type="checkbox" name="modSwitch" class="onoffswitch-checkbox" id="modSwitch">
+              <input type="checkbox" name="modSwitch" class="onoffswitch-checkbox" id="modSwitch" ng-change="handleToggles('moderating')" ng-model="moderating" ng-checked="false">
               <label class="onoffswitch-label" for="modSwitch">
                 <span class="onoffswitch-inner"></span>
                 <span class="onoffswitch-switch"></span>
@@ -107,7 +107,7 @@
           </li>
           <li wix-label="Show 'Hosted by'" class="toggle-label">
             <div class="onoffswitch">
-              <input type="checkbox" name="hostedSwitch" class="onoffswitch-checkbox" id="hostedSwitch" checked>
+              <input type="checkbox" name="hostedSwitch" class="onoffswitch-checkbox" id="hostedSwitch" ng-change="handleToggles('hostedBy')" ng-model="hostedBy" ng-checked="true">
               <label class="onoffswitch-label" for="hostedSwitch">
                 <span class="onoffswitch-inner"></span>
                 <span class="onoffswitch-switch"></span>
@@ -188,12 +188,12 @@
             </div>
           </li>
           <li wix-label="Border Width">
-            <div  wix-model="borderWidth" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 10, preLabel: '0', postLabel: '10', toolTip: true}">
+            <div  wix-model="borderWidth" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 20, preLabel: '0', postLabel: '20', toolTip: true}">
             </div>
           </li>
           <li wix-label="Corners">
             <span class="uilib-text slider-before">Sharp</span>
-            <div  wix-model="corners" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 10}">
+            <div  wix-model="corners" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 30}">
             </div>
             <span class="uilib-text slider-after">Round</span>
           </li>

@@ -59,6 +59,12 @@ angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
         $wix.setHeight($('#desktop').outerHeight());
       });
     });
+    var borderStyle = {'border-bottom-width' :  '1px',
+                       'border-bottom-color' : '#eee',
+                       'margin-bottom' : '10px'
+                      };
+    $('#header').css(borderStyle);
+
   };
 
   return {

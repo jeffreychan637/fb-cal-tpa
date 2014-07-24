@@ -1,40 +1,38 @@
 'use strict';
 
-angular.module('fbCal').factory('api', function ($wix, $location) {
+angular.module('fbCal').factory('api', function ($wix, $location, $log) {
   var defaults = {
     title: 'This is my title.',
     description: 'This is my description.',
     view: 'List',
-    widgetCorners: '20',
+    commenting: true,
+    moderating: false,
+    hostedBy: true,
+    corners: '25',
     borderWidth: '5',
     borderColor: 'black'
   };
 
   var getInstance = function() {
+    var instanceId;
     var url = $location.absUrl();
     var instanceRegexp = /.*instance=([\[\]a-zA-Z0-9\.\-_]*?)(&|$|#).*/g;
     var instance = instanceRegexp.exec(url);
     if (instance && instance[1]) {
-      var instanceId = instance[1]; //instanceId is actually the unparsed instance
+      instanceId = instance[1]; //instanceId is actually the unparsed instance
     } else {
-      console.log('All hell has broken loose.');
+      $log.error('Getting Instance ID failed');
       //BREAK STUFF! THIS SHOULD NEVER HAPPEN.
       //Probably in a hacker situation - disable functions and display error message
-      var instanceId;
     }
     return instanceId; //returns the unparsed instance
   };
 
-  var getOrigCompId = $wix.Utils.getOrigCompId;
-  var getCompId = $wix.Utils.getCompId;
-
-  var modalEvent = undefined;
+  var modalEvent;
 
   return {
     defaults: defaults,
     getInstance: getInstance,
-    getOrigCompId: getOrigCompId,
-    getCompId: getCompId,
     modalEvent: modalEvent
   };
 });
