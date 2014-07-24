@@ -1,7 +1,3 @@
-<div class="loading" ng-cloak="">
-  <h3 style="text-align: center">Loading Settings</h3>
-</div>
-
 <div ng-controller="SettingsCtrl">
   <header class="box">
     <div class="logo">
@@ -48,17 +44,19 @@
       </h3>
       <div class="acc-content">
         <ul class="list">
-          <li>
-            <div wix-model="event1" wix-ctrl="Checkbox"></div>
-            <div wix-param="eventColor1" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
-            <span class="uilib-text">Wimbledon Concert</span>
-            <br>
+          <li class="events-list" ng-repeat="event in eventList">
+              <div wix-model="event{{event.id}}" wix-ctrl="Checkbox"></div>
+              <div wix-model="event{{event.id}}Color" wix-param="event{{event.id}}Color" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
+              <span class="uilib-text">{{event.title}}</span>
+          </li>
+          <li class="events-list">
             <div wix-model="event2" wix-ctrl="Checkbox" class="non-first-events"></div>
-            <div wix-param="eventColor2" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
+            <div wix-model="event2Color" wix-param="eventColor2" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
             <span class="uilib-text">Super Bowl Gathering</span>
-            <br>
+          </li>
+          <li class="events-list">
             <div wix-model="event3" wix-ctrl="Checkbox" class="non-first-events"></div>
-            <div wix-param="eventColor3" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
+            <div wix-model="event3Color" wix-param="eventColor3" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
             <span class="uilib-text">World Cup Showing</span>
           </li>
           </ul>
@@ -70,7 +68,7 @@
         <ul class="list">
           <li wix-label="Calendar View" class="toggle-label">
             <div class="onoffswitch calendar-switch">
-              <input type="checkbox" name="calendarView" class="onoffswitch-checkbox" id="calendarView" checked>
+              <input type="checkbox" name="calendarView" class="onoffswitch-checkbox" id="calendarView"ng-change="handleToggles('view')" ng-model="view" ng-checked="true">
               <label class="onoffswitch-label" for="calendarView">
                 <span class="onoffswitch-inner calendar-switch-inner"></span>
                 <span class="onoffswitch-switch calendar-switch-switch"></span>
@@ -86,7 +84,7 @@
           </li>
           <li wix-label="Commenting" class="toggle-label">
             <div class="onoffswitch">
-              <input type="checkbox" name="commentSwitch" class="onoffswitch-checkbox" id="commentSwitch" checked>
+              <input type="checkbox" name="commentSwitch" class="onoffswitch-checkbox" id="commentSwitch" ng-change="handleToggles('commenting')" ng-model="commenting" ng-checked="true">
               <label class="onoffswitch-label" for="commentSwitch">
                 <span class="onoffswitch-inner"></span>
                 <span class="onoffswitch-switch"></span>
@@ -95,7 +93,7 @@
           </li>
           <li wix-label="Comment Moderation" class="toggle-label">
             <div class="onoffswitch">
-              <input type="checkbox" name="modSwitch" class="onoffswitch-checkbox" id="modSwitch" checked>
+              <input type="checkbox" name="modSwitch" class="onoffswitch-checkbox" id="modSwitch" ng-change="handleToggles('moderating')" ng-model="moderating" ng-checked="false">
               <label class="onoffswitch-label" for="modSwitch">
                 <span class="onoffswitch-inner"></span>
                 <span class="onoffswitch-switch"></span>
@@ -111,7 +109,7 @@
           </li>
           <li wix-label="Show 'Hosted by'" class="toggle-label">
             <div class="onoffswitch">
-              <input type="checkbox" name="hostedSwitch" class="onoffswitch-checkbox" id="hostedSwitch" checked>
+              <input type="checkbox" name="hostedSwitch" class="onoffswitch-checkbox" id="hostedSwitch" ng-change="handleToggles('hostedBy')" ng-model="hostedBy" ng-checked="true">
               <label class="onoffswitch-label" for="hostedSwitch">
                 <span class="onoffswitch-inner"></span>
                 <span class="onoffswitch-switch"></span>
@@ -138,14 +136,14 @@
       <h3>Design</h3>
       <div class="acc-content">
         <ul class="list">
-          <li wix-label="Heading Font">
-            <div wix-param="headingColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
-            <div wix-param="headingFont" wix-ctrl="FontStylePicker"></div>
+          <li wix-label="Title Font">
+            <div wix-param="titleColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-14'}"></div>
+            <div wix-param="titleFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Heading-L'}"></div>
           </li>
           <li wix-label="Secondary Font">
-            <div wix-param="secondaryColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
+            <div wix-param="secondaryColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-14'}"></div>
             <div wix-param="secondaryFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
-            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'This is the font that will be used for the calendar and event names.'}">
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'In month mode, this is the font of the current month shown. In list mode, this is font of the events and their times.'}">
               <strong>
                 <a class="uilib-text question">
                   ?
@@ -154,9 +152,9 @@
             </div>
           </li>
           <li wix-label="Tertiary Font">
-            <div wix-param="tertiaryColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-15'}"></div>
+            <div wix-param="tertiaryColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-14'}"></div>
             <div wix-param="tertiaryFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
-            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'This is the font that will be used for the Facebook popup.'}">
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'This is the font of the description text. In month mode, it is also the font of the calendar. Note after refreshing that the days of the week automatically switch to abbreviations (e.g. Mon) when the widget is small enough in width.'}">
               <strong>
                 <a class="uilib-text question">
                   ?
@@ -164,22 +162,40 @@
               </strong>
             </div>
           </li>
-          <li wix-label="Calendar">
-              <div wix-param="calendar" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
+          <li wix-label="Button Font">
+            <div wix-param="buttonColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-1'}"></div>
+            <div wix-param="buttonFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'The color picker only changes the fontcolor of the outer buttons. The middle button uses the tertiary font color.'}">
+              <strong>
+                <a class="uilib-text question">
+                  ?
+                </a>
+              </strong>
+            </div>
           </li>
           <li wix-label="Background">
-              <div wix-param="background" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
+              <div wix-param="background" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-1', startWithOpacity:100}"></div>
           </li>
           <li wix-label="Border">
-            <div wix-param="border" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-3', startWithOpacity:100}"></div>
+            <div wix-param="border" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
+          </li>
+          <li wix-label="Outer Buttons">
+            <div wix-param="outerButtons" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'This only changes the color of the outer buttons. The middle button uses the background color.'}">
+              <strong>
+                <a class="uilib-text question button-question">
+                  ?
+                </a>
+              </strong>
+            </div>
           </li>
           <li wix-label="Border Width">
-            <div  wix-model="borderWidth" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 10, preLabel: '0', postLabel: '10', toolTip: true}">
+            <div  wix-model="borderWidth" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 20, preLabel: '0', postLabel: '20', toolTip: true}">
             </div>
           </li>
           <li wix-label="Corners">
             <span class="uilib-text slider-before">Sharp</span>
-            <div  wix-model="corners" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 10}">
+            <div  wix-model="corners" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 30}">
             </div>
             <span class="uilib-text slider-after">Round</span>
           </li>

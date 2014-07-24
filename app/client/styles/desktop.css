@@ -1,5 +1,5 @@
 .app {
-  border: 5px solid black;
+  border: 1px solid black;
   border-radius: 5px;
 }
 
@@ -7,15 +7,24 @@
   float: right;
 }
 
+.btn:hover {
+  opacity: 0.4;
+}
+
+.btn:focus {
+  border-color: #ccc;
+}
+
 #calendar {
-  z-index: 2;
-  background-color: white;
   padding: 3px;
+}
+
+.glyphicon {
+  font-size: 14px !important;
 }
 
 .page-header {
   margin-top: 0;
-  margin-bottom: 20px;
   padding: 3px; 
 }
 
@@ -45,7 +54,7 @@
 
 .clear {
   clear: both;
-  border-bottom: 5px solid black;
+  border-bottom: 1px solid black;
 }
 
 @media all and (min-width: 500px) {
@@ -91,5 +100,17 @@
 @media all and (min-width: 1150px) {
   .event-title {
     max-width: 80%;
+  }
+}
+
+@media all and (min-width: 1300px) {
+  .event-title {
+    max-width: 82%;
+  }
+}
+
+@media all and (min-width: 1400px) {
+  .event-title {
+    max-width: 84%;
   }
 }

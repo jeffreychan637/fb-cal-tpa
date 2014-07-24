@@ -25,6 +25,12 @@
   margin-left: 1em;
 }
 
+.events-list {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border: none !important;
+}
+
 .non-first-events {
   margin-top: 0.5em;
 }
@@ -45,6 +51,11 @@
 
 input[type="text"].uilib-input {
 	width: 250px;
+}
+
+.button-question {
+  margin-left: 4em;
+  vertical-align: text-bottom;
 }
 
 .slider-before {

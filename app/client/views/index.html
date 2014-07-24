@@ -1,17 +1,17 @@
-<div ng-controller="DesktopCtrl" id="desktop" class="app" style="min-width: 285px">
-  <div id="header" class="page-header">
+<div ng-controller="DesktopCtrl" id="desktop" class="app" style="min-width: 285px" border-width corners>
+  <div id="header" class="page-header" border-width-header>
     <h1 class="title">{{settings.title}}</h1>
     <div>
       <div ng-show="settings.view === 'Month'">
         <div class="btn-group nav-btn">
-          <button class="btn btn-primary" data-calendar-nav="prev">&lt;&lt; Prev</button>
-          <button class="btn btn-default" data-calendar-nav="today">Today</button>
-          <button class="btn btn-primary" data-calendar-nav="next">Next &gt;&gt;</button>
+          <button class="btn btn-default direction" data-calendar-nav="prev">&lt;&lt; Prev</button>
+          <button class="btn btn-default today" data-calendar-nav="today">Today</button>
+          <button class="btn btn-default direction" data-calendar-nav="next">Next &gt;&gt;</button>
         </div>
         <h3 id="current-view" class="current-view"></h3>
       </div>
     </div>
-    <span>{{settings.description}}</span>
+    <span class="description">{{settings.description}}</span>
   </div>
   <div ng-show="settings.view === 'Month'">
     <div id="calendar" class="desktop-calendar"></div>
@@ -20,7 +20,7 @@
     <li ng-repeat="event in eventList" class="events">
       <a class="event-details event-title" ng-click="openModal($index)">{{event.title}}</a>
       <a class="event-details event-time" ng-click="openModal($index)">{{event.day}} | {{event.time}}</a>
-      <div class="clear" ng-style="listStyle($last)"></div>
+      <div class="clear" ng-style="listStyle($last)" border-width></div>
     </li>
   </ul>
   <!-- <ul id="eventlist" class="nav nav-list"></ul> -->

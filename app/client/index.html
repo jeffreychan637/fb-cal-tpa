@@ -17,7 +17,57 @@
     <link rel="stylesheet" href="client/styles/calendar.css">
     <link rel="stylesheet" href="client/styles/desktop.css">
     <!-- endbuild -->
-    <style wix-style></style>
+    <style wix-style>
+        .app {
+          border-color: {{style.border color-5}};
+          background-color: {{style.background color-1}};
+        }
+        .header {
+          border-color: {{style.border color-5}};
+        }
+        .title {
+          color: {{style.titleColor color-14}};
+          {{style.titleFont Heading-L}}
+        }
+        .current-view {
+          color: {{style.secondaryColor color-14}};
+          {{style.secondaryFont Heading-M}}
+        }
+        .description {
+          color: {{style.tertiaryColor color-14}};
+          {{style.tertiaryFont Body-M}}
+        }
+        #calendar {
+          color: {{style.tertiaryColor color-10}};
+          {{style.tertiaryFont Body-M}}
+        }
+        .direction {
+          color: {{style.buttonColor color-1}};
+          {{style.buttonFont Body-M}}
+          background-color: {{style.outerButtons color-5}} !important;
+        }
+        .direction:focus {
+          color: {{style.buttonColor color-1}};
+        }
+        .today {
+          background-color: {{style.background color-1}} !important;
+          {{style.buttonFont Body-M}}
+          color: {{style.tertiaryColor color-14}};
+        }
+        .today:focus {
+          color: {{style.tertiaryColor color-14}};
+        }
+        .event-details {
+          color: {{style.secondaryColor color-17}};
+          {{style.secondaryFont Body-M}}
+        }
+        .event-details:hover {
+          color: {{style.secondaryColor color-17}};
+        }
+        .clear {
+          border-color: {{style.border color-5}};
+        }
+    </style>
   </head>
   <body ng-app="fbCal">
     <!--[if lt IE 8]>
@@ -52,6 +102,8 @@
     <script src="client/scripts/services/desktopCalendar.js"></script>
     <script src="client/scripts/services/list.js"></script>
     <script src="client/scripts/controllers/desktop.js"></script>
+    <script src="client/scripts/directives/borderWidth.js"></script>
+    <script src="client/scripts/directives/corners.js"></script>
     <!-- endbuild -->
 
     <!-- process:remove -->
