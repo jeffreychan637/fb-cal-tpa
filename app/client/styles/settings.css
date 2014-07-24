@@ -20,6 +20,10 @@
   font-size: 12px;
 }
 
+.error {
+  color: #FF3232;
+}
+
 .question {
   color: #09F;
   margin-left: 1em;

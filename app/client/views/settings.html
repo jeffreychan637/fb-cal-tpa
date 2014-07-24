@@ -1,11 +1,14 @@
 <div ng-controller="SettingsCtrl">
   <header class="box">
     <div class="logo">
-      <img width="86" src="client/images/wix_icon.png">
+      <img width="86" src="../client/images/wix_icon.png">
     </div>
     <div ng-hide="false">
-      <p>
+      <p ng-hide="connectError">
         Connect your Facebook account. This process is secure and completely private. Wix will not have access to your Facebook password.
+      </p>
+      <p ng-show="connectError" class="error">
+        We haven't connected to the Facebook server yet. Try connecting again in a minute or reload the page.
       </p>
       <div class="login-panel">
         <p class="create-account">
@@ -15,7 +18,7 @@
             <a class="link" href="http://www.facebook.com" target="_blank">Create one</a>
           </strong>
         </p>
-        <button class="uilib-btn connect">
+        <button class="uilib-btn connect" ng-click="login()">
           Connect account
         </button>
       </div>
@@ -49,6 +52,7 @@
               <div wix-model="event{{event.id}}Color" wix-param="event{{event.id}}Color" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
               <span class="uilib-text">{{event.title}}</span>
           </li>
+          <script type="text/javascript">Wix.UI.initialize();</script>
           <li class="events-list">
             <div wix-model="event2" wix-ctrl="Checkbox" class="non-first-events"></div>
             <div wix-model="event2Color" wix-param="eventColor2" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>

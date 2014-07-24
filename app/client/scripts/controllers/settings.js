@@ -1,8 +1,7 @@
 'use strict';
 
 angular.module('fbCal')
-  .controller('SettingsCtrl', function ($scope, $wix, api, $http, init) {
-
+  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout) {
     $scope.settings = api.defaults;
 
     $scope.eventList = [{id: '454', title: 'Wimbledon'},
@@ -13,16 +12,6 @@ angular.module('fbCal')
     //hello/[0-9]+  use this regex for checking if keys are events 
     //replace hello with something like "event"
 
-    $wix.UI.onChange('*', function (value, key) {
-      console.log(key, value);
-      if (key === 'corners' || key === 'borderWidth') {
-        $scope.settings[key] = Math.ceil(value);
-      } else {
-        $scope.settings[key] = value;
-      }
-      sendSettings();
-    });
-
     /**
      * Sends the settings to the widget as well as starting the process of
      * saving the settings to the database.
@@ -32,6 +21,16 @@ angular.module('fbCal')
                                                 $wix.Utils.getOrigCompId());
       //call save to the database function here
     };
+
+    $wix.UI.onChange('*', function (value, key) {
+      console.log(key, value);
+      if (key === 'corners' || key === 'borderWidth') {
+        $scope.settings[key] = Math.ceil(value);
+      } else {
+        $scope.settings[key] = value;
+      }
+      sendSettings();
+    });
 
     $scope.handleToggles = function(toggle) {
       // console.log($scope.toggles);
@@ -50,6 +49,17 @@ angular.module('fbCal')
         $scope.settings.hostedBy = true;
       }
       sendSettings();
+    };
+
+    $scope.login = function() {
+      if (fbSetup.getFbReady()) {
+        fbLogin.checkLoginState();
+      } else {
+        $scope.connectError = true;
+        $timeout(function() {
+          $scope.connectError = false;
+        }, 5000);
+      }
     };
 
 

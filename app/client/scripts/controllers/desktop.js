@@ -2,7 +2,7 @@
 /*global $:false */
 
 angular.module('fbCal')
-  .controller('DesktopCtrl', function ($scope, $wix, api, $http, init, $log,
+  .controller('DesktopCtrl', function ($scope, $wix, api, $http, $log,
                                        desktopCalendar, list) {
     $scope.settings = api.defaults;
 
@@ -26,14 +26,13 @@ angular.module('fbCal')
     };
 
     $scope.openModal = function(index) {
-      api.modalEvent = $scope.eventList[index];
-      console.log(api.modalEvent);
+      //append event id to url
       var onClose = function(message) { 
         console.log("modal closed", message);
         api.modalEvent = undefined;
       };
       console.log('hello open modal');
-      $wix.openModal("http://localhost:5000/modal.html", 400, 400, onClose);
+      $wix.openModal("http://localhost:5000/modal/54", 400, 400, onClose);
     };
 
     /** 
