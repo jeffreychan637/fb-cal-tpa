@@ -5,11 +5,16 @@ angular.module('fbCal')
 
     $scope.settings = api.defaults;
 
+    $scope.eventList = [{id: '454', title: 'Wimbledon'},
+                        {id: '4567', title: 'Superbowl'},
+                        {id: '4548', title: 'World Cup Viewing'}];
+
     //hello/[^\s]+
     //hello/[0-9]+  use this regex for checking if keys are events 
     //replace hello with something like "event"
 
     $wix.UI.onChange('*', function (value, key) {
+      console.log(key, value);
       if (key === 'corners' || key === 'borderWidth') {
         $scope.settings[key] = Math.ceil(value);
       } else {
