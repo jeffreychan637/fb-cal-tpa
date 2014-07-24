@@ -6,12 +6,11 @@ def index():
     return send_file('client/index.html')
       # return make_response(open('app/client/index.html').read())
 
-@flask_app.route('/settings.html')
+@flask_app.route('/settings')
 def settings():
     # return make_response(open('app/client/settings.html').read())
     return send_file('client/settings.html')
 
-@flask_app.route('/modal.html/<int:event_id>')
+@flask_app.route('/modal/<int:event_id>')
 def modal(event_id):
-    # return make_response(open('app/client/modal.html').read())
     return render_template('modal.html', event_id = event_id);
