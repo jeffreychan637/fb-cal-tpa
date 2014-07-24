@@ -162,7 +162,7 @@
               </strong>
             </div>
           </li>
-          <li wix-label="Button Font">
+          <li wix-label="Button Font" ng-show="settings.view === 'Month'">
             <div wix-param="buttonColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-1'}"></div>
             <div wix-param="buttonFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
             <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'The color picker only changes the fontcolor of the outer buttons. The middle button uses the tertiary font color.'}">
@@ -179,7 +179,7 @@
           <li wix-label="Border">
             <div wix-param="border" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
           </li>
-          <li wix-label="Outer Buttons">
+          <li wix-label="Outer Buttons" ng-show="settings.view === 'Month'">
             <div wix-param="outerButtons" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
             <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'This only changes the color of the outer buttons. The middle button uses the background color.'}">
               <strong>
