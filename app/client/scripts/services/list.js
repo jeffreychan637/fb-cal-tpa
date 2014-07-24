@@ -4,9 +4,9 @@
 angular.module('fbCal').factory('list', function ($log, $wix) {
   var setup = function(borderWidth, borderColor) {
     var borderStyle = {'border-bottom-width' : borderWidth + 'px',
-                       'border-bottom-color' : borderColor,
                        'margin-bottom' : '0px'
                       };
+    $('#header').removeAttr('style');
     $('#header').css(borderStyle);
     $('#header').addClass('header'); //see if there is a way to get this
     //class to overwrite the other css added by calendar setup
