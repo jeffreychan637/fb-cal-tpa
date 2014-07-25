@@ -12,18 +12,11 @@ api = Api(flask_app)
 
 class SaveSettings(Resource):
     def put(self, compID):
-        info = validate_put_request(request, compID)
-        if info["access_token"]:
-            long_term_token = get_long_term_token(info["access_token"])
-            if  not long_term_token:
-                abort(STATUS["Bad_Gateway"], 
-                      message="Facebook returned error on access_token")
-        else:
-            long_term_token = None
-        if save_settings(compID, info, long_term_token):
-            abort(STATUS["Internal_Server_Error"], message="Could Not Save Settings")
-        else:
-            return ""
+        return save_data(request, compID, 'settings')
+
+class SaveAccessToken(Resource):
+    def put(self, compID):
+        return save_data(request, compID, 'access_token')
 
 class GetSettingsWidget(Resource):
     def get(self, compID):
@@ -34,15 +27,14 @@ class GetSettingsSettings(Resource):
         return get_data(request, compID, False)
 
 api.add_resource(SaveSettings, "/SaveSettings/<string:compID>")
+api.add_resource(SaveAccessToken, "/SaveAccessToken/<string:compID>")
 api.add_resource(GetSettingsWidget, "/GetSettingsWidget/<string:compID>")
 api.add_resource(GetSettingsSettings, "/GetSettingsSettings/<string:compID>")
 
-
-def validate_put_request(request, compID):
+def validate_put_request(request, datatype):
     try:
         instance = request.header["X-Wix-Instance"]
         window = request.header["URL"]
-        access_token = request.header["owner_access_token"]
         content_type = request.header["Content-Type"]
     except AttributeError:
         abort(STATUS["Unauthorized"], message="Request Incomplete")
@@ -52,22 +44,30 @@ def validate_put_request(request, compID):
         abort(STATUS["Forbbidden"], message="Not Inside Editor")
     if content_type != "application/json":
         abort(STATUS["Bad_Request"], message="Badly Formed Request")
-    try:
-        data = request.form["data"]
-        data_dict = json.loads(data)
-        settings = json.dumps(data_dict["settings"])
-        eventIDs = json.dumps(data_dict["eventIDs"])
-    except:
-        abort(STATUS["Bad_Request"], message="Badly Formed Request")
-    if not settings:
-        abort(STATUS["Bad_Request"], message="Missing Settings")
     if not instance_parser(instance):
         abort(STATUS["Forbbidden"], message="Invalid Instance")
-    info = {"instance" : instance, "access_token" : access_token, \
-            "settings" : settings, "eventIDs" : eventIDs}
+    if datatype == "access_token":
+        try:
+            data = request.form['access_token']
+            access_token = json.loads(data)
+        except:
+            abort(STATUS["Bad_Request"], message="Badly Formed Request")
+        info = {"instance" : instance, "access_token" : access_token}
+    else:
+        try:
+            data = request.form["data"]
+            data_dict = json.loads(data)
+            settings = json.dumps(data_dict["settings"])
+            eventIDs = json.dumps(data_dict["eventIDs"])
+        except:
+            abort(STATUS["Bad_Request"], message="Badly Formed Request")
+        if not (settings and eventIDs):
+            abort(STATUS["Bad_Request"], message="Missing Settings or Events")
+        info = {"instance" : instance, "settings" : settings, \
+                "eventIDs" : eventIDs}
     return info
 
-def validate_get_request(request, compID, request_from_widget):
+def validate_get_request(request, request_from_widget):
     try:
         instance = request.header["X-Wix-Instance"]
         if not request_from_widget:
@@ -82,13 +82,31 @@ def validate_get_request(request, compID, request_from_widget):
         abort(STATUS["Forbbidden"], message="Invalid Instance")
     return instance
 
+def save_data(request, compID, datatype):
+    info = validate_put_request(request, datatype)
+    if datatype == "access_token":
+        long_term_token = get_long_term_token(info["access_token"])
+        if  not long_term_token:
+            abort(STATUS["Bad_Gateway"], 
+                  message="Facebook returned error on access_token")
+        access_token_data = json.dumps(long_term_token)
+        if not save_settings(compID, access_token_data, datatype):
+            abort(STATUS["Internal_Server_Error"], message="Could Not Save Access Token")
+        else:
+            return {"message" : "Saved Access Token Successfully"}
+    else:
+        if not save_settings(compID, info, datatype):
+            abort(STATUS["Internal_Server_Error"], message="Could Not Save Settings")
+        else:
+            return {"message" : "Saved Settings Successfully"}
+
 def get_data(request, compID, request_from_widget):
-    instance = validate_get_request(request, compID, request_from_widget)
+    instance = validate_get_request(request, request_from_widget)
     if (instance):
         db_entry = get_settings(compID, instance)
         if db_entry is None:
             abort(STATUS["Internal_Server_Error"], \
-                  message="Could Not Get Settings")
+                  message= "Could Not Get Settings")
         if not db_entry:
             if request_from_widget:
                 empty_settings = {"settings" : "", "eventIDs" : "", \
@@ -130,9 +148,3 @@ def get_data(request, compID, request_from_widget):
             #     full_settings["app_key"] = fb_keys.app
             json.dumps(full_settings)
             return full_settings
-
-
-
-
-
-

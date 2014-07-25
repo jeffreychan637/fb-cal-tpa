@@ -73,8 +73,8 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
             headers: {'X-Wix-Instance' : instance, 'URL' : $window.location.hostname},
             timeout: 10000,
             data: data
-          }).success(function(status, data) {
-            console.log(status, data);
+          }).success(function (status, message) {
+            console.log(status, message);
             if (status === 200) {
               console.log(dataType + ' saved successfully.');
               return true;
@@ -82,7 +82,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
               console.log('The server is returning an incorrect status.');
               return false;
             }
-          }).error(function(status, message) {
+          }).error(function (status, message) {
             console.log(dataType + ' failed to save.');
             console.log(status);
             console.log(message);
