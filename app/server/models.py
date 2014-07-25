@@ -29,7 +29,8 @@ def save_settings(compID, info, long_access_token):
                             (Users.compID == compID)).get()
         entry.settings = settings
         entry.eventIDs = eventIDs
-        entry.access_token = long_access_token
+        if long_access_token:
+            entry.access_token = long_access_token
         entry.save()
         return closeDB();
     except Users.DoesNotExist:
