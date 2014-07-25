@@ -9,8 +9,7 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
     moderating: false,
     hostedBy: true,
     corners: '25',
-    borderWidth: '5',
-    borderColor: 'black'
+    borderWidth: '5'
   };
 
   var getInstance = function() {
@@ -28,11 +27,8 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
     return instanceId; //returns the unparsed instance
   };
 
-  var modalEvent;
-
   return {
     defaults: defaults,
-    getInstance: getInstance,
-    modalEvent: modalEvent
+    getInstance: getInstance
   };
 });

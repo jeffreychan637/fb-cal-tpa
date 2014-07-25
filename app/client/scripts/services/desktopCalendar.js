@@ -64,6 +64,8 @@ angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
                        'margin-bottom' : '10px'
                       };
     $('#header').css(borderStyle);
+    //add something using addAttr to add ng-change to urls
+    //remove url atttrubutes too
 
   };
 

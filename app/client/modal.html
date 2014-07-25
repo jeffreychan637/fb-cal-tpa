@@ -10,12 +10,13 @@
     <!--
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.31.0/js/Wix.js"></script>
     -->
-    <script src="client/scripts/libraries/Wix.js"></script>
+    <script src="../../client/scripts/libraries/Wix.js"></script>
+
     <!-- build:css({.tmp,app}) styles/app.css -->
-    <link rel="stylesheet" href="client/bower_components/normalize-css/normalize.css">
-    <link rel="stylesheet" href="client/bower_components/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="client/styles/calendar.css">
-    <link rel="stylesheet" href="client/styles/modal.css">
+    <link rel="stylesheet" href="../../client/bower_components/normalize-css/normalize.css">
+    <link rel="stylesheet" href="../../client/bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../client/styles/calendar.css">
+    <link rel="stylesheet" href="../../client/styles/modal.css">
     <!-- endbuild -->
     <style wix-style></style>
   </head>
@@ -33,20 +34,29 @@
     <!-- endbuild -->
 
     <!-- Add your site or application content here -->
-    <div ng-include="'client/views/modal.html'"></div>
+    <div ng-include="'../../client/views/modal.html'"></div>
 
     <!-- build:js scripts/plugins.js -->
-    <script src="client/bower_components/jquery/dist/jquery.js"></script>
-    <script src="client/bower_components/angular/angular.js"></script>
-    <script src="client/bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="client/bower_components/moment/moment.js"></script>
+    <script src="../../client/bower_components/jquery/dist/jquery.js"></script>
+    <script src="../../client/bower_components/angular/angular.js"></script>
+    <script src="../../client/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="../../client/bower_components/moment/moment.js"></script>
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/index.js -->
-    <script src="client/scripts/app.js"></script>
-    <script src="client/scripts/services/api.js"></script>
-    <script src="client/scripts/services/wix.js"></script>
-    <script src="client/scripts/controllers/modal.js"></script>
+    <script src="../../client/scripts/app.js"></script>
+
+    <!-- This is necessary to pass event ID from server into modal, so modal
+         knows what event to ask the server for later. -->
+    <script type="text/javascript">
+        angular.module('fbCal').value('eventId', {{event_id}});
+    </script>
+
+    <script src="../../client/scripts/services/facebook/fbSetup.js"></script>
+    <script src="../../client/scripts/services/facebook/fbLogin.js"></script>
+    <script src="../../client/scripts/services/api.js"></script>
+    <script src="../../client/scripts/services/wix.js"></script>
+    <script src="../../client/scripts/controllers/modal.js"></script>
     <!-- endbuild -->
 
     <!-- process:remove -->
