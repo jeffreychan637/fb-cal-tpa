@@ -1,4 +1,5 @@
 'use strict';
+/*global FB:false, console:false */
 
 angular.module('fbCal').factory('fbSetup', function ($log, $window) {
 
@@ -17,7 +18,15 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window) {
 
     $log.log('done');
     fbReady = true;
-    console.log(fbReady);
+    FB.login(function() {
+      FB.api('/me', function(response) {
+        console.log(response);
+        console.log('Successful login for: ' + response.name);
+      });
+      FB.api('/me/permissions', function(response) {
+        console.log(response);
+      });
+    });
   };
 
   (function(d, s, id){

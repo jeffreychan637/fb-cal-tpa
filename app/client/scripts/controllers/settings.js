@@ -33,8 +33,6 @@ angular.module('fbCal')
     });
 
     $scope.handleToggles = function(toggle) {
-      // console.log($scope.toggles);
-      console.log($scope.view);
       if (toggle === 'view') {
         if ($scope.view) {
           $scope.settings.view = 'Month';
@@ -52,14 +50,59 @@ angular.module('fbCal')
     };
 
     $scope.login = function() {
+      $scope.connectDisabled = true;
+      $scope.loginMessage = '';
       if (fbSetup.getFbReady()) {
-        fbLogin.checkLoginState();
+        fbLogin.checkLoginState()
+          .then(function(response) {
+            $scope.loggedIn = true;
+          }, 
+          function(error) {
+            handlingFbMessages(error);
+          })['finally'](function() {
+            $scope.connectDisabled = false;
+          });
       } else {
-        $scope.connectError = true;
-        $timeout(function() {
-          $scope.connectError = false;
-        }, 5000);
+        handlingFbMessages('not connected');
+        $scope.connectDisabled = false;
       }
+    };
+
+    $scope.logout = function() {
+      $scope.disconnectDisabled = true;
+      console.log('disconnectDisabled');
+      fbLogin.logout()
+        .then(function() {
+          handlingFbMessages('logout successful');
+          $scope.loggedIn = false;
+          $scope.disconnectDisabled = false;
+          $scope.eventList = [];
+        },
+        function(error) {
+          handlingFbMessages(error);
+        });
+    };
+
+    var handlingFbMessages = function(message) {
+      if (message === 'not connected') {
+        $scope.loginMessage = "We haven't connected to the Facebook server " +
+                             "yet. Try connecting again in a minute or " + 
+                             "reload the page.";
+      } else if (message === 'logout successful') {
+        $scope.loginMessage = 'Logout successful.';
+      } else if (message === 'unknown') {
+        $scope.loginMessage = 'Oh no! Something went wrong; please try ' +
+                            'again.';
+      } else if (message === 'declined') {
+        $scope.loginMessage = 'To use this app, you must connect it with ' +
+                            'your Facebook account.';
+      } else if (message === 'not logged in') {
+        $scope.loginMessage = 'You must log into Facebook before you can ' +
+                            'connect.';
+      }
+      $timeout(function() {
+          $scope.loginMessage = false; 
+        }, 5000);
     };
 
 

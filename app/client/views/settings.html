@@ -3,12 +3,12 @@
     <div class="logo">
       <img width="86" src="../client/images/wix_icon.png">
     </div>
-    <div ng-hide="false">
-      <p ng-hide="connectError">
+    <div ng-hide="loggedIn">
+      <p ng-hide="loginMessage">
         Connect your Facebook account. This process is secure and completely private. Wix will not have access to your Facebook password.
       </p>
-      <p ng-show="connectError" class="error">
-        We haven't connected to the Facebook server yet. Try connecting again in a minute or reload the page.
+      <p ng-show="loginMessage" class="error">
+        {{loginMessage}}
       </p>
       <div class="login-panel">
         <p class="create-account">
@@ -18,17 +18,18 @@
             <a class="link" href="http://www.facebook.com" target="_blank">Create one</a>
           </strong>
         </p>
-        <button class="uilib-btn connect" ng-click="login()">
-          Connect account
+        <button class="uilib-btn connect" ng-click="login()" ng-disabled="connectDisabled">
+          <span ng-hide="disabled">Connect account</span>
+          <span ng-show="disabled">Logging in...</span>
         </button>
       </div>
     </div>
-    <div ng-show="false">
+    <div ng-show="loggedIn">
       <p>
         <span class="icon-check-mark-circle checkmark" data-icon="a"></span>
-        You are now connected to Jeffrey Chan's Facebook account.
+        You are now connected to {{userName}}'s Facebook account.
       </p>
-        <a class="disconnect-account" target="_blank|_parent">
+        <a class="disconnect-account" ng-click="logout()" ng-disabled="disconnectDisabled">
           Disconnect Account
         </a>
     </div>
