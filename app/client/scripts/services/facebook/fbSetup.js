@@ -5,6 +5,12 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window) {
 
   var fbReady = false;
 
+  var validHosts = ['editor.wix.com', 'localhost'];
+
+  var inValidHost = function(currentHost) {
+   return validHosts.indexOf(currentHost) > 0;
+  };
+
   var getFbReady = function() {
     return fbReady;
   };
@@ -18,24 +24,20 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window) {
     });
 
     var auth_response_change_callback = function(response) {
+      if (response && !response.error && response.status === 'connected' &&
+          inValidHost($window.location.hostname)) {
+        $log.info('saving access token');
+        // server.saveAccessToken(response.authResponse);
+      }
       console.log("auth_response_change_callback");
       console.log(response);
       console.log(response.authResponse);
     };
 
-    var auth_status_change_callback = function(response) {
-      console.log("auth_status_change_callback: " + response.status);
-    };
-
     FB.Event.subscribe('auth.authResponseChange', auth_response_change_callback);
-    FB.Event.subscribe('auth.statusChange', auth_status_change_callback);
 
     $log.log('done');
     fbReady = true;
-    FB.api('/me', function(response) {
-        console.log(response);
-        console.log('Successful login for: ' + response.name);
-      });
   };
 
   (function(d, s, id){

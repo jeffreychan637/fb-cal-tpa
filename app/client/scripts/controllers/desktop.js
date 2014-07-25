@@ -2,8 +2,8 @@
 /*global $:false */
 
 angular.module('fbCal')
-  .controller('DesktopCtrl', function ($scope, $wix, api, $http, $log,
-                                       desktopCalendar, list) {
+  .controller('DesktopCtrl', function ($scope, $wix, api, $log,
+                                       desktopCalendar, list, fbSetup) {
     $scope.settings = api.defaults;
 
     //things to prepare for events: order them by time and day & get time/day out
