@@ -85,12 +85,16 @@ def validate_get_request(request, request_from_widget):
 def save_data(request, compID, datatype):
     info = validate_put_request(request, datatype)
     if datatype == "access_token":
-        long_term_token = get_long_term_token(info["access_token"])
-        if  not long_term_token:
+        long_term_token = get_long_term_token(info["access_token"], compID, \
+                                              info["instance"])
+        if  long_term_token == "Facebook Error":
             abort(STATUS["Bad_Gateway"], 
                   message="Facebook returned error on access_token")
-        access_token_data = json.dumps(long_term_token)
-        info["access_token"] = access_token_data
+        elif long_term_token == "Invalid Access Token":
+            abort(STATUS["Forbbidden"], message="This access token is invalid.")
+        else:
+            access_token_data = json.dumps(long_term_token)
+            info["access_token"] = access_token_data
     if not save_settings(compID, info, datatype):
         abort(STATUS["Internal_Server_Error"], message="Could Not Save " + datatype)
     else:

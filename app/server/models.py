@@ -19,6 +19,15 @@ class Users(BaseModel):
         # order_by = ("instanceID, compID")
         primary_key = CompositeKey('instanceID', 'compID')
 
+def closeDB():
+    try:
+        db.close()
+    except Exception, e:
+        print e
+        return False
+    else:
+        return True
+
 def save_settings(compID, info, datatype):
     try:
         db.connect()
@@ -66,14 +75,3 @@ def get_settings(compID, instanceID):
         print e
         closeDB()
         return None
-
-def closeDB():
-    try:
-        db.close()
-    except Exception, e:
-        print e
-        return False
-    else:
-        return True
-
-

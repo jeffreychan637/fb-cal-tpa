@@ -1,15 +1,27 @@
 import facebook
 from secrets import fb_keys
+from models.py import get_settings
+from time import time
 
-def get_long_term_token(short_token):
+def get_long_term_token(short_token, compID, instance):
   try:
     graph = facebook.GraphAPI(short_token)
-    long_token = graph.extend_access_token(fb_keys["app"], fb_keys["secret"])
+    verify = graph("/debug_token", input_token = short_token, \
+                         app_access_token = fb_keys["app_access_token"])
+    verify_data = verify['data']
+    if (verify_data["is_valid"] and (verify_data["app_id"] == fb_keys["app"])):
+      user = get_settings(compID, instance)
+      if user and user.access_token_data:
+        if not user.access_token_data.userID == verify_data["user_id"]:
+          return "Invalid Access Token"
+      long_token = graph.extend_access_token(fb_keys["app"], \
+                                             fb_keys["secret"])
+      long_token["generated_time"] = int(time())
+      long_token["user_id"] = verify_data["user_id"]
+      return long_token
   except facebook.GraphAPIError, e:
     print e.message
-    return
-  else:
-    return long_token
+    return "Facebook Error"
 
 #If request from widget, just get event titles/time from the event IDs.
 #If from settings, don't need eventIDs. Just get all the event titles
