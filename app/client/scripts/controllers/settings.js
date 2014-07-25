@@ -8,9 +8,8 @@ angular.module('fbCal')
                         {id: '4567', title: 'Superbowl'},
                         {id: '4548', title: 'World Cup Viewing'}];
 
-    //hello/[^\s]+
-    //hello/[0-9]+  use this regex for checking if keys are events 
-    //replace hello with something like "event"
+    // when opening settings, get settings and then save them
+
 
     /**
      * Sends the settings to the widget as well as starting the process of
@@ -24,7 +23,17 @@ angular.module('fbCal')
 
     $wix.UI.onChange('*', function (value, key) {
       console.log(key, value);
-      if (key === 'corners' || key === 'borderWidth') {
+      var eventId = key.match(/event([0-9]+)/);
+      console.log(eventId);
+      if (eventId) {
+        //$scope.
+        //prefer some kind of hashmap data structure or define an object class.
+
+      } else if (key.match(/event([0-9]+)Color/)) {
+        var eventColor = value; //check if this is actually how it works - might be some property of value instead
+        $scope.checkedEventList[key] = value; 
+      }
+      else if (key === 'corners' || key === 'borderWidth') {
         $scope.settings[key] = Math.ceil(value);
       } else {
         $scope.settings[key] = value;
@@ -55,9 +64,13 @@ angular.module('fbCal')
       if (fbSetup.getFbReady()) {
         fbLogin.checkLoginState()
           .then(function(response) {
+            console.log(response);
+            console.log('running');
+            $scope.userName = response;
             $scope.loggedIn = true;
           }, 
           function(error) {
+            console.log('got login error');
             handlingFbMessages(error);
           })['finally'](function() {
             $scope.connectDisabled = false;
@@ -68,19 +81,23 @@ angular.module('fbCal')
       }
     };
 
-    $scope.logout = function() {
-      $scope.disconnectDisabled = true;
-      console.log('disconnectDisabled');
-      fbLogin.logout()
-        .then(function() {
-          handlingFbMessages('logout successful');
-          $scope.loggedIn = false;
-          $scope.disconnectDisabled = false;
-          $scope.eventList = [];
-        },
-        function(error) {
-          handlingFbMessages(error);
-        });
+    $scope.logout = function(disconnectDisabled) {
+      if (!disconnectDisabled) {
+        $scope.disconnectDisabled = true;
+        console.log('disconnectDisabled');
+        fbLogin.logout()
+          .then(function() {
+            $scope.loggedIn = false;
+            handlingFbMessages('logout successful');
+            $scope.eventList = [];
+          },
+          function(error) {
+            $scope.loggedIn = false;
+            handlingFbMessages(error);
+          })['finally'](function() {
+            $scope.disconnectDisabled = false;
+          });
+        }
     };
 
     var handlingFbMessages = function(message) {

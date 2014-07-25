@@ -13,20 +13,29 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window) {
     FB.init({
       appId      : '790467867660486',
       xfbml      : true,
-      version    : 'v2.0'
+      version    : 'v2.0',
+      status     : true
     });
+
+    var auth_response_change_callback = function(response) {
+      console.log("auth_response_change_callback");
+      console.log(response);
+      console.log(response.authResponse);
+    };
+
+    var auth_status_change_callback = function(response) {
+      console.log("auth_status_change_callback: " + response.status);
+    };
+
+    FB.Event.subscribe('auth.authResponseChange', auth_response_change_callback);
+    FB.Event.subscribe('auth.statusChange', auth_status_change_callback);
 
     $log.log('done');
     fbReady = true;
-    FB.login(function() {
-      FB.api('/me', function(response) {
+    FB.api('/me', function(response) {
         console.log(response);
         console.log('Successful login for: ' + response.name);
       });
-      FB.api('/me/permissions', function(response) {
-        console.log(response);
-      });
-    });
   };
 
   (function(d, s, id){

@@ -14,7 +14,6 @@ class MyFlask(Flask):
         return Flask.get_send_file_max_age(self, name)
 
 flask_app = MyFlask(__name__, static_folder="client", template_folder="client");
-print flask_app.template_folder
 
 from app.server import views
 from app.server import controllers
