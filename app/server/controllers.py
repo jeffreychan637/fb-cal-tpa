@@ -2,7 +2,7 @@ from flask import request
 from app import flask_app
 from status_codes import STATUS
 from wix_verifications import instance_parser
-from fb import get_long_term_token, get_event_data
+from fb import get_long_term_token, get_event_data, get_user_name
 from models import save_settings, get_settings, delete_info
 from flask.ext.restful import Resource, Api, abort
 import json
@@ -145,18 +145,20 @@ def get_data(request, compID, request_from_widget):
                 access_token_data = ""
             if request_from_widget:
                 if access_token_data:
+                    name = get_user_name(access_token_data)
                     fb_event_data = get_event_data(eventIDs, access_token_data, \
                                                request_from_widget)
-                    if not fb_event_data:
+                    if not (fb_event_data and name):
                         abort(STATUS["Bad_Gateway"], 
                             message="Couldn't receive data from Facebook")
                     ###should consider sending settings, just without fb event data
                     full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
                                      "fb_event_data" : fb_event_data, \
-                                     "active" : "true"}
+                                     "active" : "true", "name" : name}
                 else:
                     full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
-                                     "fb_event_data" : "", "active" : "false"}
+                                     "fb_event_data" : "", "active" : "false", 
+                                     "name" : ""}
             else:
                 if access_token_data:
                     active = "true"
@@ -164,7 +166,7 @@ def get_data(request, compID, request_from_widget):
                     active = "false"
 
                 full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
-                                     "active" : active};
+                                     "active" : active, "name" : ""};
             # if request_from_widget:
             #     full_settings["app_key"] = fb_keys.app
             json.dumps(full_settings)
