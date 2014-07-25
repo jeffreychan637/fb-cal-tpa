@@ -90,15 +90,11 @@ def save_data(request, compID, datatype):
             abort(STATUS["Bad_Gateway"], 
                   message="Facebook returned error on access_token")
         access_token_data = json.dumps(long_term_token)
-        if not save_settings(compID, access_token_data, datatype):
-            abort(STATUS["Internal_Server_Error"], message="Could Not Save Access Token")
-        else:
-            return {"message" : "Saved Access Token Successfully"}
+        info["access_token"] = access_token_data
+    if not save_settings(compID, info, datatype):
+        abort(STATUS["Internal_Server_Error"], message="Could Not Save " + datatype)
     else:
-        if not save_settings(compID, info, datatype):
-            abort(STATUS["Internal_Server_Error"], message="Could Not Save Settings")
-        else:
-            return {"message" : "Saved Settings Successfully"}
+        return {"message" : "Saved " + datatype + " Successfully"}
 
 def get_data(request, compID, request_from_widget):
     instance = validate_get_request(request, request_from_widget)
@@ -119,12 +115,21 @@ def get_data(request, compID, request_from_widget):
             empty_json = json.dumps(empty_settings)
             return empty_json
         else:
-            settings = json.loads(db_entry.settings)
-            eventIDs = json.loads(db_entry.eventIDs)
-            access_token = db_entry.access_token
+            if not (db_entry.settings == ""):
+                settings = json.loads(db_entry.settings)
+            else:
+                settings = ""
+            if not (db_entry.eventIDs == ""):
+                eventIDs = json.loads(db_entry.eventIDs)
+            else:
+                eventIDs = ""
+            if not (db_entry.access_token_data == ""):
+                access_token_data = json.loads(db_entry.access_token_data)
+            else:
+                access_token_data = ""
             if request_from_widget:
-                if access_token:
-                    fb_event_data = get_event_data(eventIDs, access_token, \
+                if access_token_data:
+                    fb_event_data = get_event_data(eventIDs, access_token_data, \
                                                request_from_widget)
                     if not fb_event_data:
                         abort(STATUS["Bad_Gateway"], 
@@ -137,7 +142,7 @@ def get_data(request, compID, request_from_widget):
                     full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
                                      "fb_event_data" : "", "active" : "false"}
             else:
-                if access_token:
+                if access_token_data:
                     active = "true"
                 else:
                     active = "false"
