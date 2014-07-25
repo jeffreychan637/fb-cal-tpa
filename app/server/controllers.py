@@ -126,48 +126,41 @@ def get_data(request, compID, request_from_widget):
             else:
                 empty_settings = {"settings" : "", "eventIDs" : "", \
                                   "active" : "false"}
-            # if request_from_widget:
-            #     empty_settings["app_key"] = fb_keys.app
             empty_json = json.dumps(empty_settings)
             return empty_json
         else:
-            if not (db_entry.settings == ""):
+            settings = ""
+            access_token_data = ""
+            eventIDs = ""
+            if db_entry.settings:
                 settings = json.loads(db_entry.settings)
-            else:
-                settings = ""
-            if not (db_entry.eventIDs == ""):
+            if db_entry.eventIDs == "":
                 eventIDs = json.loads(db_entry.eventIDs)
-            else:
-                eventIDs = ""
-            if not (db_entry.access_token_data == ""):
+            if db_entry.access_token_data:
                 access_token_data = json.loads(db_entry.access_token_data)
-            else:
-                access_token_data = ""
             if request_from_widget:
                 if access_token_data:
-                    name = get_user_name(access_token_data)
                     fb_event_data = get_event_data(eventIDs, access_token_data, \
                                                request_from_widget)
-                    if not (fb_event_data and name):
+                    if not fb_event_data:
                         abort(STATUS["Bad_Gateway"], 
                             message="Couldn't receive data from Facebook")
                     ###should consider sending settings, just without fb event data
                     full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
                                      "fb_event_data" : fb_event_data, \
-                                     "active" : "true", "name" : name}
+                                     "active" : "true"}
                 else:
                     full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
-                                     "fb_event_data" : "", "active" : "false", 
-                                     "name" : ""}
+                                     "fb_event_data" : "", "active" : "false"}
             else:
                 if access_token_data:
+                    name = get_user_name(access_token_data)
                     active = "true"
                 else:
                     active = "false"
+                    name = ""
 
                 full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
-                                     "active" : active, "name" : ""};
-            # if request_from_widget:
-            #     full_settings["app_key"] = fb_keys.app
+                                     "active" : active, "name" : name};
             json.dumps(full_settings)
             return full_settings
