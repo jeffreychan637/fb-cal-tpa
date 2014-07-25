@@ -6,7 +6,7 @@ from time import time
 def get_long_term_token(short_token, compID, instance):
   try:
     graph = facebook.GraphAPI(short_token)
-    verify = graph("/debug_token", input_token = short_token, \
+    verify = graph.get_object("/debug_token", input_token = short_token, \
                          app_access_token = fb_keys["app_access_token"])
     verify_data = verify['data']
     if (verify_data["is_valid"] and (verify_data["app_id"] == fb_keys["app"])):
@@ -29,10 +29,22 @@ def get_long_term_token(short_token, compID, instance):
 def get_event_data(eventIDs, access_token, request_from_widget):
   try:
     graph = facebook.GraphAPI(access_token)
+
     
 
   except facebook.GraphAPIError, e:
     print e.message
     return False
+
+def get_user_name(access_token_data):
+  try:
+    graph = facebook.GraphAPI(access_token_data.access_token)
+    me = graph.get_object("/me")
+    name = me["name"]
+    return name
+  except facebook.GraphAPIError, e:
+    print e.message
+    return False
+
 
 
