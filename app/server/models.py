@@ -75,3 +75,18 @@ def get_settings(compID, instanceID):
         print e
         closeDB()
         return None
+
+def delete_info(compID, instanceID):
+    try:
+        db.connect()
+        entry = Users.select().where((Users.instanceID == instanceID) & \
+                            (Users.compID == compID)).get()
+        entry.access_token_data = ""
+        entry.eventIDs = ""
+        entry.save()
+        return closeDB()
+    except Exception, e:
+        print e
+        closeDB()
+        return False
+

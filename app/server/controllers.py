@@ -3,8 +3,7 @@ from app import flask_app
 from status_codes import STATUS
 from wix_verifications import instance_parser
 from fb import get_long_term_token, get_event_data
-from models import save_settings, get_settings
-from secrets import fb_keys
+from models import save_settings, get_settings, delete_info
 from flask.ext.restful import Resource, Api, abort
 import json
 
@@ -26,10 +25,21 @@ class GetSettingsSettings(Resource):
     def get(self, compID):
         return get_data(request, compID, False)
 
+
+class Logout(Resource):
+    def put(self, compID):
+        info = validate_put_request(request, "logout")
+        if not delete_info(compID, info):
+            abort(STATUS["Internal_Server_Error"], \
+                  message="Failed to Logout")
+        else:
+            return { "message" : "User Logged Out Successfully"}
+
 api.add_resource(SaveSettings, "/SaveSettings/<string:compID>")
 api.add_resource(SaveAccessToken, "/SaveAccessToken/<string:compID>")
 api.add_resource(GetSettingsWidget, "/GetSettingsWidget/<string:compID>")
 api.add_resource(GetSettingsSettings, "/GetSettingsSettings/<string:compID>")
+api.add_resource(Logout, "/Logout/<string:compID>")
 
 def validate_put_request(request, datatype):
     try:
@@ -53,7 +63,7 @@ def validate_put_request(request, datatype):
         except:
             abort(STATUS["Bad_Request"], message="Badly Formed Request")
         info = {"instance" : instance, "access_token" : access_token}
-    else:
+    elif datatype == "settings":
         try:
             data = request.form["data"]
             data_dict = json.loads(data)
@@ -65,6 +75,8 @@ def validate_put_request(request, datatype):
             abort(STATUS["Bad_Request"], message="Missing Settings or Events")
         info = {"instance" : instance, "settings" : settings, \
                 "eventIDs" : eventIDs}
+    else:
+        info = {"instance" : instance}
     return info
 
 def validate_get_request(request, request_from_widget):
