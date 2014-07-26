@@ -7,6 +7,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   
   var getSettingsWidgetURL = '/GetSettingsWidget/' + compId;
   var getSettingsSettingsURL = '/GetSettingsSettings/' + compId;
+  var getAllEventsURL = '/GetAllEvents/' + compId;
   var saveSettingsURL = '/SaveSettings/' + compId;
   var saveAccessTokenURL = '/SaveAccessToken/' + compId;
   var logoutURL = '/Logout/' + compId;
@@ -64,6 +65,28 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
           }).error(function (status, message) {
             $log.warn(status, message);
             return getDefault(from);
+          });
+  };
+
+  var getAllEvents = function() {
+    $http({
+           method: 'GET',
+           url: getAllEventsURL,
+           headers: {'X-Wix-Instance' : instance},
+           timeout: 10000
+          }).success(function (status, data) {
+            console.log(status, data);
+            if (status === 200) {
+              console.log(data);
+              return jQuery.parseJSON(data);
+            } else {
+              console.log('The server is returning an incorrect status.');
+              return {};
+              //i don't really know what the fb_event_data looks like
+            }
+          }).error(function (status, message) {
+            $log.warn(status, message);
+            return {};
           });
   };
 

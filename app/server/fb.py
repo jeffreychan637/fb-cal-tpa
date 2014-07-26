@@ -1,6 +1,6 @@
 import facebook
 from secrets import fb_keys
-from models.py import get_settings
+from models import get_settings
 from time import time
 
 def get_long_term_token(short_token, compID, instance):
@@ -26,11 +26,19 @@ def get_long_term_token(short_token, compID, instance):
 #If request from widget, just get event titles/time from the event IDs.
 #If from settings, don't need eventIDs. Just get all the event titles
 #that the user has on FB accounts
-def get_event_data(eventIDs, access_token, request_from_widget):
+def get_event_data(eventIDs, access_token_data, request_from_widget):
   try:
-    graph = facebook.GraphAPI(access_token)
+    graph = facebook.GraphAPI(access_token_data.access_token)
 
-    
+
+  except facebook.GraphAPIError, e:
+    print e.message
+    return False
+
+def get_all_event_data(access_token_data):
+  try:
+    graph = facebook.GraphAPI(access_token_data.access_token)
+
 
   except facebook.GraphAPIError, e:
     print e.message
