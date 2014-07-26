@@ -137,5 +137,4 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
             return false;
           });
   };
-
 });
