@@ -1,7 +1,7 @@
 'use strict';
 /*global $:false, FB:false, console:false, jQuery:false */
 
-angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $window) {
+angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $window, $q) {
   
   /**
    * IN PRODUCTION MODE, CHANGE HEADER URLS TO $window.location.hostname INSTEAD
@@ -106,7 +106,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
             method: 'PUT',
             url: getURL('post', dataType),
             headers: {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'},
-            timeout: 100000,
+            timeout: 10000,
             data: data
           }).success(function (message, status) {
             console.log(status, message);
@@ -126,6 +126,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   };
 
   var logout = function() {
+    var deferred = $q.defer();
     $http({
             method: 'PUT',
             url: logoutURL,
@@ -136,17 +137,18 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
             console.log(status, message);
             if (status === 200) {
               console.log('Logged out successfully.');
-              return true;
+              deferred.resolve();
             } else {
               console.log('The server is returning an incorrect status.');
-              return false;
+              deferred.resolve();
             }
           }).error(function (message, status) {
             console.log('Failed to logout.');
             console.log(status);
             console.log(message);
-            return false;
+            deferred.reject();
           });
+      return deferred.promise;
   };
 
   return {

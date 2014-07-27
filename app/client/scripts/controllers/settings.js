@@ -87,9 +87,15 @@ angular.module('fbCal')
         console.log('disconnectDisabled');
         fbLogin.logout()
           .then(function() {
-            $scope.loggedIn = false;
-            handlingFbMessages('logout successful');
-            $scope.eventList = [];
+            server.logout()
+              .then(function() {
+                  $scope.loggedIn = false;
+                  handlingFbMessages('logout successful');
+                  $scope.eventList = [];
+              }, function() {
+                $scope.loggedIn = false;
+                handlingFbMessages('unknown');
+              });
           },
           function(error) {
             $scope.loggedIn = false;

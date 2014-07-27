@@ -43,7 +43,7 @@ class GetAllEvents(Resource):
 class Logout(Resource):
     def put(self, compID):
         info = validate_put_request(request, "logout")
-        if not delete_info(compID, info):
+        if not delete_info(compID, info["instance"]):
             abort(STATUS["Internal_Server_Error"], \
                   message="Failed to Logout")
         else:

@@ -6,9 +6,9 @@ from time import time
 
 def get_long_term_token(short_token, compID, instance):
   try:
-    graph = facebook.GraphAPI(short_token)
+    graph = facebook.GraphAPI(fb_keys["app_access_token"])
     verify = graph.get_object("/debug_token", input_token = short_token, \
-                         app_access_token = fb_keys["app_access_token"])
+                              access_token = fb_keys["app_access_token"])
     verify_data = verify['data']
     if (verify_data["is_valid"] and (verify_data["app_id"] == fb_keys["app"])):
       user = get_settings(compID, instance)
@@ -16,6 +16,7 @@ def get_long_term_token(short_token, compID, instance):
         access_token_data = json.loads(user.access_token_data)
         if not access_token_data["user_id"] == verify_data["user_id"]:
           return "Invalid Access Token"
+      graph = facebook.GraphAPI(short_token)
       long_token = graph.extend_access_token(fb_keys["app"], \
                                              fb_keys["secret"])
       print "type: "
