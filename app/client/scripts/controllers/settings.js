@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fbCal')
-  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout) {
+  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout, server) {
     $scope.settings = api.defaults;
 
     $scope.eventList = [{id: '454', title: 'Wimbledon'},
@@ -113,6 +113,9 @@ angular.module('fbCal')
       } else if (message === 'declined') {
         $scope.loginMessage = 'To use this app, you must connect it with ' +
                             'your Facebook account.';
+      } else if (message === 'denied') {
+        $scope.loginMessage = 'To use this app, you must give access to your' +
+                              ' events. Please login again.';
       } else if (message === 'not logged in') {
         $scope.loginMessage = 'You must log into Facebook before you can ' +
                             'connect.';

@@ -32,8 +32,29 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
         $log.log('rejected');
         deferred.reject('unknown');
       } else {
-        $log.log('resolved');
-        deferred.resolve(response.name);
+        checkPermissions(deferred, response.name);
+      }
+    });
+  };
+
+  var checkPermissions = function(deferred, name) {
+    FB.api('/me/permissions', function(response) {
+      console.log(response);
+      if (!response || response.error) {
+        console.log(response.error, 'error');
+        deferred.reject('unknown');
+      } else {
+        for (var i = 0; i < response.data.length; i++) {
+          var permission = response.data[i];
+          if (permission.permission === 'user_events' && permission.status === 'granted') {
+            deferred.resolve(name);
+          }
+        }
+        logout().then(function() {
+          deferred.reject('denied');
+        }, function() {
+          deferred.reject('unknown');
+        });
       }
     });
   };
@@ -56,7 +77,7 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
         //show something went wrong message
         deferred.reject('unknown');
       }
-    }, {scope: 'public_profile, email'});
+    }, {scope: 'public_profile, user_events'});
   };
 
   var logout = function() {
