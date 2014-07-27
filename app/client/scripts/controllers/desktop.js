@@ -32,7 +32,7 @@ angular.module('fbCal')
         api.modalEvent = undefined;
       };
       console.log('hello open modal');
-      $wix.openModal("http://localhost:5000/modal/54", 400, 400, onClose);
+      $wix.openModal("http://localhost:5000/modal/54", 900, 590, onClose);
     };
 
     /** 
