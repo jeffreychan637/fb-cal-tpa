@@ -2,8 +2,18 @@
 /*global $:false, FB:false, console:false, jQuery:false */
 
 angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $window) {
+  
+  /**
+   * IN PRODUCTION MODE, CHANGE HEADER URLS TO $window.location.hostname INSTEAD
+   * OF editor.wix.com
+   */
+  
   var compId = $wix.Utils.getCompId();
   var instance = api.getInstance();
+
+  compId = 45;
+  instance = 47;
+
   
   var getSettingsWidgetURL = '/GetSettingsWidget/' + compId;
   var getSettingsSettingsURL = '/GetSettingsSettings/' + compId;
@@ -52,7 +62,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            url: getURL('get', from),
            headers: {'X-Wix-Instance' : instance},
            timeout: 10000
-          }).success(function (status, data) {
+          }).success(function (data, status) {
             console.log(status, data);
             if (status === 200) {
               console.log(data);
@@ -62,7 +72,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
               return getDefault(from);
               //i don't really know what the fb_event_data looks like
             }
-          }).error(function (status, message) {
+          }).error(function (message, status) {
             $log.warn(status, message);
             return getDefault(from);
           });
@@ -74,7 +84,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            url: getAllEventsURL,
            headers: {'X-Wix-Instance' : instance},
            timeout: 10000
-          }).success(function (status, data) {
+          }).success(function (data, status) {
             console.log(status, data);
             if (status === 200) {
               console.log(data);
@@ -84,20 +94,21 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
               return {};
               //i don't really know what the fb_event_data looks like
             }
-          }).error(function (status, message) {
+          }).error(function (message, status) {
             $log.warn(status, message);
             return {};
           });
   };
 
   var saveData = function(data, dataType) {
+    $log.info(getURL('post', dataType));
     $http({
             method: 'PUT',
             url: getURL('post', dataType),
-            headers: {'X-Wix-Instance' : instance, 'URL' : $window.location.hostname},
-            timeout: 10000,
+            headers: {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'},
+            timeout: 100000,
             data: data
-          }).success(function (status, message) {
+          }).success(function (message, status) {
             console.log(status, message);
             if (status === 200) {
               console.log(dataType + ' saved successfully.');
@@ -106,7 +117,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
               console.log('The server is returning an incorrect status.');
               return false;
             }
-          }).error(function (status, message) {
+          }).error(function (message, status) {
             console.log(dataType + ' failed to save.');
             console.log(status);
             console.log(message);
@@ -118,10 +129,10 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     $http({
             method: 'PUT',
             url: logoutURL,
-            headers: {'X-Wix-Instance' : instance, 'URL' : $window.location.hostname},
+            headers: {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'},
             timeout: 10000,
             data: {}
-          }).success(function (status, message) {
+          }).success(function (message, status) {
             console.log(status, message);
             if (status === 200) {
               console.log('Logged out successfully.');
@@ -130,11 +141,18 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
               console.log('The server is returning an incorrect status.');
               return false;
             }
-          }).error(function (status, message) {
+          }).error(function (message, status) {
             console.log('Failed to logout.');
             console.log(status);
             console.log(message);
             return false;
           });
+  };
+
+  return {
+    getUserInfo: getUserInfo,
+    getAllEvents: getAllEvents,
+    saveData: saveData,
+    logout: logout
   };
 });

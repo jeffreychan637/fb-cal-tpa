@@ -44,17 +44,21 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
         console.log(response.error, 'error');
         deferred.reject('unknown');
       } else {
+        var permissionGranted;
         for (var i = 0; i < response.data.length; i++) {
           var permission = response.data[i];
           if (permission.permission === 'user_events' && permission.status === 'granted') {
+            permissionGranted = true;
             deferred.resolve(name);
           }
         }
-        logout().then(function() {
-          deferred.reject('denied');
-        }, function() {
-          deferred.reject('unknown');
-        });
+        if (!permissionGranted) {
+          logout().then(function() {
+            deferred.reject('denied');
+          }, function() {
+            deferred.reject('unknown');
+          });
+        }
       }
     });
   };

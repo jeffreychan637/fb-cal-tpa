@@ -58,30 +58,33 @@ api.add_resource(Logout, "/Logout/<string:compID>")
 
 def validate_put_request(request, datatype):
     try:
-        instance = request.header["X-Wix-Instance"]
-        window = request.header["URL"]
-        content_type = request.header["Content-Type"]
-    except AttributeError:
+        instance = request.headers["X-Wix-Instance"]
+        window = request.headers["URL"]
+        content_type = request.headers["Content-Type"]
+    except AttributeError, e:
+        print e
         abort(STATUS["Unauthorized"], message="Request Incomplete")
-    except KeyError:
+    except KeyError, e:
+        print e
         abort(STATUS["Unauthorized"], message="Missing Value")
     if window != "editor.wix.com":
-        abort(STATUS["Forbbidden"], message="Not Inside Editor")
-    if content_type != "application/json":
+        abort(STATUS["Forbidden"], message="Not Inside Editor")
+    if content_type != "application/json;charset=UTF-8":
         abort(STATUS["Bad_Request"], message="Badly Formed Request")
     if not instance_parser(instance):
-        abort(STATUS["Forbbidden"], message="Invalid Instance")
+        abort(STATUS["Forbidden"], message="Invalid Instance")
     if datatype == "access_token":
         try:
-            data = request.form['access_token']
-            access_token = json.loads(data)
+
+            data = json.loads(request.data)
+            access_token = data["access_token"]
+            print access_token
         except:
             abort(STATUS["Bad_Request"], message="Badly Formed Request")
         info = {"instance" : instance, "access_token" : access_token}
     elif datatype == "settings":
         try:
-            data = request.form["data"]
-            data_dict = json.loads(data)
+            data_dict = json.loads(request.data)
             settings = json.dumps(data_dict["settings"])
             eventIDs = json.dumps(data_dict["eventIDs"])
         except:
@@ -96,17 +99,17 @@ def validate_put_request(request, datatype):
 
 def validate_get_request(request, request_from_widget):
     try:
-        instance = request.header["X-Wix-Instance"]
+        instance = request.headers["X-Wix-Instance"]
         if not request_from_widget:
-            window = request.header["URL"]
+            window = request.headers["URL"]
             if window != "editor.wix.com":
-                abort(STATUS["Forbbidden"], message="Not Inside Editor")
+                abort(STATUS["Forbidden"], message="Not Inside Editor")
     except AttributeError:
         abort(STATUS["Unauthorized"], message="Request Incomplete")
     except KeyError:
         abort(STATUS["Unauthorized"], message="Missing Value")
     if not instance_parser(instance):
-        abort(STATUS["Forbbidden"], message="Invalid Instance")
+        abort(STATUS["Forbidden"], message="Invalid Instance")
     return instance
 
 def save_data(request, compID, datatype):
@@ -118,7 +121,7 @@ def save_data(request, compID, datatype):
             abort(STATUS["Bad_Gateway"], 
                   message="Facebook returned error on access_token")
         elif long_term_token == "Invalid Access Token":
-            abort(STATUS["Forbbidden"], message="This access token is invalid.")
+            abort(STATUS["Forbidden"], message="This access token is invalid.")
         else:
             access_token_data = json.dumps(long_term_token)
             info["access_token"] = access_token_data

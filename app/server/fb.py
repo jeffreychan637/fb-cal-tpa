@@ -1,4 +1,5 @@
 import facebook
+import json
 from secrets import fb_keys
 from models import get_settings
 from time import time
@@ -12,11 +13,14 @@ def get_long_term_token(short_token, compID, instance):
     if (verify_data["is_valid"] and (verify_data["app_id"] == fb_keys["app"])):
       user = get_settings(compID, instance)
       if user and user.access_token_data:
-        if not user.access_token_data.userID == verify_data["user_id"]:
+        access_token_data = json.loads(user.access_token_data)
+        if not access_token_data["user_id"] == verify_data["user_id"]:
           return "Invalid Access Token"
       long_token = graph.extend_access_token(fb_keys["app"], \
                                              fb_keys["secret"])
-      long_token["generated_time"] = int(time())
+      print "type: "
+      print type(long_token)
+      long_token["generated_time"] = str(int(time()))
       long_token["user_id"] = verify_data["user_id"]
       return long_token
   except facebook.GraphAPIError, e:

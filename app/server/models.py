@@ -31,23 +31,27 @@ def closeDB():
 def save_settings(compID, info, datatype):
     try:
         db.connect()
-        instanceID = info['instance']
+        instanceID = info["instance"]
         entry = Users.select().where((Users.instanceID == instanceID) & \
                             (Users.compID == compID)).get()
         if datatype == "access_token":
-            entry.access_token_data = info['access_token']
+            entry.access_token_data = info["access_token"]
         else:
-            entry.settings = info['settings']
-            entry.eventIDs = info['eventIDs']
+            entry.settings = info["settings"]
+            entry.eventIDs = info["eventIDs"]
         entry.save()
         return closeDB();
     except Users.DoesNotExist:
+        print "user didn't exist"
         try:
-            instance = info['instance']
+            instance = info["instance"]
             if datatype == "access_token":
                 settings = ""
                 eventIDs = ""
+                access_token_data = info["access_token"]
             else:
+                settings = info["settings"]
+                eventIDs = info["eventIDs"]
                 access_token_data = ""
             Users.create(compID = compID, instanceID = instance, \
                          settings = settings, eventIDs = eventIDs,

@@ -1,13 +1,13 @@
 'use strict';
 /*global FB:false, console:false */
 
-angular.module('fbCal').factory('fbSetup', function ($log, $window) {
+angular.module('fbCal').factory('fbSetup', function ($log, $window, server) {
 
   var fbReady = false;
 
   var validHosts = ['editor.wix.com', 'localhost'];
 
-  var inValidHost = function(currentHost) {
+  var  checkValidHost = function(currentHost) {
    return validHosts.indexOf(currentHost) > 0;
   };
 
@@ -24,10 +24,11 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window) {
     });
 
     var auth_response_change_callback = function(response) {
+      $log.info('response change');
       if (response && !response.error && response.status === 'connected' &&
-          inValidHost($window.location.hostname)) {
+          checkValidHost($window.location.hostname)) {
         $log.info('saving access token');
-        // server.saveAccessToken(response.authResponse);
+        server.saveData({access_token: response.authResponse.accessToken}, "access token");
       }
       console.log("auth_response_change_callback");
       console.log(response);
