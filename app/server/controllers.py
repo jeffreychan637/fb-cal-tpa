@@ -78,7 +78,6 @@ def validate_put_request(request, datatype):
 
             data = json.loads(request.data)
             access_token = data["access_token"]
-            print access_token
         except:
             abort(STATUS["Bad_Request"], message="Badly Formed Request")
         info = {"instance" : instance, "access_token" : access_token}
@@ -86,13 +85,13 @@ def validate_put_request(request, datatype):
         try:
             data_dict = json.loads(request.data)
             settings = json.dumps(data_dict["settings"])
-            eventIDs = json.dumps(data_dict["eventIDs"])
+            events = json.dumps(data_dict["events"])
         except:
             abort(STATUS["Bad_Request"], message="Badly Formed Request")
-        if not (settings and eventIDs):
+        if not (settings and events):
             abort(STATUS["Bad_Request"], message="Missing Settings or Events")
         info = {"instance" : instance, "settings" : settings, \
-                "eventIDs" : eventIDs}
+                "events" : events}
     else:
         info = {"instance" : instance}
     return info
@@ -138,36 +137,36 @@ def get_data(request, compID, request_from_widget):
               message= "Could Not Get Settings")
     if not db_entry:
         if request_from_widget:
-            empty_settings = {"settings" : "", "eventIDs" : "", \
+            empty_settings = {"settings" : "", "events" : "", \
                               "fb_event_data" : "", "active" : "false"}
         else:
-            empty_settings = {"settings" : "", "eventIDs" : "", \
+            empty_settings = {"settings" : "", "events" : "", \
                               "active" : "false"}
         empty_json = json.dumps(empty_settings)
         return empty_json
     else:
         settings = ""
         access_token_data = ""
-        eventIDs = ""
+        events = ""
         if db_entry.settings:
             settings = json.loads(db_entry.settings)
-        if db_entry.eventIDs == "":
-            eventIDs = json.loads(db_entry.eventIDs)
+        if db_entry.events:
+            events = json.loads(db_entry.events)
         if db_entry.access_token_data:
             access_token_data = json.loads(db_entry.access_token_data)
         if request_from_widget:
             if access_token_data:
-                fb_event_data = get_event_data(eventIDs, access_token_data, \
+                fb_event_data = get_event_data(events, access_token_data, \
                                            request_from_widget)
                 if not fb_event_data:
                     abort(STATUS["Bad_Gateway"], 
                         message="Couldn't receive data from Facebook")
                 ###should consider sending settings, just without fb event data
-                full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
+                full_settings = {"settings" : settings, "events" : events, \
                                  "fb_event_data" : fb_event_data, \
                                  "active" : "true"}
             else:
-                full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
+                full_settings = {"settings" : settings, "events" : events, \
                                  "fb_event_data" : "", "active" : "false"}
         else:
             if access_token_data:
@@ -177,7 +176,7 @@ def get_data(request, compID, request_from_widget):
                 active = "false"
                 name = ""
 
-            full_settings = {"settings" : settings, "eventIDs" : eventIDs, \
+            full_settings = {"settings" : settings, "events" : events, \
                                  "active" : active, "name" : name};
         full_json = json.dumps(full_settings)
         return full_json

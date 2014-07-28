@@ -29,9 +29,9 @@ def get_long_term_token(short_token, compID, instance):
     return "Facebook Error"
 
 #If request from widget, just get event titles/time from the event IDs.
-#If from settings, don't need eventIDs. Just get all the event titles
+#If from settings, don't need events. Just get all the event titles
 #that the user has on FB accounts
-def get_event_data(eventIDs, access_token_data, request_from_widget):
+def get_event_data(events, access_token_data, request_from_widget):
   try:
     graph = facebook.GraphAPI(access_token_data.access_token)
 
@@ -51,7 +51,7 @@ def get_all_event_data(access_token_data):
 
 def get_user_name(access_token_data):
   try:
-    graph = facebook.GraphAPI(access_token_data.access_token)
+    graph = facebook.GraphAPI(access_token_data["access_token"])
     me = graph.get_object("/me")
     name = me["name"]
     return name
