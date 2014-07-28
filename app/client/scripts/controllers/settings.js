@@ -2,7 +2,8 @@
 /*global $:false, , console:false, JSON:false */
 
 angular.module('fbCal')
-  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout, server, $log) {
+  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup,
+                                        fbLogin, $timeout, server, $log) {
     var checkedEventsList;
     var eventsInfoList;
 
@@ -71,9 +72,26 @@ angular.module('fbCal')
         $scope.settings[key] = value;
       }
       sendSettings();
-      saveSettings($scope.settings, checkedEventsList);
-
+      saveSettingsDebounce();
     });
+
+    var debounce = function(func, wait, immediate) {
+        console.log('I got called');
+        var timeout;
+        console.debug(func);
+        return function() {
+          console.log('debounce func is running');
+          $timeout.cancel(timeout);
+          timeout = $timeout(function() {
+            timeout = null;
+            if (!immediate) {
+              console.log('I called the function');
+              func.apply();
+            }
+          }, wait);
+          if (immediate && !timeout) func.apply();
+        };
+      };
 
     /** Hack to get value of colorpicker */
     var getColor = function(eventId) {
@@ -111,7 +129,7 @@ angular.module('fbCal')
         $scope.settings.hostedBy = true;
       }
       sendSettings();
-      saveSettings($scope.settings, checkedEventsList);
+      saveSettingsDebounce();
     };
 
     $scope.login = function() {
@@ -217,10 +235,12 @@ angular.module('fbCal')
       // setTimeout(function() {$wix.UI.initialize($scope.settings);}, 3000);
     };
 
-    var saveSettings = function(settings, events) {
-      var data = JSON.stringify({'settings': settings, 'events' : events});
+    var saveSettings = function() {
+      var data = JSON.stringify({'settings': $scope.settings, 'events' : checkedEventsList});
       server.saveData(data, 'settings');
     };
+
+    var saveSettingsDebounce = debounce(saveSettings, 1000);
     
     // $timeout(function() {
     //   console.debug('a is true!');
