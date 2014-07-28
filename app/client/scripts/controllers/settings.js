@@ -198,10 +198,14 @@ angular.module('fbCal')
       } else if (message === 'not logged in') {
         $scope.loginMessage = 'You must log into Facebook before you can ' +
                             'connect.';
+      } else if (message === 'login') {
+        $scope.loginMessage = 'You are not logged out. You must be logged' +
+                              ' into Facebook before you can disconnect.' +
+                              ' Login and try again.';
       }
       $timeout(function() {
           $scope.loginMessage = false; 
-        }, 5000);
+        }, 7000);
     };
 
     var getSettings = function() {

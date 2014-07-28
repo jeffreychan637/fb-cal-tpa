@@ -99,6 +99,8 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q, server) {
         $log.info('logged out successful');
         //change back to connect account pane in settings
         deferred.resolve();
+      } else if (response.error && response.error.type === 'OAuthException') {
+        deferred.reject('login');
       } else {
         deferred.reject('unknown');
       }
