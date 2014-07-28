@@ -157,7 +157,7 @@ def get_data(request, compID, request_from_widget):
         if request_from_widget:
             if access_token_data:
                 fb_event_data = get_event_data(events, access_token_data, \
-                                           request_from_widget)
+                                               request_from_widget)
                 if not fb_event_data:
                     abort(STATUS["Bad_Gateway"], 
                         message="Couldn't receive data from Facebook")
@@ -170,13 +170,15 @@ def get_data(request, compID, request_from_widget):
                                  "fb_event_data" : "", "active" : "false"}
         else:
             if access_token_data:
+                user_id = access_token_data["user_id"]
                 name = get_user_name(access_token_data)
                 active = "true"
             else:
                 active = "false"
+                user_id = ""
                 name = ""
 
             full_settings = {"settings" : settings, "events" : events, \
-                                 "active" : active, "name" : name};
+                             "active" : active, "name" : name, "user_id" : user_id};
         full_json = json.dumps(full_settings)
         return full_json

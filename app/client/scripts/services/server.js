@@ -25,7 +25,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var defaultSettingsWidget = {settings : api.defaults, events : [],
                                fb_event_data : {}, active : true};
   var defaultSettingsSettings = {settings : api.defaults, events : [],
-                                 active : true, name: ""};
+                                 active : true, name: "", user_id: ""};
 
   var getURL = function(requestType, from) {
     if (requestType === 'get') {

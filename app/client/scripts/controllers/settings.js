@@ -5,27 +5,27 @@ angular.module('fbCal')
   .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout, server, $log) {
     $scope.settings = api.defaults;
 
-    $scope.eventList = [{id: '454', title: 'Wimbledon'},
+    $scope.allEventsList = [{id: '454', title: 'Wimbledon'},
                         {id: '4567', title: 'Superbowl'},
                         {id: '4548', title: 'World Cup Viewing'}];
 
-    $scope.eventList.push({id: '4598', title: 'World Cup Viewing'});
+    $scope.allEventsList.push({id: '4598', title: 'World Cup Viewing'});
 
     // when opening settings, get settings and then save them
     
     $scope.$on('Render Finished', function() {
         console.log("finished");
-        for (var i = 0; i < $scope.eventList.length; i++) {
-          $('#event' + $scope.eventList[i].id).attr('wix-options', '{checked:true}');
+        for (var i = 0; i < $scope.allEventsList.length; i++) {
+          $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
         }
         $wix.UI.initialize($scope.settings);
-        for (var j = 0; j < $scope.eventList.length; j++) {
-          $('#event' + $scope.eventList[j].id + 'Color .color-box-inner').css('background', 'red');
-          // $('#event' + $scope.eventList[i].id).attr('wix-options', '{checked:true}');
+        for (var j = 0; j < $scope.allEventsList.length; j++) {
+          $('#event' + $scope.allEventsList[j].id + 'Color .color-box-inner').css('background', 'red');
+          // $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
         }
     });
 
-    $scope.eventList.push({id: '4500', title: 'World Cupasdasd Viewing'});
+    $scope.allEventsList.push({id: '4500', title: 'World Cupasdasd Viewing'});
     /**
      * Sends the settings to the widget as well as starting the process of
      * saving the settings to the database.
@@ -37,7 +37,6 @@ angular.module('fbCal')
     };
 
     $wix.UI.onChange('*', function (value, key) {
-      console.log($scope.settings);
       console.log(key, value);
       var eventId = key.match(/([0-9]+)$/);
       console.log(eventId);
@@ -45,9 +44,9 @@ angular.module('fbCal')
         //$scope.
         //prefer some kind of hashmap data structure or define an object class.
 
-      } else if (key.match(/event([0-9]+)Color/)) {
+      } else if (key.match(/event([0-9]+)Color$/)) {
         var eventColor = value; //check if this is actually how it works - might be some property of value instead
-        $scope.checkedEventList[key] = value; 
+        $scope.checkedEventsList[key] = value; 
       }
       else if (key === 'corners' || key === 'borderWidth') {
         $scope.settings[key] = Math.ceil(value);
@@ -55,7 +54,7 @@ angular.module('fbCal')
         $scope.settings[key] = value;
       }
       sendSettings();
-      // saveSettings($scope.settings, $scope.checkedEventList);
+      // saveSettings($scope.settings, $scope.checkedEventsList);
     });
 
     $scope.handleToggles = function(toggle) {
@@ -108,7 +107,7 @@ angular.module('fbCal')
               .then(function() {
                   $scope.loggedIn = false;
                   handlingFbMessages('logout successful');
-                  $scope.eventList = [];
+                  $scope.allEventsList = [];
               }, function() {
                 $scope.loggedIn = false;
                 handlingFbMessages('unknown');
@@ -167,8 +166,8 @@ angular.module('fbCal')
       }
       $scope.loggedIn = response.active;
       $scope.userName = response.name;
-      //do soemthing with event IDs
-      $scope.eventList.push({id: '4600', title: 'World Cuperrr Viewing'});
+      $scope.checkedEventsList =  response.events;
+      $scope.allEventsList.push({id: '4600', title: 'World Cuperrr Viewing'});
       // setTimeout(function() {$wix.UI.initialize($scope.settings);}, 3000);
     };
 
