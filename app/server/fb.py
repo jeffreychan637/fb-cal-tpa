@@ -42,10 +42,17 @@ def get_event_data(events, access_token_data, request_from_widget):
 
 def get_all_event_data(access_token_data):
   try:
-    print access_token_data
-    graph = facebook.GraphAPI(access_token_data['access_token'])
-
-
+    print access_token_data["access_token"]
+    cur_time = int(time())
+    seconds_in_two_months = 60 * 60 * 24 * 60
+    time_two_months_ago = str(cur_time - seconds_in_two_months)
+    graph = facebook.GraphAPI(access_token_data["access_token"])
+    events = graph.get_object("/me/events/created", since = time_two_months_ago)
+    try:
+      #get events.paging.next
+      events.paging.next
+    except AttributeError:
+      return events["data"]
   except facebook.GraphAPIError, e:
     print e.message
     return False

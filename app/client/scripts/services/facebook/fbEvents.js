@@ -16,11 +16,10 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
   };
 
   var getAllEvents = function(deferred, userId) {
-    console.log(userId);
     var curTime = Math.round(new Date().getTime() / 1000);
     var secondsInTwoMonths = 60 * 60 * 24 * 60;
     var twoMonthsAgo = (curTime - secondsInTwoMonths).toString();
-    FB.api('/me/events?since=' + twoMonthsAgo, function(response) {
+    FB.api('/me/events/created?since=' + twoMonthsAgo, function(response) {
       console.info(response);
       if (response && !response.error) {
         if (response.paging) {

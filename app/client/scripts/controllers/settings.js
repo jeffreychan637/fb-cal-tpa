@@ -9,14 +9,6 @@ angular.module('fbCal')
     var eventsInfoList;
     var userId;
     $scope.allEventsList = [];
-
-    // $scope.allEventsList = [{id: '454', title: 'Wimbledon'},
-    //                     {id: '4567', title: 'Superbowl'},
-    //                     {id: '4548', title: 'World Cup Viewing'}];
-
-    // $scope.allEventsList.push({id: '4598', title: 'World Cup Viewing'});
-
-    // when opening settings, get settings and then save them
     
     $scope.$on('Render Finished', function() {
         console.log("finished");
@@ -40,7 +32,6 @@ angular.module('fbCal')
                                                  eventsInfo: eventsInfoList
                                                 },
                                                 $wix.Utils.getOrigCompId());
-      //call save to the database function here
     };
 
     $wix.UI.onChange('*', function (value, key) {
@@ -76,20 +67,6 @@ angular.module('fbCal')
       sendSettings();
       saveSettingsDebounce();
     });
-
-    var debounce = function(func, wait, immediate) {
-        var timeout;
-        return function() {
-          $timeout.cancel(timeout);
-          timeout = $timeout(function() {
-            timeout = null;
-            if (!immediate) {
-              func.apply();
-            }
-          }, wait);
-          if (immediate && !timeout) func.apply();
-        };
-      };
 
     /** Hack to get value of colorpicker */
     var getColor = function(eventId) {
@@ -241,6 +218,20 @@ angular.module('fbCal')
       server.saveData(data, 'settings');
     };
 
+    var debounce = function(func, wait, immediate) {
+        var timeout;
+        return function() {
+          $timeout.cancel(timeout);
+          timeout = $timeout(function() {
+            timeout = null;
+            if (!immediate) {
+              func.apply();
+            }
+          }, wait);
+          if (immediate && !timeout) func.apply();
+        };
+      };
+
     var saveSettingsDebounce = debounce(saveSettings, 1000);
 
     /**
@@ -297,6 +288,7 @@ angular.module('fbCal')
       server.getAllEvents()
         .then(function(eventDetailsFromServer) {
           $scope.allEventsList = eventDetailsFromServer;
+          console.log($scope.allEventsList);
         }, function() {
           console.warn('initializing from here');
           $wix.UI.initialize($scope.settings);
