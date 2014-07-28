@@ -3,7 +3,8 @@
 
 angular.module('fbCal')
   .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout, server, $log) {
-    $scope.settings = api.defaults;
+    var checkedEventsList;
+    var eventsInfoList;
 
     $scope.allEventsList = [{id: '454', title: 'Wimbledon'},
                         {id: '4567', title: 'Superbowl'},
@@ -16,11 +17,11 @@ angular.module('fbCal')
     $scope.$on('Render Finished', function() {
         console.log("finished");
         for (var i = 0; i < $scope.allEventsList.length; i++) {
-          $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
+          // $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
         }
         $wix.UI.initialize($scope.settings);
         for (var j = 0; j < $scope.allEventsList.length; j++) {
-          $('#event' + $scope.allEventsList[j].id + 'Color .color-box-inner').css('background', 'red');
+          $('#event' + $scope.allEventsList[j].id + 'Color .color-box-inner').css('background', '#0088CB');
           // $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
         }
     });
@@ -31,7 +32,10 @@ angular.module('fbCal')
      * saving the settings to the database.
      */
     var sendSettings = function() {
-      $wix.Settings.triggerSettingsUpdatedEvent($scope.settings,
+      $wix.Settings.triggerSettingsUpdatedEvent({settings: $scope.settings,
+                                                 events: checkedEventsList,
+                                                 eventsInfo: eventsInfoList
+                                                },
                                                 $wix.Utils.getOrigCompId());
       //call save to the database function here
     };
@@ -39,23 +43,58 @@ angular.module('fbCal')
     $wix.UI.onChange('*', function (value, key) {
       console.log(key, value);
       var eventId = key.match(/([0-9]+)$/);
-      console.log(eventId);
       if (eventId) {
-        //$scope.
-        //prefer some kind of hashmap data structure or define an object class.
-
+        if (value) {
+          var eventHex = getColor(eventId[1]);
+          var eventObj = {eventId: eventId[1], eventColor: eventHex};
+          checkedEventsList.push(eventObj);
+        } else {
+          var eventIndex = checkedEventsList.map(function (elem) {
+                                              return elem.eventId;
+                                            }).indexOf(eventId[1]);
+          checkedEventsList.splice(eventIndex, 1);
+        }
       } else if (key.match(/event([0-9]+)Color$/)) {
-        var eventColor = value; //check if this is actually how it works - might be some property of value instead
-        $scope.checkedEventsList[key] = value; 
-      }
-      else if (key === 'corners' || key === 'borderWidth') {
+        eventId = key.match(/([0-9]+)/);
+        console.log('value', value.cssColor, eventId);
+
+        for (var i = 0; i < checkedEventsList.length; i++) {
+          console.log(i);
+          if (checkedEventsList[i].eventId === eventId[1]) {
+            checkedEventsList[i].eventColor = value.cssColor;
+            break;
+          }
+        }
+      } else if (key === 'corners' || key === 'borderWidth') {
         $scope.settings[key] = Math.ceil(value);
       } else {
         $scope.settings[key] = value;
       }
       sendSettings();
-      // saveSettings($scope.settings, $scope.checkedEventsList);
+      saveSettings($scope.settings, checkedEventsList);
+
     });
+
+    /** Hack to get value of colorpicker */
+    var getColor = function(eventId) {
+      var style = $('#event' + eventId + 'Color .color-box-inner').attr('style');
+      var colorRGB = style.match(/rgb\(([0-9]+), ([0-9]+), ([0-9]+)\);$/);
+      return convertToHex(parseInt(colorRGB[1], 10), parseInt(colorRGB[2], 10), 
+                          parseInt(colorRGB[3], 10));
+    };
+
+    var convertToHex = function(r, g, b) {
+      return ("#" + componentToHex(r) + componentToHex(g) + componentToHex(b));
+    };
+
+    var componentToHex = function(c) {
+      var hex = c.toString(16).toUpperCase();
+      if (hex.length === 1) {
+        return "0" + hex;
+      } else {
+        return hex;
+      }
+    };
 
     $scope.handleToggles = function(toggle) {
       if (toggle === 'view') {
@@ -72,6 +111,7 @@ angular.module('fbCal')
         $scope.settings.hostedBy = true;
       }
       sendSettings();
+      saveSettings($scope.settings, checkedEventsList);
     };
 
     $scope.login = function() {
@@ -164,9 +204,15 @@ angular.module('fbCal')
       } else {
         $scope.settings = api.defaults;
       }
+      if (response.events && response.events !== "settings") {
+        checkedEventsList = response.events;
+        console.log(checkedEventsList);
+      } else {
+        checkedEventsList = [];
+      }
       $scope.loggedIn = response.active;
       $scope.userName = response.name;
-      $scope.checkedEventsList =  response.events;
+      console.log(checkedEventsList);
       $scope.allEventsList.push({id: '4600', title: 'World Cuperrr Viewing'});
       // setTimeout(function() {$wix.UI.initialize($scope.settings);}, 3000);
     };
@@ -176,7 +222,58 @@ angular.module('fbCal')
       server.saveData(data, 'settings');
     };
     
+    // $timeout(function() {
+    //   console.debug('a is true!');
+    //   $scope.a = true;
+    // }, 3000);
 
+    // $timeout(function() {
+    //   console.debug('b is true!');
+    //   $scope.b = true;
+    // }, 5000);
+
+    // $timeout(function() {
+    //   console.debug('a is false!');
+    //   $scope.a = false;
+    // }, 7000);
+
+    // $timeout(function() {
+    //   console.debug('b is false!');
+    //   $scope.b = false;
+    // }, 10000);
+
+    // $timeout(function() {
+    //   console.debug('a is true!');
+    //   $scope.a = true;
+    // }, 12000);
+
+    // $timeout(function() {
+    //   console.debug('b is true!');
+    //   $scope.b = true;
+    // }, 14000);
+
+    // var butt = $scope.$watch('a', function() {
+    //   console.debug('watching a!');
+    //   if ($scope.a) {
+    //      console.debug('I see that a is true!');
+    //     if (!$scope.b) {
+    //       var c = $scope.$watch('b', function() {
+    //         console.debug('watching b!');
+    //         if ($scope.b) {
+    //           console.debug('I see that b is true!');
+    //           c();
+    //         } else {
+    //            console.debug('b is still false!');
+    //         }
+    //       });
+    //       butt();
+    //     } else {
+    //       console.debug('b is true!');
+    //     }
+    //   } else {
+    //      console.debug('a is still false!');
+    //   }
+    // });
 
     // $wix.Settings.refreshApp();
 
