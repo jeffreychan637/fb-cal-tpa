@@ -42,7 +42,8 @@ def get_event_data(events, access_token_data, request_from_widget):
 
 def get_all_event_data(access_token_data):
   try:
-    graph = facebook.GraphAPI(access_token_data.access_token)
+    print access_token_data
+    graph = facebook.GraphAPI(access_token_data['access_token'])
 
 
   except facebook.GraphAPIError, e:

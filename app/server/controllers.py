@@ -34,7 +34,7 @@ class GetAllEvents(Resource):
               message= "Could Not Get Events")
         if not db_entry and db_entry.access_token_data:
             abort(STATUS["Not_Found"], message= "Could not find User")
-        event_data = get_all_event_data(db_entry.access_token_data)
+        event_data = get_all_event_data(json.loads(db_entry.access_token_data))
         if not event_data:
             abort(STATUS["Bad_Gateway"], 
                   message="Couldn't receive data from Facebook")
@@ -141,7 +141,7 @@ def get_data(request, compID, request_from_widget):
                               "fb_event_data" : "", "active" : "false"}
         else:
             empty_settings = {"settings" : "", "events" : "", \
-                              "active" : "false"}
+                              "active" : "false", "name" : "", "user_id" : ""}
         empty_json = json.dumps(empty_settings)
         return empty_json
     else:

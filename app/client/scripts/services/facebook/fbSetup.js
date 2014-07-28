@@ -26,6 +26,7 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window, server) {
     var auth_response_change_callback = function(response) {
       if (response && !response.error && response.status === 'connected' &&
           checkValidHost($window.location.hostname)) {
+        fbReady = true;
         server.saveData({access_token: response.authResponse.accessToken}, "access token");
       }
     };
@@ -33,7 +34,6 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window, server) {
     FB.Event.subscribe('auth.authResponseChange', auth_response_change_callback);
 
     $log.log('done');
-    fbReady = true;
   };
 
   (function(d, s, id){

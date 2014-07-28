@@ -51,19 +51,9 @@
           <li class="events-list" ng-repeat="event in allEventsList" on-finish-render="Render Finished">
               <div id="event{{event.id}}" wix-model="event{{event.id}}" wix-ctrl="Checkbox"></div>
               <div id="event{{event.id}}Color" wix-model="event{{event.id}}Color" wix-param="event{{event.id}}Color" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
-              <span class="uilib-text">{{event.title}}</span>
+              <span class="uilib-text">{{event.name}}</span>
           </li>
-          <li class="events-list">
-            <div wix-model="event2" wix-ctrl="Checkbox" class="non-first-events"></div>
-            <div wix-model="event2Color" wix-param="eventColor2" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
-            <span class="uilib-text">Super Bowl Gathering</span>
-          </li>
-          <li class="events-list">
-            <div wix-model="event3" wix-ctrl="Checkbox" class="non-first-events"></div>
-            <div wix-model="event3Color" wix-param="eventColor3" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
-            <span class="uilib-text">World Cup Showing</span>
-          </li>
-          </ul>
+        </ul>
       </div>
     </div>
     <div class="acc-pane">

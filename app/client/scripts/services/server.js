@@ -87,29 +87,30 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   };
 
   var getAllEvents = function() {
+    var deferred = $q.defer();
     $http({
            method: 'GET',
            url: getAllEventsURL,
-           headers: {'X-Wix-Instance' : instance},
+           headers: getHeader('settings'),
            timeout: 10000
           }).success(function (data, status) {
             console.log(status, data);
             if (status === 200) {
               console.log(data);
-              return jQuery.parseJSON(data);
+              deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
             } else {
               console.log('The server is returning an incorrect status.');
-              return {};
+              deferred.reject();
               //i don't really know what the fb_event_data looks like
             }
           }).error(function (message, status) {
             $log.warn(status, message);
-            return {};
+            deferred.reject();
           });
+    return deferred.promise;
   };
 
   var saveData = function(data, dataType) {
-    $log.info(getURL('post', dataType));
     $http({
             method: 'PUT',
             url: getURL('post', dataType),
@@ -117,7 +118,6 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
             timeout: 10000,
             data: data
           }).success(function (message, status) {
-            console.log(status, message);
             if (status === 200) {
               console.debug(dataType + ' saved successfully.');
               return true;

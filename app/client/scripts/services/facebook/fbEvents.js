@@ -1,9 +1,42 @@
 'use strict';
 /*global FB:false, console:false */
 
-angular.module('fbCal').factory('fbEvents', function ($log) {
-  var getEventforSettings = function() {
+angular.module('fbCal').factory('fbEvents', function ($log, $q) {
+  var getUserEventDetails = function() {
+    var deferred = $q.defer();
+    FB.api('/me', function(response) {
+      if (response && !response.error) {
+        console.log(response);
+        getAllEvents(deferred, response.id);
+      } else {
+        deferred.reject();
+      }
+    });
+    return deferred.promise;
+  };
 
+  var getAllEvents = function(deferred, userId) {
+    console.log(userId);
+    var curTime = Math.round(new Date().getTime() / 1000);
+    var secondsInTwoMonths = 60 * 60 * 24 * 60;
+    var twoMonthsAgo = (curTime - secondsInTwoMonths).toString();
+    FB.api('/me/events?since=' + twoMonthsAgo, function(response) {
+      console.info(response);
+      if (response && !response.error) {
+        if (response.paging) {
+          if (response.paging.next) {
+            //DEAL WITH PAGINATION
+            deferred.resolve({data: response.data, userId: userId});
+          } else {
+            deferred.resolve({data: response.data, userId: userId});
+          }
+        } else {
+          deferred.resolve({data: response.data, userId: userId});
+        }
+      } else {
+        deferred.reject();
+      }
+    });
   };
 
   var post = function() {
@@ -20,5 +53,9 @@ angular.module('fbCal').factory('fbEvents', function ($log) {
 
   var changeAttendingStatus = function() {
 
+  };
+
+  return {
+    getUserEventDetails: getUserEventDetails
   };
 });

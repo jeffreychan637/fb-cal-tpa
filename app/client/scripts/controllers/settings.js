@@ -3,15 +3,18 @@
 
 angular.module('fbCal')
   .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup,
-                                        fbLogin, $timeout, server, $log) {
+                                        fbLogin, $timeout, server, $log,
+                                        fbEvents) {
     var checkedEventsList;
     var eventsInfoList;
+    var userId;
+    $scope.allEventsList = [];
 
-    $scope.allEventsList = [{id: '454', title: 'Wimbledon'},
-                        {id: '4567', title: 'Superbowl'},
-                        {id: '4548', title: 'World Cup Viewing'}];
+    // $scope.allEventsList = [{id: '454', title: 'Wimbledon'},
+    //                     {id: '4567', title: 'Superbowl'},
+    //                     {id: '4548', title: 'World Cup Viewing'}];
 
-    $scope.allEventsList.push({id: '4598', title: 'World Cup Viewing'});
+    // $scope.allEventsList.push({id: '4598', title: 'World Cup Viewing'});
 
     // when opening settings, get settings and then save them
     
@@ -27,7 +30,6 @@ angular.module('fbCal')
         }
     });
 
-    $scope.allEventsList.push({id: '4500', title: 'World Cupasdasd Viewing'});
     /**
      * Sends the settings to the widget as well as starting the process of
      * saving the settings to the database.
@@ -76,16 +78,12 @@ angular.module('fbCal')
     });
 
     var debounce = function(func, wait, immediate) {
-        console.log('I got called');
         var timeout;
-        console.debug(func);
         return function() {
-          console.log('debounce func is running');
           $timeout.cancel(timeout);
           timeout = $timeout(function() {
             timeout = null;
             if (!immediate) {
-              console.log('I called the function');
               func.apply();
             }
           }, wait);
@@ -224,15 +222,13 @@ angular.module('fbCal')
       }
       if (response.events && response.events !== "settings") {
         checkedEventsList = response.events;
-        console.log(checkedEventsList);
       } else {
         checkedEventsList = [];
       }
       $scope.loggedIn = response.active;
       $scope.userName = response.name;
-      console.log(checkedEventsList);
-      $scope.allEventsList.push({id: '4600', title: 'World Cuperrr Viewing'});
-      // setTimeout(function() {$wix.UI.initialize($scope.settings);}, 3000);
+      console.log(response);
+      userId = response.user_id;
     };
 
     var saveSettings = function() {
@@ -241,59 +237,65 @@ angular.module('fbCal')
     };
 
     var saveSettingsDebounce = debounce(saveSettings, 1000);
-    
-    // $timeout(function() {
-    //   console.debug('a is true!');
-    //   $scope.a = true;
-    // }, 3000);
 
-    // $timeout(function() {
-    //   console.debug('b is true!');
-    //   $scope.b = true;
-    // }, 5000);
+    /**
+     * These lines of code essentially watch for when we get the access token
+     * for the user from Facebook on the client side. Once we get that, we pull
+     * all event data and the user's ID from Facebook. Then we compare this user
+     * ID with the user ID from the database that is sent with the settings. If
+     * they match, we show the event data in the settings panel. If they don't,
+     * we make an extra call to the server to get the actual user's event data.
+     *
+     * For the most part, users tend to stay signed into their Facebook accounts
+     * so this technique will result in simultanenous loading of event details
+     * from Facebook and settings from the database. In rare cases where this is
+     * not the case, we have to make two calls to the server before the settings
+     * are ready for the user.
+     *
+     * All watches are killed after we determine that the components we are
+     * waiting for (getting token on client side and settings from server)
+     * are received.
+     */
+    var fbInitWatch = $scope.$watch(function() {
+      return fbSetup.getFbReady();
+      }, function() {
+        if (fbSetup.getFbReady()) {
+          fbInitWatch();
+          fbEvents.getUserEventDetails()
+            .then(function(eventDetailsFromClient) {
+              var watchServerforSettings = $scope.$watch('userName', function() {
+                console.log('username', $scope.userName);
+                if (userId) {
+                  watchServerforSettings();
+                  if (userId === eventDetailsFromClient.userId) {
+                    $scope.allEventsList = eventDetailsFromClient.data;
+                    // for (var i = 0; i < eventDetailsFromClient.length; i++) {
+                    //   $scope.allEventsList.push(eventDetailsFromClient)
+                    // }
+                    console.log($scope.allEventsList);
+                  } else {
+                    getAllEventsFromServer();
+                  }
+                } else if (userId === "") {
+                   $wix.UI.initialize($scope.settings);
+                }
+              });
+            }, function(response) {
+              console.warn('called from here');
+              getAllEventsFromServer();
+            });
+        }
+    });
 
-    // $timeout(function() {
-    //   console.debug('a is false!');
-    //   $scope.a = false;
-    // }, 7000);
-
-    // $timeout(function() {
-    //   console.debug('b is false!');
-    //   $scope.b = false;
-    // }, 10000);
-
-    // $timeout(function() {
-    //   console.debug('a is true!');
-    //   $scope.a = true;
-    // }, 12000);
-
-    // $timeout(function() {
-    //   console.debug('b is true!');
-    //   $scope.b = true;
-    // }, 14000);
-
-    // var butt = $scope.$watch('a', function() {
-    //   console.debug('watching a!');
-    //   if ($scope.a) {
-    //      console.debug('I see that a is true!');
-    //     if (!$scope.b) {
-    //       var c = $scope.$watch('b', function() {
-    //         console.debug('watching b!');
-    //         if ($scope.b) {
-    //           console.debug('I see that b is true!');
-    //           c();
-    //         } else {
-    //            console.debug('b is still false!');
-    //         }
-    //       });
-    //       butt();
-    //     } else {
-    //       console.debug('b is true!');
-    //     }
-    //   } else {
-    //      console.debug('a is still false!');
-    //   }
-    // });
+    var getAllEventsFromServer = function() {
+      server.getAllEvents()
+        .then(function(eventDetailsFromServer) {
+          $scope.allEventsList = eventDetailsFromServer;
+        }, function() {
+          console.warn('initializing from here');
+          $wix.UI.initialize($scope.settings);
+        });
+    };
 
     // $wix.Settings.refreshApp();
 
