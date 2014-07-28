@@ -58,4 +58,4 @@ def get_user_name(access_token_data):
     return name
   except facebook.GraphAPIError, e:
     print e.message
-    return False
+    return ""

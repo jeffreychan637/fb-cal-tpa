@@ -1,7 +1,7 @@
 'use strict';
 /*global $:false, FB:false, console:false */
 
-angular.module('fbCal').factory('fbLogin', function ($log, $q) {
+angular.module('fbCal').factory('fbLogin', function ($log, $q, server) {
 
   var checkLoginState = function() {
     var deferred = $q.defer();
@@ -22,7 +22,7 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
     }
   };
 
-  var testAPI = function(deferred) {
+  var testAPI = function(deferred, accessToken) {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log(response);
@@ -32,12 +32,12 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
         $log.log('rejected');
         deferred.reject('unknown');
       } else {
-        checkPermissions(deferred, response.name);
+        checkPermissions(deferred, response.name, accessToken);
       }
     });
   };
 
-  var checkPermissions = function(deferred, name) {
+  var checkPermissions = function(deferred, name, accessToken) {
     FB.api('/me/permissions', function(response) {
       console.log(response);
       if (!response || response.error) {
@@ -49,7 +49,15 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
           var permission = response.data[i];
           if (permission.permission === 'user_events' && permission.status === 'granted') {
             permissionGranted = true;
-            deferred.resolve(name);
+            server.saveData({access_token: accessToken}, "access token")
+              .then(function() {
+                  deferred.resolve(name);
+                }, function() {
+                  logout()['finally'](function() {
+                  deferred.reject('unknown');
+                });
+              });
+            break;
           }
         }
         if (!permissionGranted) {
@@ -68,7 +76,7 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
       if (!response.error) {
         if (response.status === 'connected') {
           console.log('login successful');
-          testAPI(deferred);
+          testAPI(deferred, response.authResponse.accessToken);
         } else if (response.status === 'not_authorized') {
           console.log('login declined');
           //show you must authorize to use this app message

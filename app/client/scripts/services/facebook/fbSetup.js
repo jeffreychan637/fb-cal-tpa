@@ -1,7 +1,7 @@
 'use strict';
 /*global FB:false, console:false */
 
-angular.module('fbCal').factory('fbSetup', function ($log, $window, server) {
+angular.module('fbCal').factory('fbSetup', function ($log, $window, server, $rootScope) {
 
   var fbReady = false;
 
@@ -12,6 +12,7 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window, server) {
   };
 
   var getFbReady = function() {
+    console.log(fbReady);
     return fbReady;
   };
 
@@ -19,19 +20,17 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window, server) {
     FB.init({
       appId      : '790467867660486',
       xfbml      : true,
-      version    : 'v2.0',
-      status     : true
+      version    : 'v2.0'
     });
 
-    var auth_response_change_callback = function(response) {
+    FB.getLoginStatus(function(response) {
+      fbReady = true;
+      $rootScope.$apply();
       if (response && !response.error && response.status === 'connected' &&
           checkValidHost($window.location.hostname)) {
-        fbReady = true;
         server.saveData({access_token: response.authResponse.accessToken}, "access token");
       }
-    };
-
-    FB.Event.subscribe('auth.authResponseChange', auth_response_change_callback);
+    });
 
     $log.log('done');
   };

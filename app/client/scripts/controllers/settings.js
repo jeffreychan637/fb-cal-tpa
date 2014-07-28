@@ -1,5 +1,5 @@
 'use strict';
-/*global $:false, , console:false, JSON:false */
+/*global $:false, , console:false, JSON:false , location:false*/
 
 angular.module('fbCal')
   .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup,
@@ -140,6 +140,7 @@ angular.module('fbCal')
             console.log('running');
             $scope.userName = response;
             $scope.loggedIn = true;
+            location.reload();
           }, 
           function(error) {
             console.log('got login error');
@@ -260,6 +261,7 @@ angular.module('fbCal')
       return fbSetup.getFbReady();
       }, function() {
         if (fbSetup.getFbReady()) {
+          console.log('fb is ready');
           fbInitWatch();
           fbEvents.getUserEventDetails()
             .then(function(eventDetailsFromClient) {

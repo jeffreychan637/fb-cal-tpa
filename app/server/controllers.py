@@ -79,6 +79,7 @@ def validate_put_request(request, datatype):
             data = json.loads(request.data)
             access_token = data["access_token"]
         except:
+            print data
             abort(STATUS["Bad_Request"], message="Badly Formed Request")
         info = {"instance" : instance, "access_token" : access_token}
     elif datatype == "settings":

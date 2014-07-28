@@ -53,6 +53,14 @@
               <div id="event{{event.id}}Color" wix-model="event{{event.id}}Color" wix-param="event{{event.id}}Color" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
               <span class="uilib-text">{{event.name}}</span>
           </li>
+          <li>
+            <span class="uilib-text" ng-show="allEventsList.length === 0 &amp;&amp; loggedIn">
+              No events found.
+            </span>
+            <span class="uilib-text" ng-hide="loggedIn">
+              Connect to your Facebook accounts to add your events to the calendar.
+            </span>
+          </li>
         </ul>
       </div>
     </div>

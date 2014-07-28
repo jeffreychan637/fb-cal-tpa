@@ -111,6 +111,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   };
 
   var saveData = function(data, dataType) {
+    var deferred = $q.defer();
     $http({
             method: 'PUT',
             url: getURL('post', dataType),
@@ -120,17 +121,18 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
           }).success(function (message, status) {
             if (status === 200) {
               console.debug(dataType + ' saved successfully.');
-              return true;
+              deferred.resolve();
             } else {
               console.log('The server is returning an incorrect status.');
-              return false;
+              deferred.reject();
             }
           }).error(function (message, status) {
             console.log(dataType + ' failed to save.');
             console.log(status);
             console.log(message);
-            return false;
+            deferred.reject();
           });
+    return deferred.promise;
   };
 
   var logout = function() {
