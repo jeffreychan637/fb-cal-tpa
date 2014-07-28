@@ -5,7 +5,7 @@ angular.module('fbCal')
     return {
         restrict: 'A',
         link: function (scope, element, attr) {
-            if (scope.$last === true  && scope.allEventsList.length === 4) {
+            if (scope.$last === true) {
                 $timeout(function () {
                     scope.$emit(attr.onFinishRender);
                 });

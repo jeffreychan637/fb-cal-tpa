@@ -49,9 +49,9 @@
       <div class="acc-content">
         <ul class="list">
           <li class="events-list" ng-repeat="event in allEventsList" on-finish-render="Render Finished">
-              <div id="event{{event.id}}" wix-model="event{{event.id}}" wix-ctrl="Checkbox"></div>
-              <div id="event{{event.id}}Color" wix-model="event{{event.id}}Color" wix-param="event{{event.id}}Color" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
-              <span class="uilib-text">{{event.name}}</span>
+              <div id="event{{event.id}}" wix-model="event{{event.id}}" wix-ctrl="Checkbox" style=" margin-bottom: 0.75em"></div>
+              <div id="event{{event.id}}Color" wix-model="event{{event.id}}Color" wix-param="event{{event.id}}Color" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em;"></div>
+              <span class="uilib-text event-name">{{event.name}}</span>
           </li>
           <li>
             <span class="uilib-text" ng-show="allEventsList.length === 0 &amp;&amp; loggedIn">
