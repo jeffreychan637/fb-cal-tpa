@@ -1,16 +1,31 @@
 'use strict';
+/*global $:false, , console:false, JSON:false */
 
 angular.module('fbCal')
-  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout, server) {
+  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout, server, $log) {
     $scope.settings = api.defaults;
 
     $scope.eventList = [{id: '454', title: 'Wimbledon'},
                         {id: '4567', title: 'Superbowl'},
                         {id: '4548', title: 'World Cup Viewing'}];
 
+    $scope.eventList.push({id: '4598', title: 'World Cup Viewing'});
+
     // when opening settings, get settings and then save them
+    
+    $scope.$on('Render Finished', function() {
+        console.log("finished");
+        for (var i = 0; i < $scope.eventList.length; i++) {
+          $('#event' + $scope.eventList[i].id).attr('wix-options', '{checked:true}');
+        }
+        $wix.UI.initialize($scope.settings);
+        for (var j = 0; j < $scope.eventList.length; j++) {
+          $('#event' + $scope.eventList[j].id + 'Color .color-box-inner').css('background', 'red');
+          // $('#event' + $scope.eventList[i].id).attr('wix-options', '{checked:true}');
+        }
+    });
 
-
+    $scope.eventList.push({id: '4500', title: 'World Cupasdasd Viewing'});
     /**
      * Sends the settings to the widget as well as starting the process of
      * saving the settings to the database.
@@ -22,8 +37,9 @@ angular.module('fbCal')
     };
 
     $wix.UI.onChange('*', function (value, key) {
+      console.log($scope.settings);
       console.log(key, value);
-      var eventId = key.match(/event([0-9]+)/);
+      var eventId = key.match(/([0-9]+)$/);
       console.log(eventId);
       if (eventId) {
         //$scope.
@@ -39,6 +55,7 @@ angular.module('fbCal')
         $scope.settings[key] = value;
       }
       sendSettings();
+      // saveSettings($scope.settings, $scope.checkedEventList);
     });
 
     $scope.handleToggles = function(toggle) {
@@ -131,9 +148,39 @@ angular.module('fbCal')
         }, 5000);
     };
 
+    var getSettings = function() {
+      server.getUserInfo('settings')
+        .then(function (response) {
+          $log.info('got settings');
+          setSettings(response);
+        }, function(response) {
+          $log.warn('rejected');
+          setSettings(response);
+        });
+    };
+
+    var setSettings = function(response) {
+      if (response.settings) {
+        $scope.settings = response.settings;
+      } else {
+        $scope.settings = api.defaults;
+      }
+      $scope.loggedIn = response.active;
+      $scope.userName = response.name;
+      //do soemthing with event IDs
+      $scope.eventList.push({id: '4600', title: 'World Cuperrr Viewing'});
+      // setTimeout(function() {$wix.UI.initialize($scope.settings);}, 3000);
+    };
+
+    var saveSettings = function(settings, events) {
+      var data = JSON.stringify({'settings': settings, 'events' : events});
+      server.saveData(data, 'settings');
+    };
+    
 
 
     // $wix.Settings.refreshApp();
 
-    $wix.UI.initialize();
+    getSettings();
+    // $wix.UI.initialize();
 });
