@@ -22,7 +22,7 @@ angular.module('fbCal')
         console.log("modal closed", message);
         api.modalEvent = undefined;
       };
-      console.log('hello open modal');
+      console.debug('hello open modal');
       $wix.openModal("http://localhost:5000/modal/54", 900, 590, onClose);
     };
 
