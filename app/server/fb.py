@@ -33,7 +33,8 @@ def get_long_term_token(short_token, compID, instance):
 #that the user has on FB accounts
 def get_event_data(events, access_token_data, request_from_widget):
   try:
-    graph = facebook.GraphAPI(access_token_data.access_token)
+    graph = facebook.GraphAPI(access_token_data["access_token"])
+    return [{"event_data": "event_data"}]
 
 
   except facebook.GraphAPIError, e:

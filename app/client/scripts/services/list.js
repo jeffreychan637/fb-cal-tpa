@@ -2,7 +2,7 @@
 /*global $:false */
 
 angular.module('fbCal').factory('list', function ($log, $wix) {
-  var setup = function(borderWidth, borderColor) {
+  var setup = function(borderWidth, events, eventData) {
     var borderStyle = {'border-bottom-width' : borderWidth + 'px',
                        'margin-bottom' : '0px'
                       };
