@@ -12,12 +12,29 @@ angular.module('fbCal')
     
     $scope.$on('Render Finished', function() {
         console.log("finished");
-        for (var i = 0; i < $scope.allEventsList.length; i++) {
-          // $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
+        for (var i = 0; i < checkedEventsList.length; i++) {
+          console.log(checkedEventsList[i].eventId);
+          if (($scope.allEventsList.map(function (elem) {
+                console.log(elem.id);
+                return elem.id;
+              }).indexOf(checkedEventsList[i].eventId)) >= 0) {
+            console.log('made it');
+          $('#event' + checkedEventsList[i].eventId).attr('wix-options', 
+                                                        '{checked:true}');
+          }
         }
         $wix.UI.initialize($scope.settings);
         for (var j = 0; j < $scope.allEventsList.length; j++) {
           $('#event' + $scope.allEventsList[j].id + 'Color .color-box-inner').css('background', '#0088CB');
+        }
+        for (var k = 0; k < checkedEventsList.length; k++) {
+          var index = ($scope.allEventsList.map(function (elem) {
+                        return elem.id;
+                      }).indexOf(checkedEventsList[k].eventId));
+          console.log(index);
+          if (index >= 0) {
+             $('#event' + checkedEventsList[k].eventId + 'Color .color-box-inner').css('background', checkedEventsList[k].eventColor);
+          }
           // $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
         }
     });
