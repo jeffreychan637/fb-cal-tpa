@@ -16,7 +16,8 @@
 }
 
 #calendar {
-  padding: 3px;
+  padding: 5px;
+  padding-bottom: 10px;
 }
 
 .glyphicon {
