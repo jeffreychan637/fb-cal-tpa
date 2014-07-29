@@ -9,10 +9,16 @@ angular.module('fbCal')
         return {
           link: function(scope, element) {
             scope.$watch(function() {
-                return scope.settings.corners;
+                if (scope.settings) {
+                  return scope.settings.corners;
+                } else {
+                  return false;
+                }
               },
               function() {
-                element.css('border-radius', scope.settings.corners + 'px');
+                if (scope.settings) {
+                  element.css('border-radius', scope.settings.corners + 'px');
+                }
               });
           }
         };

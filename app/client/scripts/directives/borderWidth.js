@@ -9,10 +9,16 @@ angular.module('fbCal')
         return {
           link: function(scope, element) {
             scope.$watch(function() {
-                return scope.settings.borderWidth;
+                if (scope.settings) {
+                  return scope.settings.borderWidth;
+                } else {
+                  return false;
+                }
               },
               function() {
-                element.css('border-width', scope.settings.borderWidth + 'px');
+                if (scope.settings) {
+                  element.css('border-width', scope.settings.borderWidth + 'px');
+                }
               });
           }
         };
@@ -23,10 +29,14 @@ angular.module('fbCal')
         return {
           link: function(scope, element) {
             scope.$watch(function() {
-                return scope.settings.borderWidth;
+                if (scope.settings) {
+                  return scope.settings.borderWidth;
+                } else {
+                  return false;
+                }
               },
               function() {
-                if (scope.settings.view === 'List') {
+                if (scope.settings && scope.settings.view === 'List') {
                   element.css('border-width', 
                               scope.settings.borderWidth + 'px');
                 }
