@@ -70,7 +70,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            method: 'GET',
            url: getURL('get', from),
            headers: getHeader(from),
-           timeout: 10000
+           timeout: 15000
           }).success(function (data, status) {
             if (status === 200) {
               var response = jQuery.parseJSON(jQuery.parseJSON(data));
@@ -103,7 +103,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            method: 'GET',
            url: getAllEventsURL,
            headers: getHeader('settings'),
-           timeout: 10000
+           timeout: 15000
           }).success(function (data, status) {
             console.log(status, data);
             if (status === 200) {
