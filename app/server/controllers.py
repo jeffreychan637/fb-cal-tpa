@@ -138,7 +138,7 @@ def get_data(request, compID, request_from_widget):
               message= "Could Not Get Settings")
     if not db_entry:
         if request_from_widget:
-            empty_settings = {"settings" : "", "events" : "", \
+            empty_settings = {"settings" : "", \
                               "fb_event_data" : "", "active" : "false"}
         else:
             empty_settings = {"settings" : "", "events" : "", \
@@ -163,11 +163,11 @@ def get_data(request, compID, request_from_widget):
                     abort(STATUS["Bad_Gateway"], 
                         message="Couldn't receive data from Facebook")
                 ###should consider sending settings, just without fb event data
-                full_settings = {"settings" : settings, "events" : events, \
+                full_settings = {"settings" : settings, \
                                  "fb_event_data" : fb_event_data, \
                                  "active" : "true"}
             else:
-                full_settings = {"settings" : settings, "events" : events, \
+                full_settings = {"settings" : settings, \
                                  "fb_event_data" : "", "active" : "false"}
         else:
             if access_token_data:
