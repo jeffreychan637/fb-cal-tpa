@@ -320,8 +320,5 @@ angular.module('fbCal')
         });
     };
 
-    // $wix.Settings.refreshApp();
-
     getSettings();
-    // $wix.UI.initialize();
 });
