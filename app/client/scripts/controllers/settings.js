@@ -214,16 +214,8 @@ angular.module('fbCal')
     };
 
     var setSettings = function(response) {
-      if (response.settings) {
-        $scope.settings = response.settings;
-      } else {
-        $scope.settings = api.defaults;
-      }
-      if (response.events && response.events !== "settings") {
-        checkedEventsList = response.events;
-      } else {
-        checkedEventsList = [];
-      }
+      $scope.settings = response.settings;
+      checkedEventsList = response.events;
       $scope.loggedIn = response.active;
       $scope.userName = response.name;
       console.log(response);
@@ -320,8 +312,5 @@ angular.module('fbCal')
         });
     };
 
-    // $wix.Settings.refreshApp();
-
     getSettings();
-    // $wix.UI.initialize();
 });

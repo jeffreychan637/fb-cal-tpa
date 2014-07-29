@@ -3,7 +3,7 @@
 
 angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
 
-  var setup = function() {
+  var setup = function(events, eventData) { //HAVE A DEFAULT COLOR IN CASE OF DB ERROR
     var calendar = $("#calendar").calendar(
         {
            tmpl_path: "client/bower_components/bootstrap-calendar/tmpls/",

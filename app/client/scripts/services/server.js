@@ -23,7 +23,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var logoutURL = '/Logout/' + compId;
 
   var defaultSettingsWidget = {settings : api.defaults, events : [],
-                               fb_event_data : {}, active : true};
+                               fb_event_data : [], active : true};
   var defaultSettingsSettings = {settings : api.defaults, events : [],
                                  active : true, name: "", user_id: ""};
 
@@ -73,7 +73,18 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            timeout: 10000
           }).success(function (data, status) {
             if (status === 200) {
-              deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
+              var response = jQuery.parseJSON(jQuery.parseJSON(data));
+              if (!response.settings) {
+                response.settings = api.defaults;
+              }
+              if (!response.events) {
+                response.events = [];
+              }
+              if (from === 'widget' && !response.fb_event_data) {
+                response.fb_event_data = [];
+              }
+              deferred.resolve(response);
+              console.debug("Got Settings for " + from);
             } else {
               console.log('The server is returning an incorrect status.');
               deferred.reject(getDefault(from));
@@ -96,7 +107,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
           }).success(function (data, status) {
             console.log(status, data);
             if (status === 200) {
-              console.log(data);
+              console.log(data); 
               deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
             } else {
               console.log('The server is returning an incorrect status.');
