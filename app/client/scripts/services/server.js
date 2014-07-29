@@ -22,7 +22,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var saveAccessTokenURL = '/SaveAccessToken/' + compId;
   var logoutURL = '/Logout/' + compId;
 
-  var defaultSettingsWidget = {settings : api.defaults, events : [],
+  var defaultSettingsWidget = {settings : api.defaults,
                                fb_event_data : [], active : true};
   var defaultSettingsSettings = {settings : api.defaults, events : [],
                                  active : true, name: "", user_id: ""};
@@ -77,7 +77,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
               if (!response.settings) {
                 response.settings = api.defaults;
               }
-              if (!response.events) {
+              if (from === 'settings' && !response.events) {
                 response.events = [];
               }
               if (from === 'widget' && !response.fb_event_data) {
