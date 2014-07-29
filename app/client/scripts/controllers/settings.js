@@ -277,17 +277,16 @@ angular.module('fbCal')
           fbInitWatch();
           fbEvents.getUserEventDetails()
             .then(function(eventDetailsFromClient) {
-              var watchServerforSettings = $scope.$watch('userName', function() {
-                console.log('username', $scope.userName);
+              var watchServerforUserInfo = $scope.$watch('userName', function() {
                 if (userId) {
-                  watchServerforSettings();
+                  watchServerforUserInfo();
                   if (userId === eventDetailsFromClient.userId) {
                     $scope.allEventsList = eventDetailsFromClient.data;
                     // for (var i = 0; i < eventDetailsFromClient.length; i++) {
                     //   $scope.allEventsList.push(eventDetailsFromClient)
                     // }
                     console.log($scope.allEventsList);
-                  } else {
+                  } else if ($scope.loggedIn) {
                     getAllEventsFromServer();
                   }
                 } else if (userId === "") {
@@ -296,7 +295,16 @@ angular.module('fbCal')
               });
             }, function(response) {
               console.warn('called from here');
-              getAllEventsFromServer();
+              var watchServerforActiveInfo = $scope.$watch('userName', function() {
+                if ($scope.userName !== undefined) {
+                  if ($scope.userName) {
+                    watchServerforActiveInfo();
+                    getAllEventsFromServer();
+                  } else {
+                    $wix.UI.initialize($scope.settings);
+                  }
+                }
+              }); 
             });
         }
     });

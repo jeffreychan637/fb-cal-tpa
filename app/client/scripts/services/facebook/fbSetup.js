@@ -12,7 +12,6 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window, server, $roo
   };
 
   var getFbReady = function() {
-    console.log(fbReady);
     return fbReady;
   };
 
