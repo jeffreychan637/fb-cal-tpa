@@ -32,7 +32,7 @@ class GetAllEvents(Resource):
         if db_entry is None:
             abort(STATUS["Internal_Server_Error"], \
               message= "Could Not Get Events")
-        if not db_entry and db_entry.access_token_data:
+        if not (db_entry and db_entry.access_token_data):
             abort(STATUS["Not_Found"], message= "Could not find User")
         event_data = get_all_event_data(json.loads(db_entry.access_token_data))
         if not event_data:

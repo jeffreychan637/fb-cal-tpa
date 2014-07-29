@@ -104,7 +104,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
               //i don't really know what the fb_event_data looks like
             }
           }).error(function (message, status) {
-            $log.warn(status, message);
+            console.warn(status, message);
             deferred.reject();
           });
     return deferred.promise;
