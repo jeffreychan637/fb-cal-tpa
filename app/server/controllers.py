@@ -78,7 +78,7 @@ def validate_put_request(request, datatype):
 
             data = json.loads(request.data)
             access_token = data["access_token"]
-        except:
+        except Exception:
             print data
             abort(STATUS["Bad_Request"], message="Badly Formed Request")
         info = {"instance" : instance, "access_token" : access_token}
@@ -87,7 +87,7 @@ def validate_put_request(request, datatype):
             data_dict = json.loads(request.data)
             settings = json.dumps(data_dict["settings"])
             events = json.dumps(data_dict["events"])
-        except:
+        except Exception:
             abort(STATUS["Bad_Request"], message="Badly Formed Request")
         if not (settings and events):
             abort(STATUS["Bad_Request"], message="Missing Settings or Events")
