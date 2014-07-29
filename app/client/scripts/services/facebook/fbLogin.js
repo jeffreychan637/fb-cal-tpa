@@ -1,7 +1,7 @@
 'use strict';
 /*global $:false, FB:false, console:false */
 
-angular.module('fbCal').factory('fbLogin', function ($log, $q) {
+angular.module('fbCal').factory('fbLogin', function ($log, $q, server) {
 
   var checkLoginState = function() {
     var deferred = $q.defer();
@@ -22,7 +22,7 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
     }
   };
 
-  var testAPI = function(deferred) {
+  var testAPI = function(deferred, accessToken) {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log(response);
@@ -32,8 +32,41 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
         $log.log('rejected');
         deferred.reject('unknown');
       } else {
-        $log.log('resolved');
-        deferred.resolve(response.name);
+        checkPermissions(deferred, response.name, accessToken);
+      }
+    });
+  };
+
+  var checkPermissions = function(deferred, name, accessToken) {
+    FB.api('/me/permissions', function(response) {
+      console.log(response);
+      if (!response || response.error) {
+        console.log(response.error, 'error');
+        deferred.reject('unknown');
+      } else {
+        var permissionGranted;
+        for (var i = 0; i < response.data.length; i++) {
+          var permission = response.data[i];
+          if (permission.permission === 'user_events' && permission.status === 'granted') {
+            permissionGranted = true;
+            server.saveData({access_token: accessToken}, "access token")
+              .then(function() {
+                  deferred.resolve(name);
+                }, function() {
+                  logout()['finally'](function() {
+                  deferred.reject('unknown');
+                });
+              });
+            break;
+          }
+        }
+        if (!permissionGranted) {
+          logout().then(function() {
+            deferred.reject('denied');
+          }, function() {
+            deferred.reject('unknown');
+          });
+        }
       }
     });
   };
@@ -43,7 +76,7 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
       if (!response.error) {
         if (response.status === 'connected') {
           console.log('login successful');
-          testAPI(deferred);
+          testAPI(deferred, response.authResponse.accessToken);
         } else if (response.status === 'not_authorized') {
           console.log('login declined');
           //show you must authorize to use this app message
@@ -56,7 +89,7 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
         //show something went wrong message
         deferred.reject('unknown');
       }
-    }, {scope: 'public_profile, email'});
+    }, {scope: 'public_profile, user_events'});
   };
 
   var logout = function() {
@@ -66,6 +99,8 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q) {
         $log.info('logged out successful');
         //change back to connect account pane in settings
         deferred.resolve();
+      } else if (response.error && response.error.type === 'OAuthException') {
+        deferred.reject('login');
       } else {
         deferred.reject('unknown');
       }

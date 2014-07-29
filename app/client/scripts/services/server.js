@@ -1,9 +1,19 @@
 'use strict';
 /*global $:false, FB:false, console:false, jQuery:false */
 
-angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $window) {
+angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $window, $q) {
+  
+  /**
+   * IN PRODUCTION MODE, CHANGE HEADER URLS TO $window.location.hostname INSTEAD
+   * OF editor.wix.com
+   */
+  
   var compId = $wix.Utils.getCompId();
   var instance = api.getInstance();
+
+  compId = 45;
+  instance = 47;
+
   
   var getSettingsWidgetURL = '/GetSettingsWidget/' + compId;
   var getSettingsSettingsURL = '/GetSettingsSettings/' + compId;
@@ -12,10 +22,10 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var saveAccessTokenURL = '/SaveAccessToken/' + compId;
   var logoutURL = '/Logout/' + compId;
 
-  var defaultSettingsWidget = {settings : api.defaults, eventIds : [],
+  var defaultSettingsWidget = {settings : api.defaults, events : [],
                                fb_event_data : {}, active : true};
-  var defaultSettingsSettings = {settings : api.defaults, eventIds : [],
-                                 active : true, name: ""};
+  var defaultSettingsSettings = {settings : api.defaults, events : [],
+                                 active : true, name: "", user_id: ""};
 
   var getURL = function(requestType, from) {
     if (requestType === 'get') {
@@ -41,100 +51,120 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     }
   };
 
+  var getHeader = function(from) {
+    if (from === 'widget') {
+      return {'X-Wix-Instance' : instance};
+    } else {
+      return {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'};
+    }
+  };
+
   /**
    * This function makes a call to the backend database to get the
    * latest user settings. It's called whenever the widget or settings panal
    * is first loaded. On errors, the default settings are loaded.
    */
   var getUserInfo = function(from) {
+    var deferred = $q.defer();
     $http({
            method: 'GET',
            url: getURL('get', from),
-           headers: {'X-Wix-Instance' : instance},
+           headers: getHeader(from),
            timeout: 10000
-          }).success(function (status, data) {
-            console.log(status, data);
+          }).success(function (data, status) {
             if (status === 200) {
-              console.log(data);
-              return jQuery.parseJSON(data);
+              deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
             } else {
               console.log('The server is returning an incorrect status.');
-              return getDefault(from);
+              deferred.reject(getDefault(from));
               //i don't really know what the fb_event_data looks like
             }
-          }).error(function (status, message) {
+          }).error(function (message, status) {
             $log.warn(status, message);
-            return getDefault(from);
+            deferred.reject(getDefault(from));
           });
+    return deferred.promise;
   };
 
   var getAllEvents = function() {
+    var deferred = $q.defer();
     $http({
            method: 'GET',
            url: getAllEventsURL,
-           headers: {'X-Wix-Instance' : instance},
+           headers: getHeader('settings'),
            timeout: 10000
-          }).success(function (status, data) {
+          }).success(function (data, status) {
             console.log(status, data);
             if (status === 200) {
               console.log(data);
-              return jQuery.parseJSON(data);
+              deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
             } else {
               console.log('The server is returning an incorrect status.');
-              return {};
+              deferred.reject();
               //i don't really know what the fb_event_data looks like
             }
-          }).error(function (status, message) {
-            $log.warn(status, message);
-            return {};
+          }).error(function (message, status) {
+            console.warn(status, message);
+            deferred.reject();
           });
+    return deferred.promise;
   };
 
   var saveData = function(data, dataType) {
+    var deferred = $q.defer();
     $http({
             method: 'PUT',
             url: getURL('post', dataType),
-            headers: {'X-Wix-Instance' : instance, 'URL' : $window.location.hostname},
+            headers: {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'},
             timeout: 10000,
             data: data
-          }).success(function (status, message) {
-            console.log(status, message);
+          }).success(function (message, status) {
             if (status === 200) {
-              console.log(dataType + ' saved successfully.');
-              return true;
+              console.debug(dataType + ' saved successfully.');
+              deferred.resolve();
             } else {
               console.log('The server is returning an incorrect status.');
-              return false;
+              deferred.reject();
             }
-          }).error(function (status, message) {
+          }).error(function (message, status) {
             console.log(dataType + ' failed to save.');
             console.log(status);
             console.log(message);
-            return false;
+            deferred.reject();
           });
+    return deferred.promise;
   };
 
   var logout = function() {
+    var deferred = $q.defer();
     $http({
             method: 'PUT',
             url: logoutURL,
-            headers: {'X-Wix-Instance' : instance, 'URL' : $window.location.hostname},
+            headers: {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'},
             timeout: 10000,
             data: {}
-          }).success(function (status, message) {
+          }).success(function (message, status) {
             console.log(status, message);
             if (status === 200) {
               console.log('Logged out successfully.');
-              return true;
+              deferred.resolve();
             } else {
               console.log('The server is returning an incorrect status.');
-              return false;
+              deferred.resolve();
             }
-          }).error(function (status, message) {
+          }).error(function (message, status) {
             console.log('Failed to logout.');
             console.log(status);
             console.log(message);
-            return false;
+            deferred.reject();
           });
+      return deferred.promise;
+  };
+
+  return {
+    getUserInfo: getUserInfo,
+    getAllEvents: getAllEvents,
+    saveData: saveData,
+    logout: logout
   };
 });

@@ -32,7 +32,7 @@ angular.module('fbCal')
         api.modalEvent = undefined;
       };
       console.log('hello open modal');
-      $wix.openModal("http://localhost:5000/modal/54", 400, 400, onClose);
+      $wix.openModal("http://localhost:5000/modal/54", 900, 590, onClose);
     };
 
     /** 
@@ -42,12 +42,12 @@ angular.module('fbCal')
     $wix.addEventListener($wix.Events.SETTINGS_UPDATED, function(message) {
       console.log('message');
       console.log(message);
-      if (message.view === 'Month' && $scope.settings.view === 'List') {
+      if (message.settings.view === 'Month' && $scope.settings.view === 'List') {
         desktopCalendar.setup();
-      } else if (message.view === 'List' && $scope.settings.view === 'Month') {
+      } else if (message.settings.view === 'List' && $scope.settings.view === 'Month') {
         list.setup(message.borderWidth, message.borderColor);
       }
-      $scope.settings = message;
+      $scope.settings = message.settings;
       $scope.$apply();
     });
 });

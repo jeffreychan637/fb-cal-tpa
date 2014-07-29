@@ -48,23 +48,20 @@
       </h3>
       <div class="acc-content">
         <ul class="list">
-          <li class="events-list" ng-repeat="event in eventList">
-              <div wix-model="event{{event.id}}" wix-ctrl="Checkbox"></div>
-              <div wix-model="event{{event.id}}Color" wix-param="event{{event.id}}Color" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
-              <span class="uilib-text">{{event.title}}</span>
+          <li class="events-list" ng-repeat="event in allEventsList" on-finish-render="Render Finished">
+              <div id="event{{event.id}}" wix-model="event{{event.id}}" wix-ctrl="Checkbox" style=" margin-bottom: 0.75em"></div>
+              <div id="event{{event.id}}Color" wix-model="event{{event.id}}Color" wix-param="event{{event.id}}Color" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em;"></div>
+              <span class="uilib-text event-name">{{event.name}}</span>
           </li>
-          <script type="text/javascript">Wix.UI.initialize();</script>
-          <li class="events-list">
-            <div wix-model="event2" wix-ctrl="Checkbox" class="non-first-events"></div>
-            <div wix-model="event2Color" wix-param="eventColor2" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
-            <span class="uilib-text">Super Bowl Gathering</span>
+          <li>
+            <span class="uilib-text" ng-show="allEventsList.length === 0 &amp;&amp; loggedIn">
+              No events found. Create some events on Facebook first!
+            </span>
+            <span class="uilib-text" ng-hide="loggedIn">
+              Connect to your Facebook accounts to add your events to the calendar.
+            </span>
           </li>
-          <li class="events-list">
-            <div wix-model="event3" wix-ctrl="Checkbox" class="non-first-events"></div>
-            <div wix-model="event3Color" wix-param="eventColor3" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-2'}" class="spacing" style="margin-left: 0.5em; margin-right: 0.5em"></div>
-            <span class="uilib-text">World Cup Showing</span>
-          </li>
-          </ul>
+        </ul>
       </div>
     </div>
     <div class="acc-pane">

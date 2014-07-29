@@ -35,6 +35,11 @@
   border: none !important;
 }
 
+.event-name {
+  width: 80%;
+  vertical-align: baseline;
+}
+
 .non-first-events {
   margin-top: 0.5em;
 }

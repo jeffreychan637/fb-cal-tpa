@@ -1,45 +1,110 @@
 'use strict';
+/*global $:false, , console:false, JSON:false , location:false*/
 
 angular.module('fbCal')
-  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup, fbLogin, $timeout) {
-    $scope.settings = api.defaults;
-
-    $scope.eventList = [{id: '454', title: 'Wimbledon'},
-                        {id: '4567', title: 'Superbowl'},
-                        {id: '4548', title: 'World Cup Viewing'}];
-
-    // when opening settings, get settings and then save them
-
+  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup,
+                                        fbLogin, $timeout, server, $log,
+                                        fbEvents) {
+    var checkedEventsList;
+    var eventsInfoList;
+    var userId;
+    $scope.allEventsList = [];
+    
+    $scope.$on('Render Finished', function() {
+        console.log("finished");
+        for (var i = 0; i < checkedEventsList.length; i++) {
+          console.log(checkedEventsList[i].eventId);
+          if (($scope.allEventsList.map(function (elem) {
+                console.log(elem.id);
+                return elem.id;
+              }).indexOf(checkedEventsList[i].eventId)) >= 0) {
+            console.log('made it');
+          $('#event' + checkedEventsList[i].eventId).attr('wix-options', 
+                                                        '{checked:true}');
+          }
+        }
+        $wix.UI.initialize($scope.settings);
+        for (var j = 0; j < $scope.allEventsList.length; j++) {
+          $('#event' + $scope.allEventsList[j].id + 'Color .color-box-inner').css('background', '#0088CB');
+        }
+        for (var k = 0; k < checkedEventsList.length; k++) {
+          var index = ($scope.allEventsList.map(function (elem) {
+                        return elem.id;
+                      }).indexOf(checkedEventsList[k].eventId));
+          console.log(index);
+          if (index >= 0) {
+             $('#event' + checkedEventsList[k].eventId + 'Color .color-box-inner').css('background', checkedEventsList[k].eventColor);
+          }
+          // $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
+        }
+    });
 
     /**
      * Sends the settings to the widget as well as starting the process of
      * saving the settings to the database.
      */
     var sendSettings = function() {
-      $wix.Settings.triggerSettingsUpdatedEvent($scope.settings,
+      $wix.Settings.triggerSettingsUpdatedEvent({settings: $scope.settings,
+                                                 events: checkedEventsList,
+                                                 eventsInfo: eventsInfoList
+                                                },
                                                 $wix.Utils.getOrigCompId());
-      //call save to the database function here
     };
 
     $wix.UI.onChange('*', function (value, key) {
       console.log(key, value);
-      var eventId = key.match(/event([0-9]+)/);
-      console.log(eventId);
+      var eventId = key.match(/([0-9]+)$/);
       if (eventId) {
-        //$scope.
-        //prefer some kind of hashmap data structure or define an object class.
+        if (value) {
+          var eventHex = getColor(eventId[1]);
+          var eventObj = {eventId: eventId[1], eventColor: eventHex};
+          checkedEventsList.push(eventObj);
+        } else {
+          var eventIndex = checkedEventsList.map(function (elem) {
+                                              return elem.eventId;
+                                            }).indexOf(eventId[1]);
+          checkedEventsList.splice(eventIndex, 1);
+        }
+      } else if (key.match(/event([0-9]+)Color$/)) {
+        eventId = key.match(/([0-9]+)/);
+        console.log('value', value.cssColor, eventId);
 
-      } else if (key.match(/event([0-9]+)Color/)) {
-        var eventColor = value; //check if this is actually how it works - might be some property of value instead
-        $scope.checkedEventList[key] = value; 
-      }
-      else if (key === 'corners' || key === 'borderWidth') {
+        for (var i = 0; i < checkedEventsList.length; i++) {
+          console.log(i);
+          if (checkedEventsList[i].eventId === eventId[1]) {
+            checkedEventsList[i].eventColor = value.cssColor;
+            break;
+          }
+        }
+      } else if (key === 'corners' || key === 'borderWidth') {
         $scope.settings[key] = Math.ceil(value);
       } else {
         $scope.settings[key] = value;
       }
       sendSettings();
+      saveSettingsDebounce();
     });
+
+    /** Hack to get value of colorpicker */
+    var getColor = function(eventId) {
+      var style = $('#event' + eventId + 'Color .color-box-inner').attr('style');
+      var colorRGB = style.match(/rgb\(([0-9]+), ([0-9]+), ([0-9]+)\);$/);
+      return convertToHex(parseInt(colorRGB[1], 10), parseInt(colorRGB[2], 10), 
+                          parseInt(colorRGB[3], 10));
+    };
+
+    var convertToHex = function(r, g, b) {
+      return ("#" + componentToHex(r) + componentToHex(g) + componentToHex(b));
+    };
+
+    var componentToHex = function(c) {
+      var hex = c.toString(16).toUpperCase();
+      if (hex.length === 1) {
+        return "0" + hex;
+      } else {
+        return hex;
+      }
+    };
 
     $scope.handleToggles = function(toggle) {
       if (toggle === 'view') {
@@ -56,6 +121,7 @@ angular.module('fbCal')
         $scope.settings.hostedBy = true;
       }
       sendSettings();
+      saveSettingsDebounce();
     };
 
     $scope.login = function() {
@@ -68,6 +134,7 @@ angular.module('fbCal')
             console.log('running');
             $scope.userName = response;
             $scope.loggedIn = true;
+            location.reload();
           }, 
           function(error) {
             console.log('got login error');
@@ -87,9 +154,15 @@ angular.module('fbCal')
         console.log('disconnectDisabled');
         fbLogin.logout()
           .then(function() {
-            $scope.loggedIn = false;
-            handlingFbMessages('logout successful');
-            $scope.eventList = [];
+            server.logout()
+              .then(function() {
+                  $scope.loggedIn = false;
+                  handlingFbMessages('logout successful');
+                  $scope.allEventsList = [];
+              }, function() {
+                $scope.loggedIn = false;
+                handlingFbMessages('unknown');
+              });
           },
           function(error) {
             $scope.loggedIn = false;
@@ -113,18 +186,142 @@ angular.module('fbCal')
       } else if (message === 'declined') {
         $scope.loginMessage = 'To use this app, you must connect it with ' +
                             'your Facebook account.';
+      } else if (message === 'denied') {
+        $scope.loginMessage = 'To use this app, you must give access to your' +
+                              ' events. Please login again.';
       } else if (message === 'not logged in') {
         $scope.loginMessage = 'You must log into Facebook before you can ' +
                             'connect.';
+      } else if (message === 'login') {
+        $scope.loginMessage = 'You are not logged out. You must be logged' +
+                              ' into Facebook before you can disconnect.' +
+                              ' Login and try again.';
       }
       $timeout(function() {
           $scope.loginMessage = false; 
-        }, 5000);
+        }, 7000);
     };
 
+    var getSettings = function() {
+      server.getUserInfo('settings')
+        .then(function (response) {
+          $log.info('got settings');
+          setSettings(response);
+        }, function(response) {
+          $log.warn('rejected');
+          setSettings(response);
+        });
+    };
 
+    var setSettings = function(response) {
+      if (response.settings) {
+        $scope.settings = response.settings;
+      } else {
+        $scope.settings = api.defaults;
+      }
+      if (response.events && response.events !== "settings") {
+        checkedEventsList = response.events;
+      } else {
+        checkedEventsList = [];
+      }
+      $scope.loggedIn = response.active;
+      $scope.userName = response.name;
+      console.log(response);
+      userId = response.user_id;
+    };
+
+    var saveSettings = function() {
+      var data = JSON.stringify({'settings': $scope.settings, 'events' : checkedEventsList});
+      server.saveData(data, 'settings');
+    };
+
+    var debounce = function(func, wait, immediate) {
+        var timeout;
+        return function() {
+          $timeout.cancel(timeout);
+          timeout = $timeout(function() {
+            timeout = null;
+            if (!immediate) {
+              func.apply();
+            }
+          }, wait);
+          if (immediate && !timeout) func.apply();
+        };
+      };
+
+    var saveSettingsDebounce = debounce(saveSettings, 1000);
+
+    /**
+     * These lines of code essentially watch for when we get the access token
+     * for the user from Facebook on the client side. Once we get that, we pull
+     * all event data and the user's ID from Facebook. Then we compare this user
+     * ID with the user ID from the database that is sent with the settings. If
+     * they match, we show the event data in the settings panel. If they don't,
+     * we make an extra call to the server to get the actual user's event data.
+     *
+     * For the most part, users tend to stay signed into their Facebook accounts
+     * so this technique will result in simultanenous loading of event details
+     * from Facebook and settings from the database. In rare cases where this is
+     * not the case, we have to make two calls to the server before the settings
+     * are ready for the user.
+     *
+     * All watches are killed after we determine that the components we are
+     * waiting for (getting token on client side and settings from server)
+     * are received.
+     */
+    var fbInitWatch = $scope.$watch(function() {
+      return fbSetup.getFbReady();
+      }, function() {
+        if (fbSetup.getFbReady()) {
+          console.log('fb is ready');
+          fbInitWatch();
+          fbEvents.getUserEventDetails()
+            .then(function(eventDetailsFromClient) {
+              var watchServerforUserInfo = $scope.$watch('userName', function() {
+                if (userId) {
+                  watchServerforUserInfo();
+                  if (userId === eventDetailsFromClient.userId) {
+                    $scope.allEventsList = eventDetailsFromClient.data;
+                    // for (var i = 0; i < eventDetailsFromClient.length; i++) {
+                    //   $scope.allEventsList.push(eventDetailsFromClient)
+                    // }
+                    console.log($scope.allEventsList);
+                  } else if ($scope.loggedIn) {
+                    getAllEventsFromServer();
+                  }
+                } else if (userId === "") {
+                   $wix.UI.initialize($scope.settings);
+                }
+              });
+            }, function(response) {
+              console.warn('called from here');
+              var watchServerforActiveInfo = $scope.$watch('userName', function() {
+                if ($scope.userName !== undefined) {
+                  if ($scope.userName) {
+                    watchServerforActiveInfo();
+                    getAllEventsFromServer();
+                  } else {
+                    $wix.UI.initialize($scope.settings);
+                  }
+                }
+              }); 
+            });
+        }
+    });
+
+    var getAllEventsFromServer = function() {
+      server.getAllEvents()
+        .then(function(eventDetailsFromServer) {
+          $scope.allEventsList = eventDetailsFromServer;
+          console.log($scope.allEventsList);
+        }, function() {
+          console.warn('initializing from here');
+          $wix.UI.initialize($scope.settings);
+        });
+    };
 
     // $wix.Settings.refreshApp();
 
-    $wix.UI.initialize();
+    getSettings();
+    // $wix.UI.initialize();
 });

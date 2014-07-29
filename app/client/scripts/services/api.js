@@ -2,7 +2,7 @@
 
 angular.module('fbCal').factory('api', function ($wix, $location, $log) {
   var defaults = {
-    title: 'This is my title.',
+    heading: 'This is my title.',
     description: 'This is my description.',
     view: 'List',
     commenting: true,
@@ -23,6 +23,7 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
       $log.error('Getting Instance ID failed');
       //BREAK STUFF! THIS SHOULD NEVER HAPPEN.
       //Probably in a hacker situation - disable functions and display error message
+      //display none the entire app
     }
     return instanceId; //returns the unparsed instance
   };

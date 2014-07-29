@@ -1,13 +1,13 @@
 'use strict';
 /*global FB:false, console:false */
 
-angular.module('fbCal').factory('fbSetup', function ($log, $window) {
+angular.module('fbCal').factory('fbSetup', function ($log, $window, server, $rootScope) {
 
   var fbReady = false;
 
   var validHosts = ['editor.wix.com', 'localhost'];
 
-  var inValidHost = function(currentHost) {
+  var  checkValidHost = function(currentHost) {
    return validHosts.indexOf(currentHost) > 0;
   };
 
@@ -19,25 +19,19 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window) {
     FB.init({
       appId      : '790467867660486',
       xfbml      : true,
-      version    : 'v2.0',
-      status     : true
+      version    : 'v2.0'
     });
 
-    var auth_response_change_callback = function(response) {
+    FB.getLoginStatus(function(response) {
+      fbReady = true;
+      $rootScope.$apply();
       if (response && !response.error && response.status === 'connected' &&
-          inValidHost($window.location.hostname)) {
-        $log.info('saving access token');
-        // server.saveAccessToken(response.authResponse);
+          checkValidHost($window.location.hostname)) {
+        server.saveData({access_token: response.authResponse.accessToken}, "access token");
       }
-      console.log("auth_response_change_callback");
-      console.log(response);
-      console.log(response.authResponse);
-    };
-
-    FB.Event.subscribe('auth.authResponseChange', auth_response_change_callback);
+    });
 
     $log.log('done');
-    fbReady = true;
   };
 
   (function(d, s, id){
