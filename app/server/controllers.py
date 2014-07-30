@@ -163,7 +163,6 @@ def get_data(request, compID, request_from_widget):
                 if (not fb_event_data) and (fb_event_data != []):
                     abort(STATUS["Bad_Gateway"], 
                         message="Couldn't receive data from Facebook")
-                ###should consider sending settings, just without fb event data
                 full_settings = {"settings" : settings, \
                                  "fb_event_data" : fb_event_data, \
                                  "active" : "true"}

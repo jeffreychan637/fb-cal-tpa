@@ -1032,6 +1032,10 @@ if(!String.prototype.formatNum) {
 		var self = this;
 
 		$('a[data-event-id]', this.context).unbind('click');
+		
+		$('a.event-item').bind('click', function() {
+          openModal($(this).data("event-id"));
+    });
 
 		if(!self.options.modal) {
 			return;
@@ -1213,12 +1217,16 @@ if(!String.prototype.formatNum) {
 			self.activecell = $('[data-cal-date]', cell).text();
 			$('#cal-slide-tick').addClass('tick' + tick_position).show();
 			slider.slideDown('fast', function() {
-				
+
 				Wix.setHeight($('#desktop').outerHeight());
-				
+
 				$('body').one('click', function() {
 					slider.slideUp('fast');
 					self.activecell = 0;
+
+					$('a.event').click(function() {
+						openModal($(this).data("event-id"));
+					});
 					
 					setTimeout(function() {
 						Wix.setHeight($('#desktop').outerHeight());
@@ -1236,6 +1244,7 @@ if(!String.prototype.formatNum) {
 																						hexToB(colorHex) + ', 0.4)'};
 			$('a[data-event-id="' + $(this).data('event-id') + '"]').closest('.cal-cell1').css(hoverClass);
 		});
+
 		$('a.event-item').mouseleave(function() {
 			$('div.cal-cell1').removeAttr('style');
 		});
@@ -1267,5 +1276,14 @@ if(!String.prototype.formatNum) {
 
 	$.fn.calendar = function(params) {
 		return new Calendar(params, this);
+	}
+
+	var openModal = function(eventId) {
+		var url = 'http://localhost:5000/modal/' + eventId;
+		var onClose = function(message) { 
+  		console.log("modal closed", message);
+		};
+		console.debug('hello open modal', url);
+     Wix.openModal(url, 900, 590, onClose);
 	}
 }(jQuery));

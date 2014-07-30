@@ -1,9 +1,9 @@
 'use strict';
 /*global $:false */
 
-angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
+angular.module('fbCal').factory('desktopCalendar', function ($log, $wix, $rootScope) {
 
-  var setup = function(eventData) {
+  var setup = function(eventData, scope) {
     var processedData = processEventData(eventData);
     var calendar = $("#calendar").calendar(
         {
@@ -24,7 +24,7 @@ angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
             },
             onAfterViewLoad: function(view) {
               $('#current-view').text(this.getTitle());
-              //using ng-click to open modal instead of href here
+              $rootScope.$broadcast('View Loaded');
             }
           });
     $('.btn-group button[data-calendar-nav]').each(function() {
@@ -54,7 +54,11 @@ angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
       processedEvents[i].url = '#';
       //Deal with weird times and events with no end times
       processedEvents[i].start = new Date(events[i].start_time).getTime();
-      processedEvents[i].end = new Date(events[i].end_time).getTime();
+      if (events[i].end_time) {
+        processedEvents[i].end = new Date(events[i].end_time).getTime();
+      } else {
+        processedEvents[i].end = new Date(events[i].start_time).getTime();
+      }
       if (events[i].eventColor) {
         processedEvents[i].color = events[i].eventColor;
       } else {
