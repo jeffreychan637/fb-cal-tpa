@@ -13,12 +13,9 @@ angular.module('fbCal')
     $scope.$on('Render Finished', function() {
         console.log("finished");
         for (var i = 0; i < checkedEventsList.length; i++) {
-          console.log(checkedEventsList[i].eventId);
           if (($scope.allEventsList.map(function (elem) {
-                console.log(elem.id);
                 return elem.id;
               }).indexOf(checkedEventsList[i].eventId)) >= 0) {
-            console.log('made it');
           $('#event' + checkedEventsList[i].eventId).attr('wix-options', 
                                                         '{checked:true}');
           }
@@ -31,7 +28,6 @@ angular.module('fbCal')
           var index = ($scope.allEventsList.map(function (elem) {
                         return elem.id;
                       }).indexOf(checkedEventsList[k].eventId));
-          console.log(index);
           if (index >= 0) {
              $('#event' + checkedEventsList[k].eventId + 'Color .color-box-inner').css('background', checkedEventsList[k].eventColor);
           }
