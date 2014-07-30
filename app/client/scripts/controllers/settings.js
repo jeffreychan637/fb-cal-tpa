@@ -7,6 +7,7 @@ angular.module('fbCal')
                                         fbEvents) {
     var checkedEventsList;
     var eventsInfoList;
+    var eventChange;
     var userId;
     $scope.allEventsList = [];
     
@@ -61,21 +62,31 @@ angular.module('fbCal')
                                             }).indexOf(eventId[1]);
           checkedEventsList.splice(eventIndex, 1);
         }
+        eventChange = true;
       } else if (key.match(/event([0-9]+)Color$/)) {
         eventId = key.match(/([0-9]+)/);
-        console.log('value', value.cssColor, eventId);
-
+        var found;
         for (var i = 0; i < checkedEventsList.length; i++) {
           console.log(i);
           if (checkedEventsList[i].eventId === eventId[1]) {
+            found = true;
+            eventChange = true;
             checkedEventsList[i].eventColor = value.cssColor;
             break;
           }
         }
+        if ($scope.settings.view === 'List') {
+          eventChange = false;
+        }
+        if (!found) {
+          return;
+        }
       } else if (key === 'corners' || key === 'borderWidth') {
         $scope.settings[key] = Math.ceil(value);
+        eventChange = false;
       } else {
         $scope.settings[key] = value;
+        eventChange = false;
       }
       sendSettings();
       saveSettingsDebounce();
@@ -116,6 +127,7 @@ angular.module('fbCal')
       } else {
         $scope.settings.hostedBy = !$scope.settings.hostedBy;
       }
+      eventChange = false;
       sendSettings();
       saveSettingsDebounce();
     };
@@ -222,7 +234,12 @@ angular.module('fbCal')
 
     var saveSettings = function() {
       var data = JSON.stringify({'settings': $scope.settings, 'events' : checkedEventsList});
-      server.saveData(data, 'settings');
+      server.saveData(data, 'settings')
+        .then(function() {
+          if (eventChange) {
+            $wix.Settings.refreshApp();
+          }
+        });
     };
 
     var debounce = function(func, wait, immediate) {

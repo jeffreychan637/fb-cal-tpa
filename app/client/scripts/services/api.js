@@ -4,7 +4,7 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
   var defaults = {
     title: 'This is my title.',
     description: 'This is my description.',
-    view: 'List',
+    view: 'Month',
     commenting: true,
     moderating: false,
     hostedBy: true,
