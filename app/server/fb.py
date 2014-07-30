@@ -28,7 +28,7 @@ def get_long_term_token(short_token, compID, instance):
         return "Facebook Error"
 
 untilRegex = compile("until=([0-9]+)")
-afterRegex = compile("after=([0-9A-Za-z]+)")
+afterRegex = compile("after=([0-9A-Za-z=]+)")
 
 #If request from widget, just get event titles/time from the event IDs.
 #If from settings, don't need events. Just get all the event titles
@@ -73,7 +73,6 @@ def get_event_info(since, access_token, events_length):
                         until = untilPattern.group(1)
                         after = ""
         except KeyError, e:
-            print "ERROR " + e.message
             next_page = False
             return final_event_data
         except facebook.GraphAPIError, e:
