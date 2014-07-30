@@ -2,14 +2,15 @@
 /*global $:false */
 
 angular.module('fbCal').factory('list', function ($log, $wix) {
-  var setup = function(borderWidth, events, eventData) {
+  var setup = function(borderWidth, eventData) {
     var borderStyle = {'border-bottom-width' : borderWidth + 'px',
                        'margin-bottom' : '0px'
                       };
     $('#header').removeAttr('style');
     $('#header').css(borderStyle);
-    $('#header').addClass('header'); //see if there is a way to get this
-    //class to overwrite the other css added by calendar setup
+    $('#header').addClass('header');
+
+    return processEvents(eventData);
   };
 
   var listStyle = function(last) {
@@ -18,6 +19,30 @@ angular.module('fbCal').factory('list', function ($log, $wix) {
     } else {
       return {};
     }
+  };
+
+  var processEvents = function(eventData) {
+    var eventList = [];
+    for (var i = 0; i < eventData.length; i++) {
+      eventList[i] = {};
+      eventList[i].id = eventData[i].id;
+      eventList[i].title = eventData[i].name;
+      eventList[i].time = processTime(eventData[i].start_time); 
+    }
+    return eventList;
+  };
+
+  var processTime = function(time) {
+    var unixTime = new Date(time).getTime();
+    var localTime = new Date(unixTime);
+    return formatTime(localTime);
+  };
+
+  var formatTime = function(time) {
+    var timeString = time.toLocaleTimeString().replace(/:\d\d /, '');
+    var dateString = time.toLocaleDateString();
+    var dayString = time.toString().replace(/ .+/, ' ');
+    return dayString + dateString + ' ' + timeString;
   };
 
   return {

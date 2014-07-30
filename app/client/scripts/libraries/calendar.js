@@ -489,14 +489,19 @@ if(!String.prototype.formatNum) {
 	var convert_to_12_hours_format = function(event_time) {
 		var AM_PM;
 		var event_hours = event_time.getHours();
-		if (event_hours > 12) {
+		if (event_hours === 24 || event_hours === 0) {
+			event_hours = 12;
+			AM_PM = 'AM';
+		} else if (event_hours === 12) {
+			AM_PM = 'PM';
+		} else if (event_hours > 12) {
 			event_hours -= 12;
 			AM_PM = 'PM';
 		} else {
 			AM_PM = 'AM';
 		}
 		var string_event_hours = event_hours.toString().formatNum(1);
-		var string_event_minutes = event_time.getMinutes().toString().formatNum(1);
+		var string_event_minutes = event_time.getMinutes().toString().formatNum(2);
 		return string_event_hours + ':' + string_event_minutes + ' ' + AM_PM;
 	};
 
@@ -1027,6 +1032,10 @@ if(!String.prototype.formatNum) {
 		var self = this;
 
 		$('a[data-event-id]', this.context).unbind('click');
+		
+		$('a.event-item').bind('click', function() {
+          openModal($(this).data("event-id"));
+    });
 
 		if(!self.options.modal) {
 			return;
@@ -1208,12 +1217,16 @@ if(!String.prototype.formatNum) {
 			self.activecell = $('[data-cal-date]', cell).text();
 			$('#cal-slide-tick').addClass('tick' + tick_position).show();
 			slider.slideDown('fast', function() {
-				
+
 				Wix.setHeight($('#desktop').outerHeight());
-				
+
 				$('body').one('click', function() {
 					slider.slideUp('fast');
 					self.activecell = 0;
+
+					$('a.event').click(function() {
+						openModal($(this).data("event-id"));
+					});
 					
 					setTimeout(function() {
 						Wix.setHeight($('#desktop').outerHeight());
@@ -1231,6 +1244,7 @@ if(!String.prototype.formatNum) {
 																						hexToB(colorHex) + ', 0.4)'};
 			$('a[data-event-id="' + $(this).data('event-id') + '"]').closest('.cal-cell1').css(hoverClass);
 		});
+
 		$('a.event-item').mouseleave(function() {
 			$('div.cal-cell1').removeAttr('style');
 		});
@@ -1262,5 +1276,14 @@ if(!String.prototype.formatNum) {
 
 	$.fn.calendar = function(params) {
 		return new Calendar(params, this);
+	}
+
+	var openModal = function(eventId) {
+		var url = 'http://localhost:5000/modal/' + eventId;
+		var onClose = function(message) { 
+  		console.log("modal closed", message);
+		};
+		console.debug('hello open modal', url);
+     Wix.openModal(url, 900, 590, onClose);
 	}
 }(jQuery));
