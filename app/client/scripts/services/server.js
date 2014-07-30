@@ -18,6 +18,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var getSettingsWidgetURL = '/GetSettingsWidget/' + compId;
   var getSettingsSettingsURL = '/GetSettingsSettings/' + compId;
   var getAllEventsURL = '/GetAllEvents/' + compId;
+  var getModalEventURL = '/GetModalEvent/' + compId;
   var saveSettingsURL = '/SaveSettings/' + compId;
   var saveAccessTokenURL = '/SaveAccessToken/' + compId;
   var logoutURL = '/Logout/' + compId;
@@ -121,6 +122,32 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     return deferred.promise;
   };
 
+  var getModalEvent = function(eventId) {
+    var modalHeader = {'X-Wix-Instance' : instance, 
+                       'event_id' : eventId.toString()};
+    var deferred = $q.defer();
+    $http({
+           method: 'GET',
+           url: getModalEventURL,
+           headers: modalHeader,
+           timeout: 15000
+          }).success(function (data, status) {
+            console.log(status, data);
+            if (status === 200) {
+              console.log(data); 
+              deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
+            } else {
+              console.log('The server is returning an incorrect status.');
+              deferred.reject();
+              //i don't really know what the fb_event_data looks like
+            }
+          }).error(function (message, status) {
+            console.error(status, message);
+            deferred.reject();
+          });
+    return deferred.promise;
+  };
+
   var saveData = function(data, dataType) {
     var deferred = $q.defer();
     $http({
@@ -175,6 +202,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   return {
     getUserInfo: getUserInfo,
     getAllEvents: getAllEvents,
+    getModalEvent: getModalEvent,
     saveData: saveData,
     logout: logout
   };
