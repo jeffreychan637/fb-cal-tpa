@@ -35,7 +35,7 @@ afterRegex = compile("after=([0-9A-Za-z=]+)")
 #that the user has on FB accounts
 def get_event_data(events_info, access_token_data, request_from_widget):
     data = get_event_info("", access_token_data["access_token"], len(events_info))
-    if (data):
+    if (data) or (data == []):
         return process_event_data(events_info, data, access_token_data["access_token"])
     else:
         return False
@@ -96,7 +96,7 @@ def process_event_data(events_info, event_data, access_token):
             cur_event_data = get_specific_event(saved_event["eventId"], access_token)
         if cur_event_data:
             cur_event_data["eventColor"] = saved_event["eventColor"]
-        processed_events.append(cur_event_data)
+            processed_events.append(cur_event_data)
     print processed_events
     return processed_events
 
