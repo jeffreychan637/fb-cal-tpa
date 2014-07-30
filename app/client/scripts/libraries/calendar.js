@@ -496,7 +496,7 @@ if(!String.prototype.formatNum) {
 			AM_PM = 'AM';
 		}
 		var string_event_hours = event_hours.toString().formatNum(1);
-		var string_event_minutes = event_time.getMinutes().toString().formatNum(1);
+		var string_event_minutes = event_time.getMinutes().toString().formatNum(2);
 		return string_event_hours + ':' + string_event_minutes + ' ' + AM_PM;
 	};
 
