@@ -489,7 +489,12 @@ if(!String.prototype.formatNum) {
 	var convert_to_12_hours_format = function(event_time) {
 		var AM_PM;
 		var event_hours = event_time.getHours();
-		if (event_hours > 12) {
+		if (event_hours === 24 || event_hours === 0) {
+			event_hours = 12;
+			AM_PM = 'AM';
+		} else if (event_hours === 12) {
+			AM_PM = 'PM';
+		} else if (event_hours > 12) {
 			event_hours -= 12;
 			AM_PM = 'PM';
 		} else {
