@@ -31,7 +31,7 @@ class GetAllEvents(Resource):
         return get_event(request, compID, True)
 
 class GetModalEvent(Resource):
-    def put(self, compID):
+    def get(self, compID):
         return get_event(request, compID, False)
 
 class Logout(Resource):
@@ -98,9 +98,7 @@ def validate_get_request(request, request_from):
             if window != "editor.wix.com":
                 abort(STATUS["Forbidden"], message="Not Inside Editor")
         if request_from == "modal":
-            content_type = request.headers["Content-Type"]
-            if content_type != "application/json;charset=UTF-8":
-                abort(STATUS["Bad_Request"], message="Badly Formed Request")
+            event_id = request.headers["event_id"]
     except AttributeError:
         abort(STATUS["Unauthorized"], message="Request Incomplete")
     except KeyError:
@@ -108,11 +106,6 @@ def validate_get_request(request, request_from):
     if not instance_parser(instance):
         abort(STATUS["Forbidden"], message="Invalid Instance")
     if request_from == "modal":
-        try:
-            data = json.loads(request.data)
-            event_id = data["event_id"]
-        except Exception:
-            abort(STATUS["Bad_Request"], message="Badly Formed Request")
         return {"instance" : instance, "event_id" : event_id}
     else:
         return instance

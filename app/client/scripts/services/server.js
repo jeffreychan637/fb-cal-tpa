@@ -53,7 +53,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   };
 
   var getHeader = function(from) {
-    if (from !== 'settings') {
+    if (from === 'widget') {
       return {'X-Wix-Instance' : instance};
     } else {
       return {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'};
@@ -122,19 +122,15 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     return deferred.promise;
   };
 
-  /**
-   * Must use Put Request for Data to be Sent to Server
-   */
   var getModalEvent = function(eventId) {
-    var data = JSON.stringify({'event_id' : eventId.toString()});
-    console.debug('data', data);
+    var modalHeader = {'X-Wix-Instance' : instance, 
+                       'event_id' : eventId.toString()};
     var deferred = $q.defer();
     $http({
-           method: 'PUT',
+           method: 'GET',
            url: getModalEventURL,
-           headers: getHeader('modal'),
-           timeout: 15000,
-           data: data
+           headers: modalHeader,
+           timeout: 15000
           }).success(function (data, status) {
             console.log(status, data);
             if (status === 200) {
