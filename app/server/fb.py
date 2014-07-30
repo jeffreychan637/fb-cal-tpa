@@ -102,6 +102,7 @@ def process_event_data(events_info, event_data, access_token):
 
 def get_specific_event(eventId, access_token):
     try:
+        print access_token
         graph = facebook.GraphAPI(access_token)
         event = graph.get_object("/" + eventId)
         return event
