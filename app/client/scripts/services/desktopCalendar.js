@@ -3,37 +3,12 @@
 
 angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
 
-  var setup = function(events, eventData) { //HAVE A DEFAULT COLOR IN CASE OF DB ERROR
+  var setup = function(eventData) {
+    var processedData = processEventData(eventData);
     var calendar = $("#calendar").calendar(
         {
            tmpl_path: "client/bower_components/bootstrap-calendar/tmpls/",
-           events_source: 
-           [
-              {
-                "id": 293,
-                "title": "Concert",
-                "url": "http://example.com",
-                "start": 1405811799000, // Milliseconds
-                "end": 1405943911000, // Milliseconds
-                "color": "#00FF00"
-              },
-              {
-                "id": 293,
-                "title": "Concert",
-                "url": "http://example.com",
-                "start": 1405811799000, // Milliseconds
-                "end": 1405943911000, // Milliseconds
-                "color": "#00FF00"
-              },
-              {
-                "id": 293,
-                "title": "Concert",
-                "url": "http://example.com",
-                "start": 1405811799000, // Milliseconds
-                "end": 1405943911000, // Milliseconds
-                "color": "#00FF00"
-              }
-            ],
+           events_source: processedData,
             onAfterEventsLoad: function(events) {
               if(!events) {
                 return;
@@ -67,6 +42,26 @@ angular.module('fbCal').factory('desktopCalendar', function ($log, $wix) {
     //add something using addAttr to add ng-change to urls
     //remove url atttrubutes too
 
+  };
+
+  var processEventData = function(events) {
+    var processedEvents = [];
+    var processedEvent;
+    for (var i = 0; i < events.length; i++) {
+      processedEvents[i] = {};
+      processedEvents[i].id = events[i].id;
+      processedEvents[i].title = events[i].name;
+      processedEvents[i].url = '#';
+      //Deal with weird times and events with no end times
+      processedEvents[i].start = new Date(events[i].start_time).getTime();
+      processedEvents[i].end = new Date(events[i].end_time).getTime();
+      if (events[i].eventColor) {
+        processedEvents[i].color = events[i].eventColor;
+      } else {
+        processedEvents[i].color = '#0088CB';
+      }
+    }
+    return processedEvents;
   };
 
   return {
