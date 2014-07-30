@@ -17,13 +17,14 @@ angular.module('fbCal')
     };
 
     $scope.openModal = function(index) {
-      //append event id to url
+      var eventId = $scope.eventList[index].id;
+      var url = 'http://localhost:5000/modal/' + eventId;
       var onClose = function(message) { 
         console.log("modal closed", message);
         api.modalEvent = undefined;
       };
       console.debug('hello open modal');
-      $wix.openModal("http://localhost:5000/modal/54", 900, 590, onClose);
+      $wix.openModal(url, 900, 590, onClose);
     };
 
     var getSettings = function() {
@@ -45,11 +46,14 @@ angular.module('fbCal')
        *    Active stuff here to tell user to active app.
        * }
        */
+      response.fb_event_data = [{name: 'My Event (Demo for Wix App)', start_time: '2014-09-11T19:00:00-0700', location: '', timezone: 'America/Los_Angeles', id: '1512622455616642', end_time: '2014-09-11T22:00:00-0700', eventColor: '#234323'}, 
+      {'name': 'IHS INTERACT Second Semester adsdasd asdasd asdasdas Board Applications', start_time: '2013-01-19T23:50:00-0800', location: '', timezone: 'America/Los_Angeles', id: '539472619397830', end_time: '2013-01-19T23:55:00-0800', eventColor: '#87683F'}];
+      console.debug(response.fb_event_data);
       if ($scope.settings.view === "Month") {
-        desktopCalendar.setup(response.events, response.fb_event_data);
+        desktopCalendar.setup(response.fb_event_data);
       } else {
         list.setup($scope.settings.borderWidth,
-                   response.events, response.fb_event_data);
+                   response.fb_event_data);
       }
     };
 
@@ -63,7 +67,7 @@ angular.module('fbCal')
       if (message.settings.view === 'Month' && $scope.settings.view === 'List') {
         desktopCalendar.setup();
       } else if (message.settings.view === 'List' && $scope.settings.view === 'Month') {
-        list.setup(message.borderWidth, message.borderColor);
+        $scope.eventList = list.setup(message.borderWidth, message.borderColor);
       }
       $scope.settings = message.settings;
       $scope.$apply();
