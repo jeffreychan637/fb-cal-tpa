@@ -104,17 +104,17 @@ angular.module('fbCal')
 
     $scope.handleToggles = function(toggle) {
       if (toggle === 'view') {
-        if ($scope.view) {
+        if ($scope.settings.view === 'List') {
           $scope.settings.view = 'Month';
         } else {
           $scope.settings.view = 'List';
         }
       } else if (toggle === 'commenting') {
-        $scope.settings.commenting = true;
+        $scope.settings.commenting = !$scope.settings.commenting;
       } else if (toggle === 'moderating') {
-        $scope.settings.moderating = true;
+        $scope.settings.moderating = !$scope.settings.moderating;
       } else {
-        $scope.settings.hostedBy = true;
+        $scope.settings.hostedBy = !$scope.settings.hostedBy;
       }
       sendSettings();
       saveSettingsDebounce();
