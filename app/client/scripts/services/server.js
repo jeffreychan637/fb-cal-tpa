@@ -18,6 +18,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var getSettingsWidgetURL = '/GetSettingsWidget/' + compId;
   var getSettingsSettingsURL = '/GetSettingsSettings/' + compId;
   var getAllEventsURL = '/GetAllEvents/' + compId;
+  var getModalEventURL = '/GetModalEvent/' + compId;
   var saveSettingsURL = '/SaveSettings/' + compId;
   var saveAccessTokenURL = '/SaveAccessToken/' + compId;
   var logoutURL = '/Logout/' + compId;
@@ -52,7 +53,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   };
 
   var getHeader = function(from) {
-    if (from === 'widget') {
+    if (from !== 'settings') {
       return {'X-Wix-Instance' : instance};
     } else {
       return {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'};
@@ -121,6 +122,36 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     return deferred.promise;
   };
 
+  /**
+   * Must use Put Request for Data to be Sent to Server
+   */
+  var getModalEvent = function(eventId) {
+    var data = JSON.stringify({'event_id' : eventId.toString()});
+    console.debug('data', data);
+    var deferred = $q.defer();
+    $http({
+           method: 'PUT',
+           url: getModalEventURL,
+           headers: getHeader('modal'),
+           timeout: 15000,
+           data: data
+          }).success(function (data, status) {
+            console.log(status, data);
+            if (status === 200) {
+              console.log(data); 
+              deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
+            } else {
+              console.log('The server is returning an incorrect status.');
+              deferred.reject();
+              //i don't really know what the fb_event_data looks like
+            }
+          }).error(function (message, status) {
+            console.error(status, message);
+            deferred.reject();
+          });
+    return deferred.promise;
+  };
+
   var saveData = function(data, dataType) {
     var deferred = $q.defer();
     $http({
@@ -175,6 +206,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   return {
     getUserInfo: getUserInfo,
     getAllEvents: getAllEvents,
+    getModalEvent: getModalEvent,
     saveData: saveData,
     logout: logout
   };

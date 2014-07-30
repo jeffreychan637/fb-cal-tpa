@@ -2,18 +2,21 @@
 /*global $:false */
 
 angular.module('fbCal')
-  .controller('ModalCtrl', function ($scope, $wix, api, $http, $log, $timeout, eventId) {
+  .controller('ModalCtrl', function ($scope, $wix, $log, $timeout, eventId, server) {
     $scope.eventId = eventId;
-    console.log(api.modalEvent);
+
     if (!$scope.eventId) {
-      console.log('Please open with a valid event');
-      $scope.validEvent = false;
       $timeout(function() {
         $wix.closeWindow('Please open with a valid event');
       }, 4000);
     } else {
-      $scope.validEvent = true;
-      //get fb event data
+      server.getModalEvent($scope.eventId)
+        .then(function(response) {
+          $scope.eventInfo = response;
+          console.debug(response);
+        }, function() {
+          //show error message
+        });
     }
 
 });
