@@ -170,11 +170,13 @@ angular.module('fbCal')
     };
 
     var handlingFbMessages = function(message) {
+      $('.error').removeAttr('style');
       if (message === 'not connected') {
         $scope.loginMessage = "We haven't connected to the Facebook server " +
                              "yet. Try connecting again in a minute or " + 
                              "reload the page.";
       } else if (message === 'logout successful') {
+        $('.error').css('color', '#0099FF');
         $scope.loginMessage = 'Logout successful.';
       } else if (message === 'unknown') {
         $scope.loginMessage = 'Oh no! Something went wrong; please try ' +
