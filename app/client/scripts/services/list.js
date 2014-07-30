@@ -27,21 +27,28 @@ angular.module('fbCal').factory('list', function ($log, $wix) {
       eventList[i] = {};
       eventList[i].id = eventData[i].id;
       eventList[i].title = eventData[i].name;
-      eventList[i].time = processTime(eventData[i].start_time); 
+      eventList[i].unixTime = new Date(eventData[i].start_time).getTime();
+      eventList[i].time = formatTime(eventList[i].unixTime);
     }
+    eventList.sort(compare);
     return eventList;
   };
 
-  var processTime = function(time) {
-    var unixTime = new Date(time).getTime();
-    var localTime = new Date(unixTime);
-    return formatTime(localTime);
+  var compare = function(a, b) {
+    if (a.unixTime < b.unixTime) {
+      return -1;
+    } else if (a.unixTime > b.unixTime) {
+      return 1;
+    } else {
+      return 0;
+    }
   };
 
   var formatTime = function(time) {
-    var timeString = time.toLocaleTimeString().replace(/:\d\d /, '');
-    var dateString = time.toLocaleDateString();
-    var dayString = time.toString().replace(/ .+/, ' ');
+    var localTime = new Date(time);
+    var timeString = localTime.toLocaleTimeString().replace(/:\d\d /, '');
+    var dateString = localTime.toLocaleDateString();
+    var dayString = localTime.toString().replace(/ .+/, ' ');
     return dayString + dateString + ' ' + timeString;
   };
 
