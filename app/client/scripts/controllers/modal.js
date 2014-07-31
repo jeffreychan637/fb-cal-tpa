@@ -5,19 +5,32 @@ angular.module('fbCal')
   .controller('ModalCtrl', function ($scope, $wix, $log, $timeout, eventId, server) {
     $scope.eventId = eventId;
 
-    $('#myModal').modal('show');
+
+    var showErrorModal = function() {
+      $scope.messageTitle = "Oh no!";
+      $('#messageTitle').css('color', 'red');
+      $scope.messageBody = "Something terrible happened. Please exit and try again.";
+      $('#message').modal('show');
+    };
+
+
+
+
+
+
 
     if (!$scope.eventId) {
+      showErrorModal();
       $timeout(function() {
-        $wix.closeWindow('Please open with a valid event');
-      }, 4000);
+        $wix.closeWindow('Closed Modal');
+      }, 7000);
     } else {
       server.getModalEvent($scope.eventId)
         .then(function(response) {
           $scope.eventInfo = response;
           console.debug(response);
         }, function() {
-          //show error message
+          showErrorModal();
         });
     }
 
