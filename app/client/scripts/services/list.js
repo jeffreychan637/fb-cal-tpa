@@ -3,14 +3,22 @@
 
 angular.module('fbCal').factory('list', function ($log, $wix) {
   var setup = function(borderWidth, eventData) {
-    var borderStyle = {'border-bottom-width' : borderWidth + 'px',
-                       'margin-bottom' : '0px'
-                      };
-    $('#header').removeAttr('style');
-    $('#header').css(borderStyle);
-    $('#header').addClass('header');
+    console.log(eventData);
+    var borderStyle;
+    if (eventData.length) {
+      borderStyle = {'border-bottom-width' : borderWidth + 'px',
+                         'margin-bottom' : '0px'
+                        };
+      $('#header').removeAttr('style');
+      $('#header').css(borderStyle);
+      $('#header').addClass('header');
 
-    return processEvents(eventData);
+      return processEvents(eventData);
+    } else {
+      borderStyle = {'border' : 'none'};
+      $('#header').css(borderStyle);
+      return eventData;
+    }
   };
 
   var listStyle = function(last) {
