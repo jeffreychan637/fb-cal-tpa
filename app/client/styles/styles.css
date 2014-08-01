@@ -3,7 +3,7 @@
 @font-face {
   font-family: "fbcaltpa";
   src:url("../fonts/fbcaltpa.eot");
-  src:url("../fonts/fbcaltpa.eot?#iefix") format("embedded-opentype"),
+  src:url("fonts/fbcaltpa.eot?#iefix") format("embedded-opentype"),
     url("../fonts/fbcaltpa.woff") format("woff"),
     url("../fonts/fbcaltpa.ttf") format("truetype"),
     url("../fonts/fbcaltpa.svg#fbcaltpa") format("svg");
@@ -49,4 +49,7 @@
 }
 .icon-friends:before {
   content: "e";
+}
+.icon-mail:before {
+  content: "d";
 }
