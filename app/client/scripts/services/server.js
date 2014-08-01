@@ -8,7 +8,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
    * OF editor.wix.com
    */
   
-  var compId = $wix.Utils.getCompId();
+  var compId = $wix.Utils.getCompId(); //get orig comp id?;
   var instance = api.getInstance();
 
   compId = 45;
@@ -132,9 +132,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            headers: modalHeader,
            timeout: 15000
           }).success(function (data, status) {
-            console.log(status, data);
             if (status === 200) {
-              console.log(data); 
               deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
             } else {
               console.log('The server is returning an incorrect status.');

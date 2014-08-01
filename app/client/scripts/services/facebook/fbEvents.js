@@ -65,6 +65,14 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     });
   };
 
+  // FB.api("/fql?q="+encodeURIComponent('SELECT attending_count from event WHERE eid = 204048519630371'), function(response) {
+  //   if (!response || response.error) {
+  //      console.log('Error occurred: '+response.error.message);
+  //   } else {
+  //      console.log(response);
+  //   }
+  // });
+
   var post = function() {
 
   };

@@ -1,0 +1,201 @@
+.app {
+  border: 5px solid black;
+  padding: 20px;
+  background-color: pink;
+  color: white;
+}
+
+.page-header {
+  border: 5px solid black;
+  margin: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: #ff4c4c;
+  /*background-color: black;*/
+  /*background-image: url("https://scontent-a.xx.fbcdn.net/hphotos-xpa1/t31.0-8/q71/s720x720/10498057_678628625549342_2586000951315173447_o.jpg");
+  height: 327px;*/
+  background-size: 842px 390px;
+  background-repeat: no-repeat;
+  background-position: 0 90%;
+}
+
+/*.name {
+  background-color: rgba(33, 33, 33, 0.7);
+}*/
+
+.title {
+  margin-bottom: 0;
+  margin-top: 10px;
+  padding-bottom: 4px;
+}
+
+a {
+  color: white;
+}
+
+a:hover {
+  color: white;
+  cursor: pointer;
+}
+
+.host {
+  margin-bottom: 5px;
+  margin-top: 0;
+}
+
+.rvsp {
+  float: right;
+  padding-top: 15px;
+}
+
+.dropdown-menu {
+  min-width: 90px;
+}
+
+.dropdown-menu > li > a {
+  color: #ff4c4c;
+}
+
+.icon {
+  font-size: 25px;
+  vertical-align: middle;
+}
+
+.block {
+  border: 5px solid black;
+  padding: 10px;
+  background-color: #ff4c4c;
+  margin-top: 10px;
+}
+
+.add-on {
+  border-top: none;
+  margin-top: 0;
+}
+
+.left-col {
+  padding-left: 0;
+  padding-right: 10px;
+}
+
+.right-col {
+  padding-left: 10px;
+  padding-right: 0;
+}
+
+.middle-col {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media all and (max-width: 767px) {
+  .col-sm-5 {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .left-col {
+    padding-right: 0;
+  }
+  .right-col {
+    padding-left: 0;
+  }
+}
+
+.main-text {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.sub-text {
+  margin-top: 0.25em;
+  margin-bottom: 0;
+  margin-left: 2.5em;
+}
+
+.link {
+  color: white;
+}
+
+.link:hover {
+  color: #00A7FF;
+  cursor: pointer;
+}
+
+.friend {
+  vertical-align: baseline;
+}
+
+.event-stat {
+  font-size: 40px;
+  padding-left: 5px;
+}
+
+.stat-label {
+  padding: 20px;
+}
+
+@media all and (max-width: 348px) {
+  .event-stat {
+    font-size: 30px;
+  }
+  .stat-label {
+    padding: 12px;
+  }
+}
+
+@media all and (min-width: 768px) and (max-width: 805px) {
+  .event-stat {
+    font-size: 30px;
+  }
+  .stat-label {
+    padding: 12px;
+  }
+}
+
+textarea {
+  resize: none;
+  overflow: auto;
+  color: black;
+}
+
+.form-control:focus {
+  border-color: #ff4c4c;
+}
+
+.post-btn {
+  min-height: 54px;
+}
+
+.btn {
+  color: #ff4c4c !important;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+blockquote {
+  font-size: 14px;
+  padding: 5px 10px;
+  margin: 0;
+}
+
+.push-left {
+  padding-left: 15px;
+}
+
+.reply {
+  margin-left: 10px;
+}
+
+
+.like-btn {
+  border-radius: 4px !important;
+}
+
+img {
+  margin-bottom: 5px;
+}
+
+
+
