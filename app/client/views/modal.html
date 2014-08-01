@@ -1,19 +1,6 @@
 <div ng-controller="ModalCtrl">
   <div class="app" ng-show="eventInfo || true">
     <div class="page-header">
-      <div class="dropdown rvsp pull-right">
-        <button class="btn btn-default dropdown-toggle" type="button" id="rsvp" data-toggle="dropdown">
-          RSVP
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-          <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Going</a></li>
-          <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Maybe</a></li>
-          <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Decline</a></li>
-          <li role="presentation" class="divider"></li>
-          <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Share</a></li>
-        </ul>
-      </div>
       <h1 class="name title"><a href="https://www.facebook.com/events/{{eventInfo.id}}" target="blank">{{eventInfo.name}}</a></h1>
       <h6 class="name host">
         <em>Hosted by <strong>Donald Duck</strong></em>
@@ -22,6 +9,35 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-5 left-col">
+          <div class="col-sm-12 left-col">
+            <div class="block">
+                <span class="icon-mail icon"></span>
+                <div class="dropdown rvsp">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="rsvp" data-toggle="dropdown">
+                    RSVP
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Going</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Maybe</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Decline</a></li>
+                  </ul>
+                </div>
+                <div class="dropdown rvsp">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="share" data-toggle="dropdown">
+                    Share
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Via Facebook</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Get Event Link</a></li>
+                  </ul>
+                </div>
+              <h6 class="sub-text" ng-if="false">
+                Additional Time Info
+              </h6>
+            </div>
+          </div>
           <div class="col-sm-12 left-col">
             <div class="block">
               <h4 class="main-text">

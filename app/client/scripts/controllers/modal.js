@@ -31,7 +31,7 @@ angular.module('fbCal')
       //   }, function() {
       //     showErrorModal();
       //   });
-      $scope.eventInfo = {name: 'My Event (Demo for Wix App)', start_time: '2014-07-11T19:00:00-0700', location: '', timezone: 'America/Los_Angeles', id: '1512622455616642', end_time: '2014-07-11T22:00:00-0700', eventColor: '#234323'};
+      $scope.eventInfo = {name: 'My Event (Demo for Wix App) I want to see a super duper long title what will it do', start_time: '2014-07-11T19:00:00-0700', location: '', timezone: 'America/Los_Angeles', id: '1512622455616642', end_time: '2014-07-11T22:00:00-0700', eventColor: '#234323'};
     }
 
 });
