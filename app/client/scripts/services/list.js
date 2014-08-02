@@ -54,10 +54,10 @@ angular.module('fbCal').factory('list', function ($log, $wix) {
 
   var formatTime = function(time) {
     var localTime = new Date(time);
-    var timeString = localTime.toLocaleTimeString().replace(/:\d\d /, '');
+    var timeString = localTime.toLocaleTimeString().replace(/:\d\d /, '').toLowerCase();
     var dateString = localTime.toLocaleDateString();
-    var dayString = localTime.toString().replace(/ .+/, ' ');
-    return dayString + dateString + ' ' + timeString;
+    var dayString = localTime.toString().replace(/ .+/, ', ');
+    return dayString + dateString + ' at ' + timeString;
   };
 
   return {
