@@ -8,7 +8,7 @@
     </div>
     <div class="container-fluid">
       <div class="row">
-        <div class="col-sm-5 left-col">
+        <div class="col-sm-6 left-col">
           <div class="col-sm-12 left-col">
             <div class="block">
                 <span class="icon-mail icon"></span>
@@ -41,28 +41,6 @@
           <div class="col-sm-12 left-col">
             <div class="block">
               <h4 class="main-text">
-                <span class="icon-clock icon" data-icon="c"></span>
-                {{eventInfo.start_time}}
-              </h4>
-              <h6 class="sub-text" ng-if="false">
-                Additional Time Info
-              </h6>
-            </div>
-          </div>
-          <div class="col-sm-12 left-col">
-            <div class="block">
-              <h4 class="main-text">
-                <span class="icon-location icon" data-icon="b"></span>
-                Location
-              </h4>
-              <h6 class="sub-text">
-                Additional Info
-              </h6>
-            </div>
-          </div>
-          <div class="col-sm-12 left-col">
-            <div class="block">
-              <h4 class="main-text">
                 <span class="icon-friend icon friend" data-icon="e"></span>
                 <span class="event-stat">333</span>
                 <span class="event-stat">343</span>
@@ -76,10 +54,35 @@
             </div>
           </div>
         </div>
-        <div class="col-sm-7 right-col">
+        <div class="col-sm-6 right-col">
+          <div class="col-sm-12 right-col">
+            <div class="block">
+              <h4 class="main-text">
+                <span class="icon-clock icon" data-icon="c"></span>
+                {{eventInfo.start_time}}
+              </h4>
+              <h6 class="sub-text" ng-if="false">
+                Additional Time Info
+              </h6>
+            </div>
+          </div>
+          <div class="col-sm-12 right-col">
+            <div class="block">
+              <h4 class="main-text">
+                <span class="icon-location icon" data-icon="b"></span>
+                Location
+              </h4>
+              <h6 class="sub-text">
+                Additional Info
+              </h6>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 middle-col">
           <div class="block">
-            <span>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt ultrices lectus, ac dapibus nisi. Pellentesque interdum lobortis arcu, in feugiat ligula lobortis sodales. Integer id ipsum at turpis convallis mollis nec nec lorem. Morbi elementum enim sed est vehicula vehicula id vel dui. Nunc tempus mauris orci, in pellentesque metus viverra sed. Cras elementum tempor turpis, ac viverra ipsum lacinia adipiscing. In hac habitasse platea dictumst. Nullam sed mauris iaculis urna egestas convallis nec vel arcu. Sed aliquet scelerisque mi vitae fermentum. Sed luctus nulla non lectus sollicitudin, vel ullamcorper ipsum mollis. Nam quis lobortis lacus. Proin mollis sodales posuere. Maecenas ultricies at urna vel ullamcorper.
+            <span ng-bind-html="eventInfo.description" ng-if="showDescription">
             </span>
           </div>
         </div>
@@ -208,7 +211,7 @@
         </div>
       </div>
       <div class="row">
-         <div class="col-sm-10 col-sm-offset-1">
+        <div class="col-sm-10 col-sm-offset-1">
           <div class="block">
             <blockquote><strong>Mickey Mouse</strong> posted <em>Here's a picture from the event!</em>
             <br>
@@ -224,33 +227,33 @@
             </div>
           </div>
           <div class="block add-on">
-              <a class="push-left">Show older replies</a>
-              <blockquote><strong>Goofy</strong> replied <em>Good picture a huh huh. Omg, I just so love this picture so so much!</em>
-              <br>
-              August 17th 5pm<a class="push-left">Like</a><span class="push-left">87 Likes</span></blockquote>
-              <blockquote><strong>Goofy</strong> replied <em>Good picture a huh huh. Omg, I just so love this picture so so much!</em>
-              <br>
-              August 17th 5pm<a class="push-left">Like</a><span class="push-left">87 Likes</span></blockquote>
-              <blockquote><strong>Goofy</strong> replied <em>Good picture a huh huh. Omg, I just so love this picture so so much!</em>
-              <br>
-              August 17th 5pm<a class="push-left">Like</a><span class="push-left">87 Likes</span></blockquote>
+            <a class="push-left">Show older replies</a>
+            <blockquote><strong>Goofy</strong> replied <em>Good picture a huh huh. Omg, I just so love this picture so so much!</em>
+            <br>
+            August 17th 5pm<a class="push-left">Like</a><span class="push-left">87 Likes</span></blockquote>
+            <blockquote><strong>Goofy</strong> replied <em>Good picture a huh huh. Omg, I just so love this picture so so much!</em>
+            <br>
+            August 17th 5pm<a class="push-left">Like</a><span class="push-left">87 Likes</span></blockquote>
+            <blockquote><strong>Goofy</strong> replied <em>Good picture a huh huh. Omg, I just so love this picture so so much!</em>
+            <br>
+            August 17th 5pm<a class="push-left">Like</a><span class="push-left">87 Likes</span></blockquote>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="modal fade" id="message" tabindex="-1" role="dialog" aria-labelledby="messageTitle" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <h4 class="modal-title" id="messageTitle">{{messageTitle}}</h4>
-        </div>
-        <div class="modal-body">
-          {{messageBody}}
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <div class="modal fade" id="message" tabindex="-1" role="dialog" aria-labelledby="messageTitle" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="messageTitle">{{messageTitle}}</h4>
+          </div>
+          <div class="modal-body">
+            {{messageBody}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
         </div>
       </div>
     </div>
