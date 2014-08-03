@@ -30,16 +30,13 @@ img {
   padding-left: 10px;
   padding-right: 10px;
   background-color: #ff4c4c;
-  /*background-color: black;*/
+  background-repeat: no-repeat;
+  background-size: cover;
   background-image: url("https://scontent-a.xx.fbcdn.net/hphotos-xpa1/t31.0-8/q71/s720x720/10498057_678628625549342_2586000951315173447_o.jpg");
   background-image: url("https://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-xpf1/t1.0-9/q71/s720x720/10568996_10202754023515840_1708787729945311163_n.jpg");
   background-image: url("https://fbcdn-sphotos-a-a.akamaihd.net/hphotos-ak-xfa1/t31.0-8/q71/s720x720/10286851_801238859907126_3448618267544264515_o.jpg");
-  height: 298px;
-  /*background-size: 842px 390px;*/
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position-y: -26px;
-  /*background-position: 0 90%;*/
+  /*height: 298px;*/
+  /*background-position-y: -26px;*/
 }
 
 .name {
@@ -204,6 +201,14 @@ textarea {
 
 .like-btn {
   border-radius: 4px !important;
+}
+
+.modal-body {
+  color: black;
+}
+
+.modal-btn {
+  color: black !important;
 }
 
 
