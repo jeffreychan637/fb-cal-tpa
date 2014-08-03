@@ -134,7 +134,11 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            timeout: 15000
           }).success(function (data, status) {
             if (status === 200) {
-              deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
+              var response = jQuery.parseJSON(jQuery.parseJSON(data));
+              if (!response.settings) {
+                response.settings = api.defaults;
+              }
+              deferred.resolve(response);
             } else {
               console.log('The server is returning an incorrect status.');
               deferred.reject();

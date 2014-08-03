@@ -8,12 +8,12 @@ angular.module('fbCal')
     var eventInfo;
     var feedObject;
 
-    $scope.eventId = "1512622455616642";
+    // $scope.eventId = "1512622455616642";
 
     var showErrorModal = function() {
       $scope.messageTitle = "Oh no!";
       $('#messageTitle').css('color', 'red');
-      $scope.messageBody = "Something terrible happened. Please exit and try again.";
+      $scope.messageBody = 'Something terrible happened. Please exit and try again.';
       $('#message').modal('show');
     };
 
@@ -77,7 +77,14 @@ angular.module('fbCal')
 
     var processCover = function(coverObject) {
       console.log('processing cover');
-      console.log(coverObject);
+      if (coverObject.cover && coverObject.cover.source) {
+        var cover = coverObject.cover;
+        var cssClass = {'background-image' : 'url(' + cover.source + ')',
+                        'height' : '296px',
+                        'background-position' : ''
+                       };
+        $('#header').css(cssClass);
+      }
     };
 
     var processGuest = function(guestObject) {
@@ -123,7 +130,8 @@ angular.module('fbCal')
             }, function(response) {
               console.log('could not get cover');
             });
-          eventInfo = response;
+          eventInfo = response.event_data;
+          $scope.settings = response.settings;
           processEventInfo();
         }, function() {
           showErrorModal();
