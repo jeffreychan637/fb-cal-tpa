@@ -17,13 +17,14 @@ angular.module('fbCal')
     };
 
     var prepareEventInfo = function() {
-      console.log(eventInfo);
-      console.log(eventInfo.name);
+      $scope.id = eventInfo.id;
       $scope.name = eventInfo.name;
+      $scope.owner = eventInfo.owner.name;
       console.log($scope.name);
       prepareDesciption();
       prepareTime();
       prepareLocation();
+      //display modal info here - before this just show some loading screen
     };
 
     var prepareDesciption = function() {
@@ -85,7 +86,7 @@ angular.module('fbCal')
         .then(function(response) {
           //get cover photo here
           //  then cover photo
-          //    then guest links
+          //    then guest stats
           //      feed
           eventInfo = response;
           prepareEventInfo();

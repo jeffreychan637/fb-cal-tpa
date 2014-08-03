@@ -1,9 +1,9 @@
 <div ng-controller="ModalCtrl">
   <div class="app" ng-show="eventInfo || true">
     <div class="page-header" id="header">
-      <h1 class="name title"><a href="https://www.facebook.com/events/{{eventInfo.id}}" target="blank">{{name}}</a></h1>
+      <h1 class="name title"><a href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
       <h6 class="name host">
-        <em>Hosted by <strong>Donald Duck</strong></em>
+        <em>Hosted by <strong>{{owner}}</strong></em>
       </h6>
     </div>
     <div class="container-fluid">
