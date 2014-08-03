@@ -1,11 +1,12 @@
 'use strict';
-/*global $:false */
+/*global $:false, console:false */
 
 angular.module('fbCal')
   .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, $timeout, eventId, server) {
     $scope.eventId = eventId;
 
     var eventInfo;
+    var feedObject;
 
     $scope.eventId = "1512622455616642";
 
@@ -16,25 +17,25 @@ angular.module('fbCal')
       $('#message').modal('show');
     };
 
-    var prepareEventInfo = function() {
+    var processEventInfo = function() {
       $scope.id = eventInfo.id;
       $scope.name = eventInfo.name;
       $scope.owner = eventInfo.owner.name;
       console.log($scope.name);
-      prepareDesciption();
-      prepareTime();
-      prepareLocation();
+      processDesciption();
+      processTime();
+      processLocation();
       //display modal info here - before this just show some loading screen
     };
 
-    var prepareDesciption = function() {
+    var processDesciption = function() {
       $scope.description = eventInfo.description.replace(/\r?\n/g, "<br>");
       $scope.description = $sanitize($scope.description);
       $sce.trustAsHtml($scope.description);
       $scope.showDescription = true;
     };
 
-    var prepareTime = function() {
+    var processTime = function() {
       var startTime = new Date(eventInfo.start_time);
       var endTime = new Date(eventInfo.end_time);
       //find a way to tell if they're on the same day
@@ -58,7 +59,7 @@ angular.module('fbCal')
       }
     };
 
-    var prepareLocation = function() {
+    var processLocation = function() {
       $scope.location = eventInfo.location;
       if (eventInfo.venue && (eventInfo.venue.street || eventInfo.venue.city ||
                               eventInfo.venue.state || 
@@ -74,6 +75,23 @@ angular.module('fbCal')
       }
     };
 
+    var processCover = function(coverObject) {
+      console.log('processing cover');
+      console.log(coverObject);
+    };
+
+    var processGuest = function(guestObject) {
+      console.log('processing guest');
+      console.log(guestObject);
+
+    };
+
+    var processFeed = function() {
+      console.log('processing feed');
+      console.log(feedObject);
+      //if feedFromServer is empty, display end of feed message
+    };
+
 
 
     if (!$scope.eventId) {
@@ -82,14 +100,31 @@ angular.module('fbCal')
         $wix.closeWindow('Closed Modal');
       }, 7000);
     } else {
-      server.getModalEvent($scope.eventId)
+      server.getModalEvent($scope.eventId, "all")
         .then(function(response) {
-          //get cover photo here
-          //  then cover photo
-          //    then guest stats
-          //      feed
+          server.getModalEvent($scope.eventId, "cover")
+            .then(function(response) {
+              server.getModalEvent($scope.eventId, "guests")
+                .then(function(response) {
+                  server.getModalEvent($scope.eventId, "feed")
+                    .then(function(response) {
+                      feedObject = response;
+                      processFeed();
+                    }, function(response) {
+                      console.log('could not get feed');
+                      $scope.feedFailed = true;
+                    });
+                  processGuest(response);
+                }, function(response) {
+                  console.log('could not get guests');
+                  $scope.guestFailed = true;
+                });
+              processCover(response);
+            }, function(response) {
+              console.log('could not get cover');
+            });
           eventInfo = response;
-          prepareEventInfo();
+          processEventInfo();
         }, function() {
           showErrorModal();
         });
@@ -118,7 +153,7 @@ angular.module('fbCal')
       //               }, 
       //               "id": "1512622455616642"
       //             };
-      // prepareEventInfo();
+      // processEventInfo();
     }
 
 });

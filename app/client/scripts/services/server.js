@@ -122,9 +122,10 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     return deferred.promise;
   };
 
-  var getModalEvent = function(eventId) {
+  var getModalEvent = function(eventId, desiredData) {
     var modalHeader = {'X-Wix-Instance' : instance, 
-                       'event_id' : eventId.toString()};
+                       'event_id' : eventId.toString(),
+                       'desired_data' : desiredData};
     var deferred = $q.defer();
     $http({
            method: 'GET',
