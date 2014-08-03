@@ -103,15 +103,14 @@ def process_event_data(events_info, event_data, access_token):
 def get_specific_event(eventId, access_token, desired_data):
     try:
         url = "/" + eventId
-        if desired_data == "feed":
-            url = url + "/feed"
         graph = facebook.GraphAPI(access_token)
         if desired_data == "cover":
             data = graph.get_object(url, fields="cover")
         elif desired_data == "guests":
             query = "SELECT attending_count, unsure_count, not_replied_count from event WHERE eid = " + eventId
             data = graph.get_object("/fql", q=query)
-            print data
+        elif desired_data == 'feed':
+            data = graph.get_object(url + "/feed")
         else:
             data = graph.get_object(url);
         return data
