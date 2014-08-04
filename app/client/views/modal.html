@@ -39,14 +39,32 @@
             <div class="block">
               <h4 class="main-text">
                 <span class="icon-friend icon friend" data-icon="e"></span>
-                <span class="event-stat">333</span>
-                <span class="event-stat">343</span>
-                <span class="event-stat">34K</span>
+                <span ng-hide="stats || guestFailed">
+                  Getting Guest Stats...
+                </span>
+                <span ng-show="guestFailed">
+                  No Guest Stats Available
+                </span>
+                <span class="event-stat going" ng-show="stats.attending_count >= 0">
+                  {{stats.attending_count}}
+                </span>
+                <span class="event-stat maybe" ng-show="stats.unsure_count >= 0">
+                  {{stats.unsure_count}}
+                </span>
+                <span class="event-stat invited" ng-show="stats.not_replied_count >= 0">
+                  {{stats.not_replied_count}}
+                </span>
               </h4>
-              <h6 class="sub-text">
-                <span class="stat-label">Going</span>
-                <span class="stat-label">Maybe</span>
-                <span class="stat-label">Invited</span>
+              <h6 class="sub-text" ng-show="stats">
+                <span class="stat-label" ng-show="stats.attending_count >= 0">
+                  Going
+                </span>
+                <span class="stat-label" ng-show="stats.unsure_count >= 0">
+                  Maybe
+                </span>
+                <span class="stat-label" ng-show="stats.not_replied_count >= 0">
+                  Invited
+                </span>
               </h6>
             </div>
           </div>

@@ -118,6 +118,7 @@ img {
 .main-text {
   margin-top: 0;
   margin-bottom: 0;
+  position: relative;
 }
 
 .sub-text {
@@ -140,12 +141,25 @@ img {
 }
 
 .event-stat {
+  position: absolute;
   font-size: 40px;
-  padding-left: 5px;
+  top: -8px;
+}
+
+.going {
+  left: 1.57em;
+}
+
+.maybe {
+ left: 4.1em;
+}
+
+.invited {
+  left: 6.7em;
 }
 
 .stat-label {
-  padding: 20px;
+  padding: 2.8em;
 }
 
 @media all and (max-width: 348px) {
