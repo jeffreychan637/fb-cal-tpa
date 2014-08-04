@@ -96,11 +96,34 @@ angular.module('fbCal')
       console.log('processing guest');
       console.log(guestObject);
       if (guestObject.data) {
-        $scope.stats = guestObject.data[0];
+        var stats = guestObject.data[0];
+        stats.attending_count = processNumber(stats.attending_count);
+        stats.unsure_count = processNumber(stats.unsure_count);
+        stats.not_replied_count = processNumber(stats.not_replied_count);
+        $scope.stats = stats;
       } else {
         $scope.guestFailed = true;
       }
+    };
 
+    var processNumber = function(number) {
+      if (number >= 100000) {
+          console.log('hello');
+          number = (number/1000000).toString().substring(0, 3);
+          var index = number.indexOf(".");
+          if (!(index === 0 || index === 1)) {
+            number = number.substring(0, 2);
+          } 
+          number += "M";
+        } else if (number >= 1000) {
+          number = +(number/1000).toString().substring(0, 3);
+          var decimal = number.indexOf(".");
+          if (!(decimal === 0 || decimal === 1)) {
+            number = number.substring(0, 2);
+          } 
+          number += "K";
+        }
+      return number;
     };
 
     var processFeed = function() {
