@@ -45,24 +45,24 @@
                 <span ng-show="guestFailed">
                   No Guest Stats Available
                 </span>
-                <span class="event-stat going" ng-show="stats.attending_count >= 0">
+                <span class="event-stat going" ng-show="stats.attending_count">
                   {{stats.attending_count}}
                 </span>
-                <span class="event-stat maybe" ng-show="stats.unsure_count >= 0">
+                <span class="event-stat maybe" ng-show="stats.unsure_count">
                   {{stats.unsure_count}}
                 </span>
-                <span class="event-stat invited" ng-show="stats.not_replied_count >= 0">
+                <span class="event-stat invited" ng-show="stats.not_replied_count">
                   {{stats.not_replied_count}}
                 </span>
               </h4>
               <h6 class="sub-text" ng-show="stats">
-                <span class="stat-label" ng-show="stats.attending_count >= 0">
+                <span class="stat-label" ng-show="stats.attending_count">
                   Going
                 </span>
-                <span class="stat-label" ng-show="stats.unsure_count >= 0">
+                <span class="stat-label" ng-show="stats.unsure_count">
                   Maybe
                 </span>
-                <span class="stat-label" ng-show="stats.not_replied_count >= 0">
+                <span class="stat-label" ng-show="stats.not_replied_count">
                   Invited
                 </span>
               </h6>
@@ -151,7 +151,7 @@
             </div>
             <div class="block add-on" ng-if="status.comments">
               <div ng-repeat="comment in status.comments">
-                <blockquote><strong>{{comment.name}}</strong> replied <em>{{comment.message}}</em>
+                <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
                   {{comment.time}}
                   <a class="push-left">Like</a>
