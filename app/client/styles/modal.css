@@ -13,10 +13,6 @@ blockquote {
   margin: 0;
 }
 
-img {
-  margin-bottom: 5px;
-}
-
 .app {
   border: 5px solid black;
   padding: 20px;
@@ -225,6 +221,15 @@ textarea {
 
 .like-btn {
   min-height: 34px;
+}
+
+.load-posts {
+  margin: 0;
+  cursor: pointer;
+}
+
+.load-posts:hover {
+  text-decoration: underline;
 }
 
 .modal-body {
