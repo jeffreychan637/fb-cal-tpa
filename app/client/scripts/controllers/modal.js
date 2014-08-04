@@ -33,7 +33,7 @@ angular.module('fbCal')
       $scope.id = eventInfo.id;
       $scope.name = eventInfo.name;
       $scope.owner = eventInfo.owner.name;
-      console.log($scope.name);
+      $scope.ownerId = eventInfo.owner.id;
       processDesciption();
       processTime();
       processLocation();
@@ -115,7 +115,6 @@ angular.module('fbCal')
     };
 
     var processCover = function(coverObject) {
-      console.log('processing cover');
       if (coverObject.cover && coverObject.cover.source) {
         var cover = coverObject.cover;
         var height = 296 + $scope.settings.borderWidth;
@@ -132,8 +131,6 @@ angular.module('fbCal')
     };
 
     var processGuest = function(guestObject) {
-      console.log('processing guest');
-      console.log(guestObject);
       if (guestObject.data) {
         var stats = guestObject.data[0];
         console.log('stats', stats);
@@ -176,7 +173,6 @@ angular.module('fbCal')
 
     var processFeed = function() {
       $scope.loadMoreFeed = false;
-      console.log('processing feed');
       console.log(feedObject);
       if (feedObject.paging && feedObject.paging.next) {
         nextFeed = feedObject.paging.next;
