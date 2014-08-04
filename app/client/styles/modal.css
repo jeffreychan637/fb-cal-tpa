@@ -162,12 +162,22 @@ img {
   padding: 2.8em;
 }
 
-@media all and (max-width: 348px) {
+@media all and (max-width: 475px) {
   .event-stat {
-    font-size: 30px;
+    font-size: 25px;
+    top: 0;
+  }
+  .going {
+    left: 1.9em;
+  }
+  .maybe {
+    left: 4.7em;
+  }
+  .invited {
+    left: 7.7em;
   }
   .stat-label {
-    padding: 12px;
+    padding: 1.5em;
   }
 }
 
