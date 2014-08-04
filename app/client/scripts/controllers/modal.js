@@ -79,9 +79,12 @@ angular.module('fbCal')
       console.log('processing cover');
       if (coverObject.cover && coverObject.cover.source) {
         var cover = coverObject.cover;
+        var height = 296 + $scope.settings.borderWidth;
+
+        height = 306;
         // cover.source = "https://fbcdn-sphotos-a-a.akamaihd.net/hphotos-ak-xfa1/t31.0-8/q71/s720x720/10286851_801238859907126_3448618267544264515_o.jpg";
         var cssClass = {'background-image' : 'url(' + cover.source + ')',
-                        'height' : '296px',
+                        'height' : height + 'px',
                         'background-position' : cover.offset_x + '% ' +
                                                 cover.offset_y + '%'
                        };
