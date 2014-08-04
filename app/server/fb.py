@@ -93,19 +93,27 @@ def process_event_data(events_info, event_data, access_token):
     for saved_event in events_info:
         cur_event_data = next((event for event in event_data if event["id"] == saved_event["eventId"]), None)
         if cur_event_data is None:
-            cur_event_data = get_specific_event(saved_event["eventId"], access_token)
+            cur_event_data = get_specific_event(saved_event["eventId"], access_token, "all")
         if cur_event_data:
             cur_event_data["eventColor"] = saved_event["eventColor"]
             processed_events.append(cur_event_data)
     print processed_events
     return processed_events
 
-def get_specific_event(eventId, access_token):
+def get_specific_event(eventId, access_token, desired_data):
     try:
-        print access_token
+        url = "/" + eventId
         graph = facebook.GraphAPI(access_token)
-        event = graph.get_object("/" + eventId)
-        return event
+        if desired_data == "cover":
+            data = graph.get_object(url, fields="cover")
+        elif desired_data == "guests":
+            query = "SELECT attending_count, unsure_count, not_replied_count from event WHERE eid = " + eventId
+            data = graph.get_object("/fql", q=query)
+        elif desired_data == 'feed':
+            data = graph.get_object(url + "/feed")
+        else:
+            data = graph.get_object(url);
+        return data
     except facebook.GraphAPIError, e:
         print "FACEBOOK ERROR " + e.message
         return {}

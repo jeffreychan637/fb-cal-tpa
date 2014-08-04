@@ -36,6 +36,7 @@ angular.module('fbCal').factory('desktopCalendar', function ($log, $wix, $rootSc
     });
     var borderStyle = {'border-bottom-width' :  '1px',
                        'border-bottom-color' : '#eee',
+                       'border-bottom-style' : 'solid',
                        'margin-bottom' : '10px'
                       };
     $('#header').css(borderStyle);

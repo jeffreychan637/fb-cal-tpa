@@ -8,7 +8,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
    * OF editor.wix.com
    */
   
-  var compId = $wix.Utils.getCompId();
+  var compId = $wix.Utils.getCompId(); //get orig comp id?;
   var instance = api.getInstance();
 
   compId = 45;
@@ -122,9 +122,10 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     return deferred.promise;
   };
 
-  var getModalEvent = function(eventId) {
+  var getModalEvent = function(eventId, desiredData) {
     var modalHeader = {'X-Wix-Instance' : instance, 
-                       'event_id' : eventId.toString()};
+                       'event_id' : eventId.toString(),
+                       'desired_data' : desiredData};
     var deferred = $q.defer();
     $http({
            method: 'GET',
@@ -132,10 +133,12 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            headers: modalHeader,
            timeout: 15000
           }).success(function (data, status) {
-            console.log(status, data);
             if (status === 200) {
-              console.log(data); 
-              deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
+              var response = jQuery.parseJSON(jQuery.parseJSON(data));
+              if (!response.settings) {
+                response.settings = api.defaults;
+              }
+              deferred.resolve(response);
             } else {
               console.log('The server is returning an incorrect status.');
               deferred.reject();

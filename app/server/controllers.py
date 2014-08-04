@@ -99,6 +99,7 @@ def validate_get_request(request, request_from):
                 abort(STATUS["Forbidden"], message="Not Inside Editor")
         if request_from == "modal":
             event_id = request.headers["event_id"]
+            desired_data = request.headers["desired_data"]
     except AttributeError:
         abort(STATUS["Unauthorized"], message="Request Incomplete")
     except KeyError:
@@ -106,7 +107,8 @@ def validate_get_request(request, request_from):
     if not instance_parser(instance):
         abort(STATUS["Forbidden"], message="Invalid Instance")
     if request_from == "modal":
-        return {"instance" : instance, "event_id" : event_id}
+        return {"instance" : instance, "event_id" : event_id, \
+                "desired_data" : desired_data}
     else:
         return instance
 
@@ -191,6 +193,8 @@ def get_event(request, compID, all_events):
     else:
         info = validate_get_request(request, "modal")
         instance = info["instance"]
+        event_id = info["event_id"]
+        desired_data = info["desired_data"]
     db_entry = get_settings(compID, instance)
     if db_entry is None:
         abort(STATUS["Internal_Server_Error"], \
@@ -201,7 +205,24 @@ def get_event(request, compID, all_events):
     if (all_events):
         event_data = get_all_event_data(access_token_data)
     else:
-        event_data = get_specific_event(info["event_id"], access_token_data["access_token"])
+        if not (db_entry.events):
+            abort(STATUS["Not_Found"], message= "User has no events to display")
+        events = json.loads(db_entry.events)
+        found = False
+        for event in events:
+            if event["eventId"] == event_id:
+                found = True
+                break;
+        if (found):
+            event_data = get_specific_event(event_id, access_token_data["access_token"], \
+                                            desired_data)
+        else:
+            abort(STATUS["Forbidden"], message= "User cannot display this event")
+        if desired_data == "all":
+            settings = ""
+            if db_entry.settings:
+                settings = json.loads(db_entry.settings)
+            event_data = {"settings" : settings, "event_data" : event_data}
     if not event_data:
         abort(STATUS["Bad_Gateway"],
               message="Couldn't receive data from Facebook")

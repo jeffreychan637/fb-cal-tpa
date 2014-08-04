@@ -1,19 +1,19 @@
 @charset "UTF-8";
 
 @font-face {
-  font-family: "checkmark";
-  src:url("../fonts/checkmark.eot");
-  src:url("../fonts/checkmark.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/checkmark.woff") format("woff"),
-    url("../fonts/checkmark.ttf") format("truetype"),
-    url("../fonts/checkmark.svg#checkmark") format("svg");
+  font-family: "fbcaltpa";
+  src:url("../fonts/fbcaltpa.eot");
+  src:url("fonts/fbcaltpa.eot?#iefix") format("embedded-opentype"),
+    url("../fonts/fbcaltpa.woff") format("woff"),
+    url("../fonts/fbcaltpa.ttf") format("truetype"),
+    url("../fonts/fbcaltpa.svg#fbcaltpa") format("svg");
   font-weight: normal;
   font-style: normal;
 
 }
 
 [data-icon]:before {
-  font-family: "checkmark" !important;
+  font-family: "fbcaltpa" !important;
   content: attr(data-icon);
   font-style: normal !important;
   font-weight: normal !important;
@@ -27,7 +27,7 @@
 
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
-  font-family: "checkmark" !important;
+  font-family: "fbcaltpa" !important;
   font-style: normal !important;
   font-weight: normal !important;
   font-variant: normal !important;
@@ -40,4 +40,16 @@
 
 .icon-check-mark-circle:before {
   content: "a";
+}
+.icon-clock:before {
+  content: "c";
+}
+.icon-location:before {
+  content: "b";
+}
+.icon-friends:before {
+  content: "e";
+}
+.icon-mail:before {
+  content: "d";
 }

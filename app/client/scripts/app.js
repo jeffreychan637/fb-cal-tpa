@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('fbCal', []);
+angular.module('fbCal', ['ngSanitize']);
