@@ -8,6 +8,10 @@ angular.module('fbCal')
     var eventInfo;
     var feedObject;
 
+    $scope.feed = [];
+
+    var nextFeed;
+
     // $scope.eventId = "1512622455616642";
 
     var showErrorModal = function() {
@@ -38,15 +42,13 @@ angular.module('fbCal')
     var processTime = function() {
       var startTime = new Date(eventInfo.start_time);
       var endTime = new Date(eventInfo.end_time);
-      //find a way to tell if they're on the same day
-      var onSameDay;
       var startHour = startTime.toLocaleTimeString().toLowerCase();
       var endHour = endTime.toLocaleTimeString().toLowerCase();
       startHour = startHour.replace(/:\d\d /, "");
       endHour = endHour.replace(/:\d\d /, "");
       var startDateString = startTime.toLocaleDateString();
       var startDayString = startTime.toString().replace(/ .+/, ", ");
-      if (onSameDay) {
+      if (isSameDay(startTime, endTime)) {
         $scope.shortTime = startDayString + startDateString + " at " +
                            startHour + "-" + endHour;
       } else {
@@ -57,6 +59,12 @@ angular.module('fbCal')
                           " to " + endDayString + endDateString + " at " +
                           endHour;
       }
+    };
+
+    var isSameDay = function(a, b) {
+      return (a.getDate() === b.getDate() &&
+              a.getMonth() === b.getMonth() &&
+              a.getFullYear() === b.getFullYear());
     };
 
     var processLocation = function() {
@@ -127,9 +135,92 @@ angular.module('fbCal')
     };
 
     var processFeed = function() {
+      $scope.loadMoreFeed = false;
       console.log('processing feed');
       console.log(feedObject);
-      //if feedFromServer is empty, display end of feed message
+      if (feedObject.paging && feedObject.paging.next) {
+        nextFeed = feedObject.paging.next;
+        $scope.loadMoreFeed = true;
+      } else {
+        $scope.endOfFeed = true;
+      }
+      var data = feedObject.data;
+      if (data) {
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].message) {
+            var status = { picture : data[i].picture,
+                           name: data[i].from.name,
+                           link: data[i].link,
+                           linkName: data[i].name,
+                           caption: data[i].caption,
+                           description : data[i].description,
+                           video: data[i].source,
+                           videoDetails : data[i].properties,
+                           id: data[i].id
+                         };
+            status = processActions(status, data[i]);
+            $scope.feed.push(status);
+          }
+        }
+      } else {
+        $scope.endOfFeed = true;
+      }
+    };
+
+    var processActions = function(status, data) {
+      var postTime = new Date(data.created_time);
+      status.time = postCreatedTime(postTime);
+      status.message = $sanitize(data.message.replace(/\r?\n/g, "<br>"));
+      $sce.trustAsHtml(status.message);
+      if (data.actions) {
+        for (var i = 0; i < data.actions.length; i++) {
+          if (data.actions[i].name === 'Like') {
+            status.like = data.actions[i].link;
+          } else if (data.actions[i].name === 'Comment') {
+            status.comment = data.actions[i].link;
+          }
+        }
+      }
+      if (data.likes) {
+        status.numberLikes = data.likes.data.length;
+      }
+      if (data.sharedposts) {
+        status.numberShares = data.sharedposts.data.length;
+      }
+      if (data.comments) {
+        status.comments = [];
+        var comments = data.comments;
+        for (var j = 0; j < comments.length; j++) {
+          var comment = { id : comments[j].id,
+                          can_remove : comments[j].can_remove,
+                          message : comments[j].message,
+                          numberLikes : comments[j].like_count,
+                          name: comments[j].from.name,
+                          time: postCreatedTime(new Date(comments[j].created_time))
+                        };
+          if (comments[j].message) {
+            comment.message = $sanitize(comments[j].message.replace(/\r?\n/g, "<br>"));
+            $sce.trustAsHtml(comment.message);
+          }
+          status.comments.push(comment);
+        }
+      }
+      return status;
+    };
+
+    var postCreatedTime = function(time) {
+      var today = new Date();
+      if (isSameDay(today, time)) {
+        if (today.getHours() - time.getHours()) {
+           return (today.getHours() - time.getHours()).toString() + ' hours ago';
+        } else if (today.getMinutes() - time.getMinutes()) {
+          return (today.getMinutes() - time.getMinutes()).toString() + ' minutes ago';
+        } else {
+          return 'Just now';
+        }
+      } else {
+        return time.toLocaleString().replace(/:\d\d /, '').toLowerCase();
+      }
     };
 
 
