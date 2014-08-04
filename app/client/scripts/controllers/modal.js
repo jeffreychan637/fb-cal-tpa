@@ -22,6 +22,13 @@ angular.module('fbCal')
       $('#message').modal('show');
     };
 
+    // var showPleaseWait = function(message) {
+    //   $scope.messageTitle = "Please wait...";
+    //   $('#messageTitle').css('color', '#09F');
+    //   $scope.messageBody = 'We\'re currently loading your replies.';
+    //   $('#message').modal('show');
+    // };
+
     var processEventInfo = function() {
       $scope.id = eventInfo.id;
       $scope.name = eventInfo.name;
@@ -41,24 +48,34 @@ angular.module('fbCal')
     };
 
     var processTime = function() {
-      var startTime = new Date(eventInfo.start_time);
-      var endTime = new Date(eventInfo.end_time);
-      var startHour = startTime.toLocaleTimeString().toLowerCase();
-      var endHour = endTime.toLocaleTimeString().toLowerCase();
-      startHour = startHour.replace(/:\d\d /, "");
-      endHour = endHour.replace(/:\d\d /, "");
-      var startDateString = startTime.toLocaleDateString();
-      var startDayString = startTime.toString().replace(/ .+/, ", ");
-      if (isSameDay(startTime, endTime)) {
-        $scope.shortTime = startDayString + startDateString + " at " +
-                           startHour + "-" + endHour;
+      if (eventInfo.start_time) {
+        var startTime = new Date(eventInfo.start_time);
+        var startHour = startTime.toLocaleTimeString().toLowerCase();
+        startHour = startHour.replace(/:\d\d /, "");
+        var startDateString = startTime.toLocaleDateString();
+        var startDayString = startTime.toString().replace(/ .+/, ", ");
+        if (eventInfo.end_time) {
+          var endTime = new Date(eventInfo.end_time);
+          var endHour = endTime.toLocaleTimeString().toLowerCase();
+          endHour = endHour.replace(/:\d\d /, "");
+          
+          if (isSameDay(startTime, endTime)) {
+            $scope.shortTime = startDayString + startDateString + " at " +
+                               startHour + "-" + endHour;
+          } else {
+            var endDateString = endTime.toLocaleDateString();
+            var endDayString = endTime.toString().replace(/ .+/, ", ");
+            $scope.shortTime = startDayString + startDateString + " - " + endDayString + endDateString;
+            $scope.longTime = startDayString + startDateString + " at " + startHour +
+                              " to " + endDayString + endDateString + " at " +
+                              endHour;
+          }
+        } else {
+          $scope.shortTime = startDayString + startDateString + " at " +
+                             startHour;
+        }
       } else {
-        var endDateString = endTime.toLocaleDateString();
-        var endDayString = endTime.toString().replace(/ .+/, ", ");
-        $scope.shortTime = startDayString + startDateString + " - " + endDayString + endDateString;
-        $scope.longTime = startDayString + startDateString + " at " + startHour +
-                          " to " + endDayString + endDateString + " at " +
-                          endHour;
+        $scope.shortTime = 'No time specified';
       }
       $timeout(function() {
         if ($($window).width() > 760) {
@@ -78,18 +95,22 @@ angular.module('fbCal')
     };
 
     var processLocation = function() {
-      $scope.location = eventInfo.location;
-      if (eventInfo.venue && (eventInfo.venue.street || eventInfo.venue.city ||
-                              eventInfo.venue.state || 
-                              eventInfo.venue.country)) {
-        $scope.venue = eventInfo.venue.street + ", " + eventInfo.venue.city + 
-                         ", " + eventInfo.venue.state + ", " +
-                         eventInfo.venue.country + " " + eventInfo.venue.zip;
-        $scope.venue = $scope.venue.replace(/, undefined/, "")
-                                       .replace(/undefined, /, "")
-                                       .replace(/undefined/, "")
-                                       .replace(/ $/, "")
-                                       .replace(/, $/, "");
+      if (eventInfo.location) {
+        $scope.location = eventInfo.location;
+        if (eventInfo.venue && (eventInfo.venue.street || eventInfo.venue.city ||
+                                eventInfo.venue.state || 
+                                eventInfo.venue.country)) {
+          $scope.venue = eventInfo.venue.street + ", " + eventInfo.venue.city + 
+                           ", " + eventInfo.venue.state + ", " +
+                           eventInfo.venue.country + " " + eventInfo.venue.zip;
+          $scope.venue = $scope.venue.replace(/, undefined/, "")
+                                         .replace(/undefined, /, "")
+                                         .replace(/undefined/, "")
+                                         .replace(/ $/, "")
+                                         .replace(/, $/, "");
+        }
+      } else {
+        $scope.location = "No location specified";
       }
     };
 
@@ -173,14 +194,13 @@ angular.module('fbCal')
                            linkName: data[i].name,
                            caption: data[i].caption,
                            description : data[i].description,
-                           video: data[i].source,
-                           videoDetails : data[i].properties,
                            id: data[i].id
                          };
             status = processActions(status, data[i]);
             $scope.feed.push(status);
           }
         }
+        console.log($scope.feed);
       } else {
         $scope.endOfFeed = true;
       }
@@ -208,20 +228,35 @@ angular.module('fbCal')
       }
       if (data.comments) {
         status.comments = [];
-        var comments = data.comments;
-        for (var j = 0; j < comments.length; j++) {
-          var comment = { id : comments[j].id,
-                          can_remove : comments[j].can_remove,
-                          message : comments[j].message,
-                          numberLikes : comments[j].like_count,
-                          name: comments[j].from.name,
-                          time: postCreatedTime(new Date(comments[j].created_time))
-                        };
-          if (comments[j].message) {
-            comment.message = $sanitize(comments[j].message.replace(/\r?\n/g, "<br>"));
-            $sce.trustAsHtml(comment.message);
+        status.extraComments = [];
+        var comments = data.comments.data;
+        if (comments) {
+          for (var j = 0; j < comments.length; j++) {
+            var comment = { id : comments[j].id,
+                            can_remove : comments[j].can_remove,
+                            message : comments[j].message,
+                            numberLikes : comments[j].like_count,
+                            name: comments[j].from.name,
+                            time: postCreatedTime(new Date(comments[j].created_time))
+                          };
+            if (comments[j].message) {
+              comment.message = $sanitize(comments[j].message.replace(/\r?\n/g, "<br>"));
+              $sce.trustAsHtml(comment.message);
+            }
+            if (status.comments.length < 5) { 
+              status.comments.push(comment);
+            } else {
+              status.extraComments.push(comment);
+            }
           }
-          status.comments.push(comment);
+        }
+        if (data.comments.paging) {
+          if (data.comments.paging.next) {
+              status.more = data.comments.paging.next;
+          }
+        }
+        if (status.more || status.extraComments) {
+          status.repliesMessage = 'Show more replies';
         }
       }
       return status;
@@ -239,6 +274,25 @@ angular.module('fbCal')
         }
       } else {
         return time.toLocaleString().replace(/:\d\d /, '').toLowerCase();
+      }
+    };
+
+    $scope.showMoreReplies = function(index) {
+      if (!$scope.feed[index].gettingReplies) {
+         $scope.feed[index].gettingReplies = true;
+         $scope.feed[index].repliesMessage = 'Getting more replies';
+        if ($scope.feed[index].extraComments) {
+          $scope.feed[index].comments = $scope.feed[index].comments.concat($scope.feed[index].extraComments);
+          $scope.feed[index].extraComments = [];
+          if (!$scope.feed[index].more) {
+            $scope.feed[index].repliesMessage = 'End of post';
+          } else {
+            $scope.feed[index].repliesMessage = 'Show more replies';
+          }
+           $scope.feed[index].gettingReplies = false;
+        } else {
+          //get more replies from server.
+        }
       }
     };
 
