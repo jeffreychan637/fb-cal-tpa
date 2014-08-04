@@ -123,6 +123,7 @@
               <blockquote><strong>{{status.name}}</strong> posted <em><span ng-bind-html="status.message"></span></em>
                 <br>
                 {{status.time}}
+                <a class="push-left" ng-show="status.like && !status.comment">Like</a>
                 <span class="push-left" ng-show="status.numberLikes">
                   {{status.numberLikes}} Likes
                 </span>
@@ -139,13 +140,14 @@
                 <span ng-if="status.description">{{status.description}}</span>
               </blockquote>
             </div>
-            <div class="block add-on">
-              <div class="input-group">
+            <div class="block add-on" ng-show="status.comment">
+              <div class="input-group" ng-show="status.like && status.comment">
                 <span class="input-group-btn">
                   <button class="btn btn-default like-btn" type="button">Like</button>
                 </span>
                 <input type="text" class="form-control" placeholder="Comment...">
               </div>
+              <input type="text" class="form-control" placeholder="Comment..." ng-show="!status.like && status.comment">
             </div>
             <div class="block add-on" ng-if="status.comments">
               <div ng-repeat="comment in status.comments">
