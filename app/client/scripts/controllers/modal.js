@@ -137,6 +137,7 @@ angular.module('fbCal')
         stats.attending_count = processNumber(stats.attending_count);
         stats.unsure_count = processNumber(stats.unsure_count);
         stats.not_replied_count = processNumber(stats.not_replied_count);
+        console.log(stats);
         $scope.stats = stats;
       } else {
         $scope.guestFailed = true;
@@ -168,7 +169,7 @@ angular.module('fbCal')
         } 
         number += "K";
       }
-      return number.toString();
+      return number;
     };
 
     var processFeed = function() {
