@@ -95,6 +95,11 @@ angular.module('fbCal')
     var processGuest = function(guestObject) {
       console.log('processing guest');
       console.log(guestObject);
+      if (guestObject.data) {
+        $scope.stats = guestObject.data[0];
+      } else {
+        $scope.guestFailed = true;
+      }
 
     };
 
