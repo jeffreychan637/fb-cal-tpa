@@ -10,9 +10,9 @@
       <div class="row">
         <div class="col-sm-6 left-col">
           <div class="col-sm-12 left-col">
-            <div class="block">
+            <div class="block" id="rsvp">
               <span class="icon-mail icon"></span>
-              <div class="dropdown rvsp">
+              <div class="dropdown rsvp">
                 <button class="btn btn-default dropdown-toggle" type="button" id="rsvp" data-toggle="dropdown">
                   RSVP
                   <span class="caret"></span>
@@ -23,7 +23,7 @@
                   <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Decline</a></li>
                 </ul>
               </div>
-              <div class="dropdown rvsp">
+              <div class="dropdown rsvp">
                 <button class="btn btn-default dropdown-toggle" type="button" id="share" data-toggle="dropdown">
                   Share
                   <span class="caret"></span>
@@ -36,7 +36,7 @@
             </div>
           </div>
           <div class="col-sm-12 left-col">
-            <div class="block">
+            <div class="block" id="guests">
               <h4 class="main-text">
                 <span class="icon-friend icon friend" data-icon="e"></span>
                 <span ng-hide="stats || guestFailed">
@@ -71,7 +71,7 @@
         </div>
         <div class="col-sm-6 right-col">
           <div class="col-sm-12 right-col">
-            <div class="block">
+            <div class="block" id="time">
               <h4 class="main-text">
                 <span class="icon-clock icon" data-icon="c"></span>
                 {{shortTime}}
@@ -82,7 +82,7 @@
             </div>
           </div>
           <div class="col-sm-12 right-col">
-            <div class="block">
+            <div class="block" id="location">
               <h4 class="main-text">
                 <span class="icon-location icon" data-icon="b"></span>
                 <a href="https://maps.google.com/?q={{location}}" target="blank">

@@ -52,13 +52,13 @@ img {
   margin-top: 0;
 }
 
-.rvsp {
+.rsvp {
   display: inline-block;
   padding-left: 60px;
 }
 
 @media all and (max-width: 475px) {
-  .rvsp {
+  .rsvp {
     padding-left: 20px;
   }
 }

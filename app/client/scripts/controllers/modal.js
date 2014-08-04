@@ -2,7 +2,8 @@
 /*global $:false, console:false */
 
 angular.module('fbCal')
-  .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, $timeout, eventId, server) {
+  .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, 
+                                     $timeout, $window, eventId, server) {
     $scope.eventId = eventId;
 
     var eventInfo;
@@ -59,6 +60,15 @@ angular.module('fbCal')
                           " to " + endDayString + endDateString + " at " +
                           endHour;
       }
+      $timeout(function() {
+        if ($($window).width() > 760) {
+          if ($('#time').height() > $('#rsvp').height()) {
+            $('#rsvp').height($('#time').height());
+          } else {
+            $('#time').height($('#rsvp').height());
+          }
+        }
+      }, 1000);
     };
 
     var isSameDay = function(a, b) {
@@ -112,6 +122,15 @@ angular.module('fbCal')
       } else {
         $scope.guestFailed = true;
       }
+      $timeout(function() {
+        if ($($window).width() > 760) {
+          if ($('#location').height() > $('#guests').height()) {
+            $('#guests').height($('#location').height());
+          } else {
+            $('#location').height($('#guests').height());
+          }
+        }
+      }, 1000);
     };
 
     var processNumber = function(number) {
