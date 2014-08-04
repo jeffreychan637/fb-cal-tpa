@@ -1284,6 +1284,6 @@ if(!String.prototype.formatNum) {
   		console.log("modal closed", message);
 		};
 		console.debug('hello open modal', url);
-     Wix.openModal(url, 850, 590, onClose);
+     Wix.openModal(url, 850, 600, onClose);
 	}
 }(jQuery));

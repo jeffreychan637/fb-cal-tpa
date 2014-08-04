@@ -26,7 +26,7 @@ angular.module('fbCal')
         api.modalEvent = undefined;
       };
       console.debug('hello open modal');
-      $wix.openModal(url, 850, 590, onClose);
+      $wix.openModal(url, 850, 600, onClose);
     };
 
 
