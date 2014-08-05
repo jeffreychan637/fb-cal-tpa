@@ -65,46 +65,48 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     });
   };
 
-  var objectRegex = /posts\/([0-9a-zA-Z]+)$/;
+  // var objectRegex = /posts\/([0-9a-zA-Z]+)$/;
 
-  var getObjectId = function(url, deferred) {
-    var objectPattern = url.match(objectRegex);
-    if  (objectPattern) {
-      return objectPattern[1];
-    } else {
-      deferred.reject();
-      return false;
-    }
-  };
+  // var getObjectId = function(url, deferred) {
+  //   console.log(typeof(url));
+  //   url = url.toString();
+  //   console.log(url);
+  //   var objectPattern = url.match(objectRegex);
+  //   if  (objectPattern) {
+  //     return objectPattern[1];
+  //   } else {
+  //     deferred.reject();
+  //     return false;
+  //   }
+  // };
   
   var rsvp = ['attending', 'maybe', 'declined']; 
 
   var processInteraction = function(action, key, message) {
+    console.log('performing ' + action);
     var deferred = $q.defer();
     if (rsvp.indexOf(action) >= 0) {
       changeAttendingStatus(action, key, deferred);
     } else if (action === 'post') {
       post(key, deferred, message);
-    } else if (action === 'like') {
-      key = getObjectId(key, deferred);
+    } else if (action === 'like' || action === 'likeComment') {
       if (key) {
         like(key, deferred);        
       }
     } else {
-      key = getObjectId(key, deferred);
       if (key) {
         comment(key, deferred, message);
       }
     }
+    return deferred.promise;
   };
 
   var post = function(key, deferred, message) {
+    console.log(message);
     FB.api("/" + key + "/feed",
            "POST",
            {
-              "object": {
-                "message": message
-              }
+              "message": message
            },
            function(response) {
              if (response && !response.error) {
@@ -113,22 +115,23 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
                         if (response && !response.error) {
                           deferred.resolve(response);
                         } else {
+                          console.log(response.error);
                           deferred.reject();
                         }
                       });
              } else {
+              console.log(response.error);
                deferred.reject();
              }
            });
   };
 
   var comment = function(key, deferred, message) {
+    console.log(message);
     FB.api("/" + key + "/comments",
            "POST",
            {
-              "object": {
-                "message": message
-              }
+              "message": message
            },
            function(response) {
              if (response && !response.error) {
@@ -153,6 +156,7 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
              if (response && !response.error) {
                deferred.resolve(true);
              } else {
+               console.log(response.error);
                deferred.reject();
              }
            });
@@ -166,6 +170,7 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
              if (response && !response.error) {
                deferred.resolve(true);
              } else {
+               console.log(response.error);
                deferred.reject();
              }
            });

@@ -79,6 +79,7 @@ angular.module('fbCal').factory('modalFbLogin', function ($log, $q) {
   };
 
   var loginWithPermission = function(permission) {
+    console.log('checking login with permissions');
     var deferred = $q.defer();
     FB.login(function(response) {
       if (!response.error) {
@@ -98,6 +99,7 @@ angular.module('fbCal').factory('modalFbLogin', function ($log, $q) {
         deferred.reject('unknown');
       }
     }, {scope: permission});
+    return deferred.promise;
   };
 
   return {

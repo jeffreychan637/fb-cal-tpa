@@ -139,11 +139,9 @@ angular.module('fbCal')
     var processGuest = function(guestObject) {
       if (guestObject.data) {
         var stats = guestObject.data[0];
-        console.log('stats', stats);
         stats.attending_count = processNumber(stats.attending_count);
         stats.unsure_count = processNumber(stats.unsure_count);
         stats.not_replied_count = processNumber(stats.not_replied_count);
-        console.log(stats);
         $scope.stats = stats;
       } else {
         $scope.guestFailed = true;
@@ -180,7 +178,6 @@ angular.module('fbCal')
 
     var processFeed = function() {
       $scope.loadMoreFeed = false;
-      console.log(feedObject);
       if (feedObject.paging && feedObject.paging.next) {
         nextFeed = feedObject.paging.next;
         $scope.moreFeedMessage = "Load more posts";
@@ -339,18 +336,15 @@ angular.module('fbCal')
 
     var rsvp = ['attending', 'maybe', 'declined']; 
 
-    $scope.interactWithFb = function(action, index) {
+    $scope.interactWithFb = function(action, key, message) {
       if ($scope.settings.commenting) {
-        var key;
-        var message;
         if (rsvp.indexOf(action) >= 0 || action === 'post') {
           key = $scope.eventId;
           if (action === 'post') {
-            message = $sanitize($scope.post);
+            message = $sanitize(message);
           }
-        } else {
-          //separate by comment and like
-          key = 5;//do something with index
+        } else if (action === 'like' || action === 'comment') {
+            key = $scope.feed[key].id;
         }
         if (fbSetup.getFbReady()) {
           if (modalFbLogin.checkFirstTime()) {
@@ -368,6 +362,7 @@ angular.module('fbCal')
               permission = 'publish_actions';
             }
             if (modalFbLogin.checkPermission(permission)) {
+              console.log('all permissions met');
               handleFbInteraction(action, key, message);
             } else {
               modalFbLogin.loginWithPermission(permission)
@@ -388,9 +383,16 @@ angular.module('fbCal')
       fbEvents.processInteraction(action, key, message)
         .then(function(response) {
           if (response) {
+            console.log('Successful!  ' + action);
             if (rsvp.indexOf(action) >= 0) {
               //tell user they have been succesfully rsvp or declined or maybe
-              $scope.rsvpStatus = action;
+              if (action === 'attending') {
+                $scope.rsvpStatus = 'Going';
+              } else if (action === 'maybe') {
+                $scope.rsvpStatus = 'Maybe';
+              } else {
+                $scope.rsvpStatus = 'Declined';
+              }
             } else if (action === 'post') {
               //append user's to front of feed array
               var status = processStatus(response);

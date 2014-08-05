@@ -18,9 +18,15 @@
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Going</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Maybe</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Decline</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="interactWithFb('attending', undefined)">
+                    Going
+                  </a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="interactWithFb('maybe', undefined)">
+                    Maybe
+                  </a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="interactWithFb('declined', undefined)">
+                    Decline
+                  </a></li>
                 </ul>
               </div>
               <div class="dropdown rsvp">
@@ -104,13 +110,13 @@
           </div>
         </div>
       </div>
-      <div class="row" ng-if="settings.commenting">
+      <div class="row" ng-show="settings.commenting">
         <div class="col-sm-12 middle-col">
           <div class="block">
-            <form class="input-group">
-              <textarea placeholder="Post to event's Facebook page..." class="form-control" ng-model="post" required></textarea>
+            <form class="input-group" ng-model="postForm" id="postForm" name="postForm">
+              <textarea name="post" id="post" placeholder="Post to event's Facebook page..." class="form-control" ng-model="post"></textarea>
               <span class="input-group-btn">
-                <button type="submit" class="btn btn-default post-btn" type="button" ng-click="postToFb()">Post!</button>
+                <button type="submit" class="btn btn-default post-btn" ng-click="interactWithFb('post', undefined, post)">Post!</button>
               </span>
             </form>
           </div>
@@ -123,7 +129,7 @@
               <blockquote><strong>{{status.name}}</strong> posted <em><span ng-bind-html="status.message"></span></em>
                 <br>
                 {{status.time}}
-                <a class="push-left" ng-show="status.like && !status.comment && settings.commenting">Like</a>
+                <a class="push-left" ng-show="status.like && !status.comment && settings.commenting" ng-click="interactWithFb('like', $index, undefined)">Like</a>
                 <span class="push-left" ng-show="status.numberLikes">
                   {{status.numberLikes}} Likes
                 </span>
@@ -141,16 +147,20 @@
               </blockquote>
             </div>
             <div class="block add-on" ng-show="status.comment && settings.commenting">
-              <div class="input-group" ng-if="status.like && status.comment">
+              <form class="input-group" ng-if="status.like && status.comment">
                 <span class="input-group-btn">
-                  <button class="btn btn-default like-btn" type="button">Like</button>
+                  <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)">Like</button>
                 </span>
-                <form>
-                  <input type="text" class="form-control" placeholder="Comment..." ng-model="status.visitorComment" required>
-                </form>
-              </div>
-              <form>
-                <input type="text" class="form-control" placeholder="Comment..." ng-if="!status.like && status.comment" ng-model="status.visitorComment" required>
+                <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment" required>
+                <span class="input-group-btn">
+                  <button class="btn btn-default comment-btn" type="submit" ng-click="interactWithFb('comment', $index, visitorComment)">Post!</button>
+                </span>
+              </form>
+              <form class="input-group" ng-if="!status.like && status.comment">
+                <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment" required>
+                <span class="input-group-btn">
+                  <button class="btn btn-default comment-btn" type="submit" ng-click="interactWithFb('comment', $index, vistorComment)">Post!</button>
+                </span>
               </form>
             </div>
             <div class="block add-on" ng-if="status.comments">
@@ -158,7 +168,7 @@
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
                   {{comment.time}}
-                  <a class="push-left" ng-if="settings.commenting">Like</a>
+                  <a class="push-left" ng-if="settings.commenting" ng-click="interactWithFb('likeComment', comment.id, undefined)">Like</a>
                   <span class="push-left" ng-show="comment.numberLikes">{{comment.numberLikes}} Likes</span>
                 </blockquote>
               </div>
@@ -169,8 +179,8 @@
       </div>
       <div class="row">
          <div class="col-sm-4 col-sm-offset-4">
-          <div class="block">
-            <p class="text-center load-posts" ng-if="moreFeedMessage" ng-click="showMoreFeed()">{{moreFeedMessage}}</p>
+          <div class="block" ng-if="moreFeedMessage">
+            <p class="text-center load-posts" ng-click="showMoreFeed()">{{moreFeedMessage}}</p>
             </div>
         </div>
       </div>
