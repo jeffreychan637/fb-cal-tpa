@@ -65,33 +65,114 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     });
   };
 
-  var parseFbUrl = function(url) {
-    return url;
+  var objectRegex = /posts\/([0-9a-zA-Z]+)$/;
+
+  var getObjectId = function(url, deferred) {
+    var objectPattern = url.match(objectRegex);
+    if  (objectPattern) {
+      return objectPattern[1];
+    } else {
+      deferred.reject();
+      return false;
+    }
   };
   
-  var processInteraction = function(action, destination) {
+  var rsvp = ['attending', 'maybe', 'declined']; 
+
+  var processInteraction = function(action, key, message) {
+    var deferred = $q.defer();
+    if (rsvp.indexOf(action) >= 0) {
+      changeAttendingStatus(action, key, deferred);
+    } else if (action === 'post') {
+      post(key, deferred, message);
+    } else if (action === 'like') {
+      key = getObjectId(key, deferred);
+      if (key) {
+        like(key, deferred);        
+      }
+    } else {
+      key = getObjectId(key, deferred);
+      if (key) {
+        comment(key, deferred, message);
+      }
+    }
+  };
+
+  var post = function(key, deferred, message) {
+    FB.api("/" + key + "/feed",
+           "POST",
+           {
+              "object": {
+                "message": message
+              }
+           },
+           function(response) {
+             if (response && !response.error) {
+               FB.api("/" + response.id,
+                      function(response) {
+                        if (response && !response.error) {
+                          deferred.resolve(response);
+                        } else {
+                          deferred.reject();
+                        }
+                      });
+             } else {
+               deferred.reject();
+             }
+           });
+  };
+
+  var comment = function(key, deferred, message) {
+    FB.api("/" + key + "/comments",
+           "POST",
+           {
+              "object": {
+                "message": message
+              }
+           },
+           function(response) {
+             if (response && !response.error) {
+               FB.api("/" + response.id,
+                      function(response) {
+                        if (response && !response.error) {
+                          deferred.resolve(response);
+                        } else {
+                          deferred.reject();
+                        }
+                      });
+             } else {
+               deferred.reject();
+             }
+           });
+  };
+
+  var like = function(key, deferred) {
+    FB.api("/" + key + "/likes",
+           "POST",
+           function (response) {
+             if (response && !response.error) {
+               deferred.resolve(true);
+             } else {
+               deferred.reject();
+             }
+           });
 
   };
 
-  var post = function(message) {
-
-  };
-
-  var comment = function() {
-
-  };
-
-  var like = function() {
-
-  };
-
-  var changeAttendingStatus = function() {
-
+  var changeAttendingStatus = function(action, key, deferred) {
+    FB.api("/" + key + "/" + action,
+           "POST",
+           function(response) {
+             if (response && !response.error) {
+               deferred.resolve(true);
+             } else {
+               deferred.reject();
+             }
+           });
   };
 
   return {
     getUserEventDetails: getUserEventDetails,
     processInteraction: processInteraction,
-    parseFbUrl: parseFbUrl
   };
 });
