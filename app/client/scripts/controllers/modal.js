@@ -3,7 +3,8 @@
 
 angular.module('fbCal')
   .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, 
-                                     $timeout, $window, eventId, server) {
+                                     $timeout, $window, eventId, server,
+                                     fbSetup, fbEvents, modalFbLogin) {
     $scope.eventId = eventId;
 
     var eventInfo;
@@ -288,9 +289,88 @@ angular.module('fbCal')
           }
            $scope.feed[index].gettingReplies = false;
         } else {
+          var info = fbEvents.parseFbUrl($scope.feed.more);
           //get more replies from server.
         }
       }
+    };
+
+    $scope.showMoreFeed = function() {
+      var info = fbEvents.parseFbUrl(nextFeed);
+      //make server call
+    };
+
+    $scope.interactWithFb = function(action, index) {
+      var destination;
+      if (action === 'rsvp' || action === 'post') {
+        destination = $scope.eventId;
+      } else {
+        destination = 5;//do something with index
+      }
+      console.log($scope.post);
+      var message = $sanitize($scope.post);
+      if (fbSetup.getFbReady()) {
+        if (modalFbLogin.checkFirstTime()) {
+          modalFbLogin.checkLoginState()
+            .then(function() {
+              handleFbInteraction(action, destination);
+            }, function(response) {
+              if (response === 'declined') {
+                //user declined modal
+              } else if (response === 'not logged in') {
+
+              } else {
+                showErrorModal();
+              }
+            });
+        } else {
+          var permission;
+          if (action === 'rsvp') {
+            permission = 'rsvp_event';
+          } else {
+            permission = 'publish_actions';
+          }
+          if (modalFbLogin.checkPermission(permission)) {
+            handleFbInteraction(action, destination);
+          } else {
+            modalFbLogin.loginWithPermission(permission)
+              .then(function() {
+                handleFbInteraction(action, destination);
+              }, function(response) {
+                if (response === 'declined') {
+                  //user declined login
+                } else if (response === 'not logged in') {
+                  //user is not logged in
+                } else if (response === 'denied permission') {
+                  //user did not grant permission - explain permission
+                } else {
+                  showErrorModal();
+                }
+              });
+          }
+        }
+      } else {
+        //open please wait modal
+      }
+    };
+
+    var handleFbInteraction = function(action, destination) {
+      fbEvents.processInteraction(action, destination)
+        .then(function() {
+          if (action === 'rsvp') {
+            //tell user they have been succesfully rvsp or declined or maybe
+          } else if (action === 'post') {
+            //append user's to front of feed array
+          } else if (action === 'like') {
+            //update like
+          } else if (action === 'unlike') {
+            //update like
+          } else {
+            //update comment
+          }
+        }, function() {
+          showErrorModal(); 
+        });
     };
 
 
