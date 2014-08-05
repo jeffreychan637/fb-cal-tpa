@@ -336,16 +336,21 @@ angular.module('fbCal')
 
     var rsvp = ['attending', 'maybe', 'declined']; 
 
+    //explain what key does for different actions (e.g. key is comment id when liking a comment)
     $scope.interactWithFb = function(action, key, message) {
       if ($scope.settings.commenting) {
         if (rsvp.indexOf(action) >= 0 || action === 'post') {
           key = $scope.eventId;
-          if (action === 'post') {
-            message = $sanitize(message);
           }
         } else if (action === 'like' || action === 'comment') {
             key = $scope.feed[key].id;
         }
+        if (action === 'post' || action === 'comment') {
+            if (message) {
+              message = $sanitize(message);
+            } else {
+              return;
+            }
         if (fbSetup.getFbReady()) {
           if (modalFbLogin.checkFirstTime()) {
             modalFbLogin.checkLoginState()

@@ -116,7 +116,7 @@
             <form class="input-group" ng-model="postForm" id="postForm" name="postForm">
               <textarea name="post" id="post" placeholder="Post to event's Facebook page..." class="form-control" ng-model="post"></textarea>
               <span class="input-group-btn">
-                <button type="submit" class="btn btn-default post-btn" ng-click="interactWithFb('post', undefined, post)">Post!</button>
+                <button type="submit" class="btn btn-default post-btn" ng-click="interactWithFb('post', undefined, post); post = '';">Post!</button>
               </span>
             </form>
           </div>
@@ -151,15 +151,15 @@
                 <span class="input-group-btn">
                   <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)">Like</button>
                 </span>
-                <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment" required>
+                <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment">
                 <span class="input-group-btn">
-                  <button class="btn btn-default comment-btn" type="submit" ng-click="interactWithFb('comment', $index, visitorComment)">Post!</button>
+                  <button class="btn btn-default comment-btn" type="submit" ng-click="interactWithFb('comment', $index, visitorComment); visitorComment = '';">Post!</button>
                 </span>
               </form>
               <form class="input-group" ng-if="!status.like && status.comment">
-                <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment" required>
+                <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment">
                 <span class="input-group-btn">
-                  <button class="btn btn-default comment-btn" type="submit" ng-click="interactWithFb('comment', $index, vistorComment)">Post!</button>
+                  <button class="btn btn-default comment-btn" type="submit" ng-click="interactWithFb('comment', $index, vistorComment); visitorComment = '';">Post!</button>
                 </span>
               </form>
             </div>

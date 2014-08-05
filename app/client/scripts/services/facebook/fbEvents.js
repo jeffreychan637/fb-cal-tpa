@@ -65,45 +65,31 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     });
   };
 
-  // var objectRegex = /posts\/([0-9a-zA-Z]+)$/;
-
-  // var getObjectId = function(url, deferred) {
-  //   console.log(typeof(url));
-  //   url = url.toString();
-  //   console.log(url);
-  //   var objectPattern = url.match(objectRegex);
-  //   if  (objectPattern) {
-  //     return objectPattern[1];
-  //   } else {
-  //     deferred.reject();
-  //     return false;
-  //   }
-  // };
-  
   var rsvp = ['attending', 'maybe', 'declined']; 
 
-  var processInteraction = function(action, key, message) {
+  var processInteraction = function(action, id, message) {
     console.log('performing ' + action);
     var deferred = $q.defer();
     if (rsvp.indexOf(action) >= 0) {
-      changeAttendingStatus(action, key, deferred);
+      changeAttendingStatus(action, id, deferred);
     } else if (action === 'post') {
-      post(key, deferred, message);
+      post(id, deferred, message);
     } else if (action === 'like' || action === 'likeComment') {
-      if (key) {
-        like(key, deferred);        
+      if (id) {
+        like(id, deferred);        
       }
     } else {
-      if (key) {
-        comment(key, deferred, message);
+      console.log(id);
+      if (id) {
+        comment(id, deferred, message);
       }
     }
     return deferred.promise;
   };
 
-  var post = function(key, deferred, message) {
+  var post = function(id, deferred, message) {
     console.log(message);
-    FB.api("/" + key + "/feed",
+    FB.api("/" + id + "/feed",
            "POST",
            {
               "message": message
@@ -126,9 +112,9 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
            });
   };
 
-  var comment = function(key, deferred, message) {
+  var comment = function(id, deferred, message) {
     console.log(message);
-    FB.api("/" + key + "/comments",
+    FB.api("/" + id + "/comments",
            "POST",
            {
               "message": message
@@ -149,8 +135,8 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
            });
   };
 
-  var like = function(key, deferred) {
-    FB.api("/" + key + "/likes",
+  var like = function(id, deferred) {
+    FB.api("/" + id + "/likes",
            "POST",
            function (response) {
              if (response && !response.error) {
@@ -163,8 +149,8 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
 
   };
 
-  var changeAttendingStatus = function(action, key, deferred) {
-    FB.api("/" + key + "/" + action,
+  var changeAttendingStatus = function(action, id, deferred) {
+    FB.api("/" + id + "/" + action,
            "POST",
            function(response) {
              if (response && !response.error) {
