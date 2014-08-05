@@ -1,6 +1,6 @@
 import facebook
 import json
-from re import compile
+from re import compile, sub
 from secrets import fb_keys
 from models import get_settings
 from time import time
@@ -27,8 +27,8 @@ def get_long_term_token(short_token, compID, instance):
         print e.message
         return "Facebook Error"
 
-untilRegex = compile("until=([0-9]+)")
-afterRegex = compile("after=([0-9A-Za-z=]+)")
+until_regex = compile("until=([0-9]+)")
+after_regex = compile("after=([0-9A-Za-z=]+)")
 
 #If request from widget, just get event titles/time from the event IDs.
 #If from settings, don't need events. Just get all the event titles
@@ -61,16 +61,16 @@ def get_event_info(since, access_token, events_length):
                         next_page = False
                 else:
                     next = events["paging"]["next"]
-                    untilPattern = untilRegex.search(next)
-                    if untilPattern is None:
-                        afterPattern = afterRegex.search(next)
-                        if afterPattern is None:
+                    until_pattern = until_regex.search(next)
+                    if until_pattern is None:
+                        after_pattern = after_regex.search(next)
+                        if after_pattern is None:
                             raise Exception("Regex is not working")
                         else:
-                            after = afterPattern.group(1)
+                            after = after_pattern.group(1)
                             until = ""
                     else:
-                        until = untilPattern.group(1)
+                        until = until_pattern.group(1)
                         after = ""
         except KeyError, e:
             next_page = False
@@ -112,11 +112,34 @@ def get_specific_event(eventId, access_token, desired_data):
         elif desired_data == 'feed':
             data = graph.get_object(url + "/feed")
         else:
-            data = graph.get_object(url);
+            data = graph.get_object(url)
+        data = clean_data_dict(data)
         return data
     except facebook.GraphAPIError, e:
         print "FACEBOOK ERROR " + e.message
         return {}
+
+def clean_data_dict(data):
+    if type(data) is dict:
+        for key in data:
+            if type(data[key]) is dict:
+                data[key] = clean_data_dict(data[key])
+            elif type(data[key]) is list:
+                data[key] = clean_data_list(data[key])
+            elif type(data[key]) is unicode:
+                data[key] = sub(r"access_token=[0-9A-Za-z]+", "", data[key])
+    return data
+
+def clean_data_list(data):
+    if type(data) is list:
+        for index in range(0, len(data)):
+            if type(data[index]) is list:
+                data[index] = clean_data_list(data[index])
+            elif type(data[index]) is dict:
+                data[index] = clean_data_dict(data[index])
+            elif type(data[index]) is unicode:
+                data[index] = sub(r"access_token=[0-9A-Za-z]+", "", data[index])
+    return data
 
 def get_all_event_data(access_token_data):
     try:
