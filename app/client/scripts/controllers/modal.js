@@ -301,56 +301,44 @@ angular.module('fbCal')
     };
 
     $scope.interactWithFb = function(action, index) {
-      var destination;
-      if (action === 'rsvp' || action === 'post') {
-        destination = $scope.eventId;
-      } else {
-        destination = 5;//do something with index
-      }
-      console.log($scope.post);
-      var message = $sanitize($scope.post);
-      if (fbSetup.getFbReady()) {
-        if (modalFbLogin.checkFirstTime()) {
-          modalFbLogin.checkLoginState()
-            .then(function() {
-              handleFbInteraction(action, destination);
-            }, function(response) {
-              if (response === 'declined') {
-                //user declined modal
-              } else if (response === 'not logged in') {
-
-              } else {
-                showErrorModal();
-              }
-            });
+      if ($scope.settings.commenting) {
+        var destination;
+        if (action === 'rsvp' || action === 'post') {
+          destination = $scope.eventId;
         } else {
-          var permission;
-          if (action === 'rsvp') {
-            permission = 'rsvp_event';
-          } else {
-            permission = 'publish_actions';
-          }
-          if (modalFbLogin.checkPermission(permission)) {
-            handleFbInteraction(action, destination);
-          } else {
-            modalFbLogin.loginWithPermission(permission)
+          destination = 5;//do something with index
+        }
+        console.log($scope.post);
+        var message = $sanitize($scope.post);
+        if (fbSetup.getFbReady()) {
+          if (modalFbLogin.checkFirstTime()) {
+            modalFbLogin.checkLoginState()
               .then(function() {
                 handleFbInteraction(action, destination);
               }, function(response) {
-                if (response === 'declined') {
-                  //user declined login
-                } else if (response === 'not logged in') {
-                  //user is not logged in
-                } else if (response === 'denied permission') {
-                  //user did not grant permission - explain permission
-                } else {
-                  showErrorModal();
-                }
+                handleFailedFbLogin(response);
               });
+          } else {
+            var permission;
+            if (action === 'rsvp') {
+              permission = 'rsvp_event';
+            } else {
+              permission = 'publish_actions';
+            }
+            if (modalFbLogin.checkPermission(permission)) {
+              handleFbInteraction(action, destination);
+            } else {
+              modalFbLogin.loginWithPermission(permission)
+                .then(function() {
+                  handleFbInteraction(action, destination);
+                }, function(response) {
+                  handleFailedFbLogin(response);
+                });
+            }
           }
+        } else {
+          //open please wait modal
         }
-      } else {
-        //open please wait modal
       }
     };
 
@@ -371,6 +359,18 @@ angular.module('fbCal')
         }, function() {
           showErrorModal(); 
         });
+    };
+
+    var handleFailedFbLogin = function(response) {
+      if (response === 'declined') {
+        //user declined login
+      } else if (response === 'not logged in') {
+        //user is not logged in
+      } else if (response === 'denied permission') {
+        //user did not grant permission - explain permission
+      } else {
+        showErrorModal();
+      }
     };
 
 
