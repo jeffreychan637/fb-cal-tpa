@@ -108,9 +108,9 @@
         <div class="col-sm-12 middle-col">
           <div class="block">
             <form class="input-group">
-              <textarea placeholder="Post to event's Facebook page..." class="form-control"></textarea>
+              <textarea placeholder="Post to event's Facebook page..." class="form-control" ng-model="post"></textarea>
               <span class="input-group-btn">
-                <button type="submit" class="btn btn-default post-btn" type="button">Post!</button>
+                <button type="submit" class="btn btn-default post-btn" type="button" ng-click="postToFb()">Post!</button>
               </span>
             </form>
           </div>
@@ -141,13 +141,17 @@
               </blockquote>
             </div>
             <div class="block add-on" ng-show="status.comment">
-              <div class="input-group" ng-show="status.like && status.comment">
+              <div class="input-group" ng-if="status.like && status.comment">
                 <span class="input-group-btn">
                   <button class="btn btn-default like-btn" type="button">Like</button>
                 </span>
-                <input type="text" class="form-control" placeholder="Comment...">
+                <form>
+                  <input type="text" class="form-control" placeholder="Comment..." ng-model="status.visitorComment">
+                </form>
               </div>
-              <input type="text" class="form-control" placeholder="Comment..." ng-show="!status.like && status.comment">
+              <form>
+                <input type="text" class="form-control" placeholder="Comment..." ng-if="!status.like && status.comment" ng-model="status.visitorComment">
+              </form>
             </div>
             <div class="block add-on" ng-if="status.comments">
               <div ng-repeat="comment in status.comments">
@@ -166,7 +170,7 @@
       <div class="row">
          <div class="col-sm-4 col-sm-offset-4">
           <div class="block">
-            <p class="text-center load-posts" ng-show="loadMoreFeed">Load more posts</p>
+            <p class="text-center load-posts" ng-show="loadMoreFeed" ng-click="showMoreFeed()">Load more posts</p>
             </div>
         </div>
       </div>
