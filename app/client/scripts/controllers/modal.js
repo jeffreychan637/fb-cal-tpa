@@ -338,10 +338,13 @@ angular.module('fbCal')
     //explain what key does for different actions (e.g. key is comment id when liking a comment)
     $scope.interactWithFb = function(action, key, message) {
       if ($scope.settings.commenting) {
+        console.log('running');
         var index;
-        if (!(action === 'like' && !$scope.feed[key].userLiked)) {
+        if (action === 'like') {
+          if($scope.feed[key].userLiked) {
           //prevents liking something you've liked already (only works for likes made in modal)
-          return;
+            return;
+          }
         }
         if (rsvp.indexOf(action) >= 0 || action === 'post') {
           key = $scope.eventId;
@@ -356,6 +359,7 @@ angular.module('fbCal')
             return;
           }
         }
+        console.log('got to here');
         if (fbSetup.getFbReady()) {
           if (modalFbLogin.checkFirstTime()) {
             modalFbLogin.checkLoginState()
@@ -412,6 +416,7 @@ angular.module('fbCal')
             } else if (action === 'likeComment') {
               //update comment like
             } else {
+              $scope.showMoreReplies(index);
               var comment = processComments(response);
               $scope.feed[index].comments.push(comment);
             }
