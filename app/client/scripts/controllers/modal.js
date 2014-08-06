@@ -34,6 +34,11 @@ angular.module('fbCal')
                         });
                       }
                   });
+
+    $scope.shareFbEvent = function() {
+      console.log('hello');
+      fbEvents.shareEvent($scope.eventId);
+    };
     
     var errorTypes = ['facebook', 'facebook login', 'load'];
 

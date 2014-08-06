@@ -90,6 +90,16 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     return deferred.promise;
   };
 
+  var shareEvent = function(eventId) {
+    console.log('running');
+    FB.ui({
+           method: 'share',
+           href: 'https://www.facebook.com/events/' + eventId,
+          }, function(response) {
+            console.log(response);
+          });
+  };
+
   var rsvp = ['attending', 'maybe', 'declined']; 
 
   var processInteraction = function(action, id, message) {
@@ -175,6 +185,7 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
   };
 
   return {
+    shareEvent: shareEvent,
     getUserEventDetails: getUserEventDetails,
     processInteraction: processInteraction,
     getRsvpStatus: getRsvpStatus
