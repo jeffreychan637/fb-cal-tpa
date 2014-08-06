@@ -104,7 +104,7 @@ angular.module('fbCal')
             $('#time').height($('#rsvp').height());
           }
         }
-      }, 1000);
+      }, 500);
     };
 
     var isSameDay = function(a, b) {
@@ -169,7 +169,7 @@ angular.module('fbCal')
             $('#location').height($('#guests').height());
           }
         }
-      }, 1000);
+      }, 100);
     };
 
     var processNumber = function(number) {
