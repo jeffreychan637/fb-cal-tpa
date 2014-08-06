@@ -245,10 +245,6 @@ angular.module('fbCal')
         if (comments) {
           for (var j = 0; j < comments.length; j++) {
             var comment = processComments(comments[j]);
-            if (comments[j].message) {
-              comment.message = $sanitize(comments[j].message.replace(/\r?\n/g, "<br>"));
-              $sce.trustAsHtml(comment.message);
-            }
             if (status.comments.length < 5) { 
               status.comments.push(comment);
             } else {
@@ -271,11 +267,14 @@ angular.module('fbCal')
     var processComments = function(data) {
       var comment = {id : data.id,
                      can_remove : data.can_remove,
-                     message : data.message,
                      numberLikes : data.like_count,
                      name: data.from.name,
                      time: postCreatedTime(new Date(data.created_time))
                     };
+      if (data.message) {
+        comment.message = $sanitize(data.message.replace(/\r?\n/g, "<br>"));
+        $sce.trustAsHtml(comment.message);
+      }
       return comment;
     };
 
@@ -339,14 +338,12 @@ angular.module('fbCal')
     //explain what key does for different actions (e.g. key is comment id when liking a comment)
     $scope.interactWithFb = function(action, key, message) {
       if ($scope.settings.commenting) {
-        console.log(key, action);
+        var index;
         if (rsvp.indexOf(action) >= 0 || action === 'post') {
           key = $scope.eventId;
         } else if (action === 'like' || action === 'comment') {
-            console.log(key);
-            console.log($scope.feed);
+            index = key;
             key = $scope.feed[key].id;
-            console.log(key);
         }
         if (action === 'post' || action === 'comment') {
           if (message) {
@@ -359,7 +356,7 @@ angular.module('fbCal')
           if (modalFbLogin.checkFirstTime()) {
             modalFbLogin.checkLoginState()
               .then(function() {
-                handleFbInteraction(action, key, message);
+                handleFbInteraction(action, key, message, index);
               }, function(response) {
                 handleFailedFbLogin(response);
               });
@@ -372,11 +369,11 @@ angular.module('fbCal')
             }
             if (modalFbLogin.checkPermission(permission)) {
               console.log('all permissions met');
-              handleFbInteraction(action, key, message);
+              handleFbInteraction(action, key, message, index);
             } else {
               modalFbLogin.loginWithPermission(permission)
                 .then(function() {
-                  handleFbInteraction(action, key, message);
+                  handleFbInteraction(action, key, message, index);
                 }, function(response) {
                   handleFailedFbLogin(response);
                 });
@@ -388,7 +385,7 @@ angular.module('fbCal')
       }
     };
 
-    var handleFbInteraction = function(action, key, message) {
+    var handleFbInteraction = function(action, key, message, index) {
       fbEvents.processInteraction(action, key, message)
         .then(function(response) {
           if (response) {
@@ -403,8 +400,6 @@ angular.module('fbCal')
                 $scope.rsvpStatus = 'Declined';
               }
             } else if (action === 'post') {
-              //append user's to front of feed array
-              console.log(response);
               var status = processStatus(response);
               $scope.feed.unshift(status);
             } else if (action === 'like') {
@@ -412,7 +407,8 @@ angular.module('fbCal')
             } else if (action === 'unlike') {
               //update like
             } else {
-              //update comment
+              var comment = processComments(response);
+              $scope.feed[index].comments.push(comment);
             }
           }
         }, function() {
