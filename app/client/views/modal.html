@@ -1,5 +1,6 @@
 <div ng-controller="ModalCtrl">
-  <div class="app" ng-show="eventInfo || true">
+  <h2 class="text-center loading" ng-hide="displayModal">Loading Event Details...</h2>
+  <div class="app" ng-show="displayModal">
     <div class="page-header" id="header">
       <h1 id="title" class="title"><a ng-href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
       <h5 id="host" class="host" ng-if="settings.hostedBy">
@@ -122,7 +123,14 @@
           </div>
         </div>
       </div>
-      <div ng-repeat="status in feed">
+      <div class="row" ng-hide="displayFeed">
+         <div class="col-sm-4 col-sm-offset-4">
+          <div class="block">
+            <h4 class="text-center load-feed">Loading Event Feed...</h4>
+            </div>
+        </div>
+      </div>
+      <div ng-repeat="status in feed" ng-show="displayFeed">
         <div class="row">
           <div class="col-sm-10 col-sm-offset-1">
             <div class="block">
@@ -183,7 +191,7 @@
       <div class="row">
          <div class="col-sm-4 col-sm-offset-4">
           <div class="block" ng-if="moreFeedMessage">
-            <p class="text-center load-posts" ng-click="showMoreFeed()">{{moreFeedMessage}}</p>
+            <h4 class="text-center load-posts" ng-click="showMoreFeed()">{{moreFeedMessage}}</h4>
             </div>
         </div>
       </div>

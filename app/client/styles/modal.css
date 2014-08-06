@@ -13,6 +13,12 @@ blockquote {
   margin: 0;
 }
 
+.loading {
+  position: absolute;
+  top: 245px;
+  left: 255px;
+}
+
 .app {
   border: 5px solid black;
   padding: 20px;
@@ -208,6 +214,10 @@ textarea {
 
 .btn:focus {
   outline: none;
+}
+
+.load-feed {
+  margin: 0;
 }
 
 .push-left {

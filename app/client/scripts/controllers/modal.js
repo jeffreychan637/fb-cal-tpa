@@ -55,6 +55,7 @@ angular.module('fbCal')
       processDesciption();
       processTime();
       processLocation();
+      $scope.displayModal = true;
       //display modal info here - before this just show some loading screen
     };
 
@@ -194,7 +195,7 @@ angular.module('fbCal')
       $scope.loadMoreFeed = false;
       if (feedObject.paging && feedObject.paging.next) {
         nextFeed = feedObject.paging.next;
-        $scope.moreFeedMessage = "Load more posts";
+        $scope.moreFeedMessage = "Show more posts";
       } else {
         $scope.moreFeedMessage = "";
       }
@@ -211,11 +212,12 @@ angular.module('fbCal')
           }
         }
         if ($scope.extraFeed.length > 0) {
-          $scope.moreFeedMessage = "Load more posts";
+          $scope.moreFeedMessage = "Show more posts";
         }
       } else {
         $scope.moreFeedMessage = "";
       }
+      $scope.displayFeed = true;
     };
 
     var processStatus = function(data) {
