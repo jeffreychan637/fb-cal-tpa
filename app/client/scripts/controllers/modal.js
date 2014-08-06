@@ -133,6 +133,8 @@ angular.module('fbCal')
                                                 cover.offset_y + '%'
                        };
         $('#header').css(cssClass);
+        $('#title').addClass('name');
+        $('#host').addClass('name');
       }
     };
 

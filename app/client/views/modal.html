@@ -1,8 +1,8 @@
 <div ng-controller="ModalCtrl">
   <div class="app" ng-show="eventInfo || true">
     <div class="page-header" id="header">
-      <h1 class="name title"><a ng-href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
-      <h6 class="name host" ng-if="settings.hostedBy">
+      <h1 id="title" class="title"><a ng-href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
+      <h6 id="host" class="host" ng-if="settings.hostedBy">
         <em>Hosted by <strong><a ng-href="https://www.facebook.com/{{ownerId}}" target="blank">{{owner}}</a></strong></em>
       </h6>
     </div>
