@@ -249,9 +249,13 @@ angular.module('fbCal')
       }
       if (data.likes) {
         status.numberLikes = data.likes.data.length;
+      } else {
+        status.numberLikes = 0;
       }
       if (data.sharedposts) {
         status.numberShares = data.sharedposts.data.length;
+      } else {
+        status.numberShares = 0;
       }
       status.comments = [];
       status.extraComments = [];
@@ -355,65 +359,84 @@ angular.module('fbCal')
     //message is usally message except for like/unlike commment where it is the index
     $scope.interactWithFb = function(action, key, message) {
       console.log(message);
+      var index;
       if ($scope.settings.commenting) {
         console.log('running');
-        var index;
-        if (action === 'like') {
-          if($scope.feed[key].userLiked) {
-          //prevents liking something you've liked already (only works for likes made in modal)
-            return;
-          }
-        } else if (action === 'post' || action === 'comment') {
-          if (!message) {
-            return;
-          }
-        }
-        if (rsvp.indexOf(action) >= 0 || action === 'post') {
-          key = $scope.eventId;
-        } else if (action === 'like' || action === 'comment') {
-            index = key;
-            key = $scope.feed[key].id;
-        } else if (action === 'likeComment' || action === 'unlikeComment') {
-          for (var i = 0; i < $scope.feed.length; i++) {
-            if ($scope.feed[i].comments[message] &&
-                $scope.feed[i].comments[message].id === key) {
-              index = i;
-              break;
-            }
-          }
-        }
-        console.log('got to here');
-        if (fbSetup.getFbReady()) {
-          if (modalFbLogin.checkFirstTime()) {
-            modalFbLogin.checkLoginState()
-              .then(function() {
-                handleFbInteraction(action, key, message, index);
-              }, function(response) {
-                handleFailedFbLogin(response);
-              });
-          } else {
-            var permission;
-            if (rsvp.indexOf(action) >= 0) {
-              permission = 'rsvp_event';
-            } else {
-              permission = 'publish_actions';
-            }
-            if (modalFbLogin.checkPermission(permission)) {
-              console.log('all permissions met');
-              handleFbInteraction(action, key, message, index);
-            } else {
-              modalFbLogin.loginWithPermission(permission)
+        var processed = processAction(action, key, message);
+        if (!processed) {
+          return;
+        } else {
+          key = processed.key;
+          index = processed.index;
+          console.log('got to here');
+          if (fbSetup.getFbReady()) {
+            if (modalFbLogin.checkFirstTime()) {
+              modalFbLogin.checkLoginState()
                 .then(function() {
                   handleFbInteraction(action, key, message, index);
                 }, function(response) {
                   handleFailedFbLogin(response);
                 });
+            } else {
+              var permission;
+              if (rsvp.indexOf(action) >= 0) {
+                permission = 'rsvp_event';
+              } else {
+                permission = 'publish_actions';
+              }
+              if (modalFbLogin.checkPermission(permission)) {
+                console.log('all permissions met');
+                handleFbInteraction(action, key, message, index);
+              } else {
+                modalFbLogin.loginWithPermission(permission)
+                  .then(function() {
+                    handleFbInteraction(action, key, message, index);
+                  }, function(response) {
+                    handleFailedFbLogin(response);
+                  });
+              }
             }
+          } else {
+            //open please wait modal
           }
-        } else {
-          //open please wait modal
         }
       }
+    };
+
+    var processAction = function(action, key, message) {
+      var index;
+      if (action === 'like' || action === 'unlike') {
+        if($scope.feed[key].liking) {
+        //prevents problems if user mashes like button
+          return false;
+        } else {
+          $scope.feed[key].liking = true;
+        }
+      } else if (action === 'post' || action === 'comment') {
+        if (!message) {
+          return false;
+        }
+      }
+      if (rsvp.indexOf(action) >= 0 || action === 'post') {
+        key = $scope.eventId;
+      } else if (action === 'like' || action === 'unlike' || action === 'comment') {
+          index = key;
+          key = $scope.feed[key].id;
+      } else if (action === 'likeComment' || action === 'unlikeComment') {
+        for (var i = 0; i < $scope.feed.length; i++) {
+          if ($scope.feed[i].comments[message] &&
+              $scope.feed[i].comments[message].id === key) {
+            index = i;
+            break;
+          }
+        }
+        if ($scope.feed[index].comments[message].liking) {
+          return false;
+        } else {
+          $scope.feed[index].comments[message].liking = true;
+        }
+      }
+      return {key: key, index: index};
     };
 
     var handleFbInteraction = function(action, key, message, index) {

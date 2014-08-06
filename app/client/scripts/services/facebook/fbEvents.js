@@ -100,14 +100,11 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     } else if (action === 'post') {
       post(id, deferred, message);
     } else if (action === 'like' || action === 'likeComment') {
-      if (id) {
-        like(id, deferred);        
-      }
+      like(id, deferred, true);
+    } else if (action === 'unlike' || action === 'unlikeComment') {
+      like(id, deferred, false);
     } else {
-      console.log(id);
-      if (id) {
-        comment(id, deferred, message);
-      }
+      comment(id, deferred, message);
     }
     return deferred.promise;
   };
@@ -161,9 +158,16 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
            });
   };
 
-  var like = function(id, deferred) {
+  var like = function(id, deferred, like) {
+    console.log(id);
+    var method;
+    if (like) {
+      method = 'POST';
+    } else {
+      method = 'DELETE';
+    }
     FB.api("/" + id + "/likes",
-           "POST",
+           method,
            function (response) {
              if (response && !response.error) {
                deferred.resolve(true);

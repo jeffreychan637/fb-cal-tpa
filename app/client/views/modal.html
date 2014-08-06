@@ -137,7 +137,8 @@
               <blockquote><strong>{{status.name}}</strong> posted <em><span ng-bind-html="status.message"></span></em>
                 <br>
                 {{status.time}}
-                <a class="push-left" ng-show="status.like && !status.comment && settings.commenting" ng-click="interactWithFb('like', $index, undefined)">Like</a>
+                <a class="push-left" ng-show="status.like && !status.comment && settings.commenting && !status.userliked" ng-click="interactWithFb('like', $index, undefined)">Like</a>
+                 <a class="push-left" ng-show="status.like && !status.comment && settings.commenting && status.userliked" ng-click="interactWithFb('unlike', $index, undefined)">Unlike</a>
                 <span class="push-left" ng-show="status.numberLikes">
                   {{status.numberLikes}} Likes
                 </span>
@@ -157,9 +158,11 @@
             <div class="block add-on" ng-show="status.comment && settings.commenting">
               <form class="input-group" ng-if="status.like && status.comment">
                 <span class="input-group-btn">
-                  <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)">
-                    <span ng-hide="status.userLiked">Like</span>
-                    <span ng-show="status.userLiked">Liked</span>
+                  <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)" ng-hide="status.userLiked">
+                    Like
+                  </button>
+                  <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('unlike', $index, undefined)" ng-show="status.userLiked">
+                    Unlike
                   </button>
                 </span>
                 <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment">
@@ -179,7 +182,8 @@
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
                   {{comment.time}}
-                  <a class="push-left" ng-if="settings.commenting" ng-click="interactWithFb('likeComment', comment.id, $index)">Like</a>
+                  <a class="push-left" ng-show="settings.commenting && !comment.userLiked" ng-click="interactWithFb('likeComment', comment.id, $index)">Like</a>
+                  <a class="push-left" ng-show="settings.commenting && comment.userLiked" ng-click="interactWithFb('unlikeComment', comment.id, $index)">Unlike</a>
                   <span class="push-left" ng-show="comment.numberLikes">{{comment.numberLikes}} Likes</span>
                 </blockquote>
               </div>
