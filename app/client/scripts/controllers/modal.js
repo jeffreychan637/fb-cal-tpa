@@ -16,10 +16,22 @@ angular.module('fbCal')
     var nextFeed;
     var notGettingMoreFeed = true;
 
-    $scope.rsvpStatus = 'RSVP'; //change this as appropriate (cancelled watch)
+    $scope.rsvpStatus = 'RSVP';
     //make fql query
 
     // $scope.eventId = "1512622455616642";
+
+    var watchFb = $scope.$watch(function() {
+                    return fbSetup.getFbReady();
+                  }, function() {
+                      if (fbSetup.getFbReady()) {
+                        watchFb();
+                        fbEvents.getRsvpStatus($scope.eventId)
+                        .then(function(response) {
+                          $scope.rsvpStatus = response;
+                        });
+                      }
+                  });
 
     var showErrorModal = function() {
       $scope.messageTitle = "Oh no!";
@@ -201,7 +213,6 @@ angular.module('fbCal')
         if ($scope.extraFeed.length > 0) {
           $scope.moreFeedMessage = "Load more posts";
         }
-        console.log($scope.feed);
       } else {
         $scope.moreFeedMessage = "";
       }
@@ -428,7 +439,13 @@ angular.module('fbCal')
             }
           }
         }, function() {
-          showErrorModal(); 
+          if (action === 'post' || action === 'comment') {
+            //let user know that reason for error might be that they didn't
+            //rsvp yet.
+            //don't forget to let give user the message that they tried to post/comment
+            //so they don't have to retype
+          }
+          showErrorModal();
         });
     };
 

@@ -65,6 +65,31 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     });
   };
 
+  var getRsvpStatus = function(eventId) {
+    var deferred = $q.defer();
+    FB.api('/fql',
+          {
+            'q' : 'SELECT rsvp_status FROM event_member WHERE eid = ' + eventId + ' AND uid=me()'
+          }, 
+          function(response) {
+            if (response && !response.error) {
+              var rsvp_status = response.data[0].rsvp_status;
+              if (rsvp_status === 'attending') {
+                deferred.resolve('Going');
+              } else if (rsvp_status === 'maybe') {
+                deferred.resolve('Maybe');
+              } else if (rsvp_status === 'declined') {
+                deferred.resolve('Declined');
+              } else {
+                deferred.resolve('RSVP');
+              }
+            } else {
+              deferred.reject();
+            }
+          });
+    return deferred.promise;
+  };
+
   var rsvp = ['attending', 'maybe', 'declined']; 
 
   var processInteraction = function(action, id, message) {
@@ -166,5 +191,6 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
   return {
     getUserEventDetails: getUserEventDetails,
     processInteraction: processInteraction,
+    getRsvpStatus: getRsvpStatus
   };
 });
