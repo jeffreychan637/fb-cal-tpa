@@ -9,6 +9,7 @@ angular.module('fbCal').factory('modalFbLogin', function ($log, $q) {
   };
 
   var checkFirstTime = function() {
+    console.log(grantedPermissions);
     return grantedPermissions === [];
   };
 
@@ -48,7 +49,7 @@ angular.module('fbCal').factory('modalFbLogin', function ($log, $q) {
           if (checkPermission(specificPermission)) {
             deferred.resolve();
           } else {
-            deferred.reject('denied permission');
+            deferred.reject('declined permission');
           }
         } else {
           deferred.resolve();
@@ -78,7 +79,13 @@ angular.module('fbCal').factory('modalFbLogin', function ($log, $q) {
     }, {scope: 'public_profile, publish_actions, rsvp_event'});
   };
 
-  var loginWithPermission = function(permission) {
+  var loginWithPermission = function(permission, rejected) {
+    var params;
+    if (rejected) {
+      params = {scope: permission, auth_type: 'rerequest'};
+    } else {
+      params = {scope: permission};
+    }
     console.log('checking login with permissions');
     var deferred = $q.defer();
     FB.login(function(response) {
@@ -98,7 +105,7 @@ angular.module('fbCal').factory('modalFbLogin', function ($log, $q) {
         //show something went wrong message
         deferred.reject('unknown');
       }
-    }, {scope: permission});
+    }, params);
     return deferred.promise;
   };
 

@@ -37,7 +37,7 @@
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
                   <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Via Facebook</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Get Event Link</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="showModal('link')">Get Event Link</a></li>
                 </ul>
               </div>
             </div>
@@ -123,10 +123,17 @@
           </div>
         </div>
       </div>
-      <div class="row" ng-hide="displayFeed">
+      <div class="row" ng-hide="displayFeed || feedFailed">
          <div class="col-sm-4 col-sm-offset-4">
           <div class="block">
             <h4 class="text-center load-feed">Loading Event Feed...</h4>
+            </div>
+        </div>
+      </div>
+      <div class="row" ng-show="feedFailed">
+         <div class="col-sm-4 col-sm-offset-4">
+          <div class="block">
+            <h4 class="text-center load-feed">Could not load Event Feed</h4>
             </div>
         </div>
       </div>
@@ -134,6 +141,7 @@
         <div class="row">
           <div class="col-sm-10 col-sm-offset-1">
             <div class="block">
+              <!-- <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button> -->
               <blockquote><strong>{{status.name}}</strong> posted <em><span ng-bind-html="status.message"></span></em>
                 <br>
                 {{status.time}}
@@ -179,6 +187,7 @@
             </div>
             <div class="block add-on" ng-if="status.comments && status.comments.length > 0">
               <div ng-repeat="comment in status.comments">
+                <!-- <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button> -->
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
                   {{comment.time}}
@@ -200,19 +209,65 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="message" tabindex="-1" role="dialog" aria-labelledby="messageTitle" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="messageTitle">{{messageTitle}}</h4>
-          </div>
-          <div class="modal-body">
+  </div>
+  <div class="modal fade" id="message" tabindex="-1" role="dialog" aria-labelledby="messageTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="messageTitle">{{messageTitle}}</h4>
+        </div>
+        <div class="modal-body">
+          <p>
             {{messageBody}}
+            <a class="share-link" ng-show="showLink" ng-href="https://www.facebook.com/events/{{id}}" target="blank">
+              https://www.facebook.com/events/{{id}}
+            </a>
+          </p>
+          <p ng-show="postError">
+            Potential Reasons for Error
+            <ol ng-show="postError">
+              <li>
+                If your RVSP status is not <strong>going</strong> or <strong>maybe</strong>, Facebook does not allow you to post or comment.
+              </li>
+              <li>
+                If you granted us permission to post but to only share these posts with <em>yourself</em>, then we cannot post to an event page for you where <em>posts are open to all event invitees</em>. You can change this through your Facebook account settings.
+              </li>
+            </ol>
+          </p>
+          <div ng-show="postError">
+            <p>
+              If it helps, here's your post so you don't have to retype it again. Or just click <em>Try Again</em> to auto retry.
+            </p>
+            <p>
+              {{userPost}}
+            </p>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default modal-btn" data-dismiss="modal">Close</button>
+          <div ng-show="permissionError">
+            <p>
+              Here’s a quick explanation of the permissions we need access to.
+            </p>
+            <ul>
+              <li>
+                <strong>Public Profile:</strong> All requests to Facebook for permissions grants us this. We don’t use this information at all, but Facebook gives us no choice but to request for it.
+              </li>
+              <br>
+              <li>
+                <strong>Managing your events:</strong> This gives us permission to change your RSVP status to the Facebook event.
+              </li>
+              <br>
+              <li>
+                <strong>Posting:</strong> This gives permission to post on the event wall as well as like/comment on other posts.
+              </li>
+            </ul>
+            <p>
+              Feel free to only grant permissions for the actions you want to do on this webpage. We only perform the actions you request and will never misuse your trust.
+            </p>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-btn" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary modal-btn-primary" ng-hide="messageTitle === 'Trying again...' || showLink" ng-click="solveError()">{{modalButton}}</button>
         </div>
       </div>
     </div>

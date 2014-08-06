@@ -1,8 +1,8 @@
 'use strict';
-/*global $:false, console:false */
+/*global $:false, console:false, location:false */
 
 angular.module('fbCal')
-  .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, 
+  .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, $q, 
                                      $timeout, $window, eventId, server,
                                      fbSetup, fbEvents, modalFbLogin) {
     $scope.eventId = eventId;
@@ -17,7 +17,9 @@ angular.module('fbCal')
     var notGettingMoreFeed = true;
 
     $scope.rsvpStatus = 'RSVP';
-    //make fql query
+    
+    var curErrorType;
+    var interactionParams;
 
     // $scope.eventId = "1512622455616642";
 
@@ -32,13 +34,122 @@ angular.module('fbCal')
                         });
                       }
                   });
+    
+    var errorTypes = ['facebook', 'facebook login', 'load'];
 
-    var showErrorModal = function() {
-      $scope.messageTitle = "Oh no!";
-      $('#messageTitle').css('color', 'red');
-      $scope.messageBody = 'Something terrible happened. Please exit and try again.';
-      $('#message').modal('show');
+    var errorModal = {title: 'Oh no!',
+                      css: {'color' : 'red'},
+                      message: 'Something terrible happened. Please try again or reload the page.',
+                      modalButton: 'Try Again'
+                     };
+
+    var waitModal = {title: 'Please wait...',
+                     message: 'We are still connecting to Facebook. Please wait a few seconds and then click try again.',
+                     modalButton: 'Try Again'
+                    };
+
+    var permissionModal = {title: 'Hello there!',
+                           modalButton: 'Grant Permission',
+                           declinedMessage: 'We can’t perform your request regarding this Facebook event unless you don’t give us permission to.',
+                           notLoggedInMessage: 'We need your permission to fulfill your request regarding this Facebook event. If you’re not logged in, you can’t grant your permission.',
+                           declinedPermissionMessage: 'You might be wondering why we need these permissions to fulfill your request.'
+                          };
+
+    var solveModal = {title: 'Trying again...',
+                      message: 'Giving our best effort!'
+                     };
+
+    var linkModal = {title: 'Share'};
+
+    $scope.showModal = function(type, message) {
+      $('#messageTitle').css({'color' : '#09F'});
+      curErrorType = type;
+      $scope.showLink = false;
+      $scope.postError = false;
+      $scope.permissionError = false;
+      if (errorTypes.indexOf(type) >= 0) {
+        $scope.messageTitle = errorModal.title;
+        $('#messageTitle').css(errorModal.css);
+        $scope.messageBody = errorModal.message;
+        $scope.modalButton = errorModal.modalButton;
+        if (message) {
+          $scope.postError = true;
+          $scope.userPost = message;
+        }
+      } else if (type === 'link') {
+        $scope.messageTitle = linkModal.title;
+        $scope.showLink = true;
+      }
+        else if (type === 'wait') {
+        $scope.messageTitle = waitModal.title;
+        $scope.messageBody = waitModal.message;
+        $scope.modalButton = waitModal.modalButton;
+      } else {
+        $scope.permissionError = true;
+        $scope.messageTitle = permissionModal.title;
+        $scope.modalButton = permissionModal.modalButton;
+        switch(type) {
+          case 'declined permission':
+            $scope.messageBody = permissionModal.declinedPermissionMessage;
+            break;
+          case 'declined':
+            $scope.messageBody = permissionModal.declinedMessage;
+            break;
+          case 'not logged in':
+            $scope.messageBody = permissionModal.notLoggedInMessage;
+        }
+      }
+      $timeout(function() {
+        $('#message').modal('show');
+      }, 500);
     };
+
+    $scope.solveError = function() {
+      $scope.postError = false;
+      $scope.permissionError = false;
+      $scope.messageTitle = solveModal.title;
+      $('#messageTitle').css({'color' : '#09F'});
+      $scope.messageBody = solveModal.message;
+      if (curErrorType === 'declined permission') {
+        getDeniedPermission();
+      } else if (curErrorType === 'load') {
+        location.reload();
+      } else if (curErrorType === 'wait') {
+        $timeout(function() {
+          tryInteractionAgain();
+        }, 2500);
+      } else {
+        tryInteractionAgain();
+      }
+    };
+
+    var getDeniedPermission = function() {
+      var permission;
+      if (rsvp.indexOf(interactionParams.action) >= 0) {
+        permission = 'rsvp_event';
+      } else {
+        permission = 'publish_actions';
+      }
+      modalFbLogin.loginWithPermission(permission, true)
+        .then(function() {
+          tryInteractionAgain();
+        }, function() {
+          $('#message').modal('hide');
+          $timeout(function() {
+            $scope.showModal('declined permission');
+          }, 1000);
+        });
+    };
+
+    var tryInteractionAgain = function() {
+      $scope.interactWithFb(interactionParams.action, interactionParams.key,
+                            interactionParams.message)
+        .then(function() {
+          $scope.messageBody = 'Success!';
+        }, function() {
+          $('#message').modal('hide');
+        });
+      };
 
     // var showPleaseWait = function(message) {
     //   $scope.messageTitle = "Please wait...";
@@ -358,12 +469,14 @@ angular.module('fbCal')
     //explain what key does for different actions (e.g. key is comment id when liking a comment)
     //message is usally message except for like/unlike commment where it is the index
     $scope.interactWithFb = function(action, key, message) {
+      var deferred = $q.defer();
       console.log(message);
       var index;
       if ($scope.settings.commenting) {
         console.log('running');
         var processed = processAction(action, key, message);
         if (!processed) {
+          deferred.reject();
           return;
         } else {
           key = processed.key;
@@ -373,8 +486,10 @@ angular.module('fbCal')
             if (modalFbLogin.checkFirstTime()) {
               modalFbLogin.checkLoginState()
                 .then(function() {
-                  handleFbInteraction(action, key, message, index);
+                  handleFbInteraction(action, key, message, index, deferred);
                 }, function(response) {
+                  deferred.reject();
+                  setParams(action, key, message, index);
                   handleFailedFbLogin(response);
                 });
             } else {
@@ -386,21 +501,29 @@ angular.module('fbCal')
               }
               if (modalFbLogin.checkPermission(permission)) {
                 console.log('all permissions met');
-                handleFbInteraction(action, key, message, index);
+                handleFbInteraction(action, key, message, index, deferred);
               } else {
-                modalFbLogin.loginWithPermission(permission)
+                modalFbLogin.loginWithPermission(permission, false)
                   .then(function() {
-                    handleFbInteraction(action, key, message, index);
+                    handleFbInteraction(action, key, message, index, deferred);
                   }, function(response) {
+                    deferred.reject();
+                    setParams(action, key, message, index);
                     handleFailedFbLogin(response);
                   });
               }
             }
           } else {
-            //open please wait modal
+            deferred.reject();
+            setParams(action, key, message, index);
+            $scope.showModal('wait');
           }
         }
+      } else {
+        deferred.reject();
+        location.reload();
       }
+      return deferred.promise;
     };
 
     var processAction = function(action, key, message) {
@@ -439,82 +562,100 @@ angular.module('fbCal')
       return {key: key, index: index};
     };
 
-    var handleFbInteraction = function(action, key, message, index) {
+    var handleFbInteraction = function(action, key, message, index, deferred) {
       fbEvents.processInteraction(action, key, message)
         .then(function(response) {
           if (response) {
             console.log('Successful!  ' + action);
             if (rsvp.indexOf(action) >= 0) {
-              //tell user they have been succesfully rsvp or declined or maybe
-              if (action === 'attending') {
-                $scope.rsvpStatus = 'Going';
-              } else if (action === 'maybe') {
-                $scope.rsvpStatus = 'Maybe';
-              } else {
-                $scope.rsvpStatus = 'Declined';
+              switch(action) {
+                case 'attending':
+                  $scope.rsvpStatus = 'Going';
+                  break;
+                case 'maybe':
+                  $scope.rsvpStatus = 'Maybe';
+                  break;
+                case 'declined':
+                  $scope.rsvpStatus = 'Declined';
               }
-            } else if (action === 'post') {
-              var status = processStatus(response);
-              $scope.feed.unshift(status);
-            } else if (action === 'like') {
-              $scope.feed[index].numberLikes++;
-              $scope.feed[index].userLiked = true;
-             } else if (action === 'unlike') {
-              $scope.feed[index].numberLikes--;
-              $scope.feed[index].userLiked = false;
-            } else if (action === 'likeComment') {
-              $scope.feed[index].comments[message].numberLikes++;
-              $scope.feed[index].comments[message].userLiked = true;
-            } else if (action === 'unlikeComment') {
-              $scope.feed[index].comments[message].numberLikes--;
-              $scope.feed[index].comments[message].userLiked = false;
-            } else { 
-              $scope.showMoreReplies(index);
-              var comment = processComments(response);
-              if ($scope.$$phase) { // most of the time it is "$digest"
-                $scope.feed[index].comments.push(comment);
-              } else {
-                $scope.$apply($scope.feed[index].comments.push(comment));
+            } else {
+              switch(action) {
+                case 'post':
+                  var status = processStatus(response);
+                  $scope.feed.unshift(status);
+                  break;
+                case 'like':
+                  $scope.feed[index].numberLikes++;
+                  $scope.feed[index].userLiked = true;
+                  break;
+                case 'unlike':
+                  $scope.feed[index].numberLikes--;
+                  $scope.feed[index].userLiked = false;
+                  break;
+                case 'likeComment':
+                  $scope.feed[index].comments[message].numberLikes++;
+                  $scope.feed[index].comments[message].userLiked = true;
+                  break;
+                case 'unlikeComment':
+                  $scope.feed[index].comments[message].numberLikes--;
+                  $scope.feed[index].comments[message].userLiked = false;
+                  break;
+                case 'comment':
+                  $scope.showMoreReplies(index);
+                  var comment = processComments(response);
+                  if ($scope.$$phase) {
+                    $scope.feed[index].comments.push(comment);
+                  } else {
+                    $scope.$apply($scope.feed[index].comments.push(comment));
+                  }
               }
             }
-            if (action.match(/likeComment/)) {
-              console.log('yay');
-              $scope.feed[index].comments[message].liking = false;
-            } else if (action.match(/like/)) {
-              console.log('nay');
-              $scope.feed[index].liking = false;
-            }
+            deferred.resolve();
           }
         }, function() {
+          setParams(action, key, message, index);
+          deferred.reject();
           if (action === 'post' || action === 'comment') {
-            //let user know that reason for error might be that they didn't
-            //rsvp yet.
-            //don't forget to let give user the message that they tried to post/comment
-            //so they don't have to retype
+            $scope.showModal('facebook', message);
+          } else {
+            $scope.showModal('facebook');
           }
-          showErrorModal();
+        })['finally'](function() {
+            if (action.match(/likeComment/)) {
+              $scope.feed[index].comments[message].liking = false;
+            } else if (action.match(/like/)) {
+              $scope.feed[index].liking = false;
+            }
         });
     };
 
-    var handleFailedFbLogin = function(response) {
-      if (response === 'declined') {
-        //user declined login
-      } else if (response === 'not logged in') {
-        //user is not logged in
-      } else if (response === 'denied permission') {
-        //user did not grant permission - explain permission
+    var setParams = function(action, key, message, index) {
+      var changedKeyActions = ['like' , 'unlike', 'comment'];
+      if (changedKeyActions.indexOf(action) >= 0) {
+        interactionParams = {action: action,
+                             key: index,
+                             message: message
+                            };
       } else {
-        showErrorModal();
+        interactionParams = {action: action,
+                             key: key,
+                             message: message
+                            };
+      }
+    };
+
+    var handleFailedFbLogin = function(response) {
+      if (['declined', 'not logged in', 'declined permission'].indexOf(response) >= 0) {
+        $scope.showModal(response);
+      } else {
+        $scope.showModal('facebook login');
       }
     };
 
 
 
     if (!$scope.eventId) {
-      showErrorModal();
-      $timeout(function() {
-        $wix.closeWindow('Closed Modal');
-      }, 7000);
+      $scope.showModal('load');
     } else {
       server.getModalEvent($scope.eventId, "all")
         .then(function(response) {
@@ -543,7 +684,7 @@ angular.module('fbCal')
           $scope.settings = response.settings;
           processEventInfo();
         }, function() {
-          showErrorModal();
+          $scope.showModal('load');
         });
       // eventInfo = {
       //               "description": "OMG this is the story of my life. Narwhal bicycle rights aesthetic fanny pack, art party ennui Brooklyn twee typewriter polaroid chia lo-fi Carles drinking vinegar pour-over. Chambray Pinterest ethical banjo church-key whatever hashtag XOXO. American Apparel Banksy twee, paleo bicycle rights readymade bitters. Seitan Wes.\n\nHoodie pork belly DIY pug VHS messenger bag, readymade four loko wolf occupy. Pop-up aesthetic Pitchfork Tumblr. Mumblecore hella DIY, McSweeney's lo-fi meggings yr banh mi trust fund Odd Future cardigan disrupt sartorial kale chips. Pitchfork organic keytar, roof party street art PBR&B Tumblr church-key High Life beard +1.", 

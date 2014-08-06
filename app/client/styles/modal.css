@@ -250,5 +250,16 @@ textarea {
   color: black !important;
 }
 
+.modal-btn-primary {
+  color: white !important;
+}
+
+.share-link {
+  color: #2A6496;
+}
+
+.share-link:hover {
+  color: #2A6496;
+}
 
 

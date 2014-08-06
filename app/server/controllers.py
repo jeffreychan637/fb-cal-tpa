@@ -216,6 +216,9 @@ def get_event(request, compID, all_events):
         if (found):
             event_data = get_specific_event(event_id, access_token_data["access_token"], \
                                             desired_data)
+            if not event_data:
+                abort(STATUS["Bad_Gateway"],
+                message="Couldn't receive data from Facebook")
         else:
             abort(STATUS["Forbidden"], message= "User cannot display this event")
         if desired_data == "all":

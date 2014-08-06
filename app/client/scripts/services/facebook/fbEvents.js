@@ -98,23 +98,29 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     if (rsvp.indexOf(action) >= 0) {
       changeAttendingStatus(action, id, deferred);
     } else if (action === 'post') {
-      post(id, deferred, message);
+      post(id, deferred, message, true);
     } else if (action === 'like' || action === 'likeComment') {
       like(id, deferred, true);
     } else if (action === 'unlike' || action === 'unlikeComment') {
       like(id, deferred, false);
     } else {
-      comment(id, deferred, message);
+      post(id, deferred, message, false);
     }
     return deferred.promise;
   };
 
-  var post = function(id, deferred, message) {
+  var post = function(id, deferred, message, post) {
+    var link;
     console.log(message);
-    FB.api("/" + id + "/feed",
-           "POST",
+    if (post) {
+      link = '/feed';
+    } else {
+      link = '/comments';
+    }
+    FB.api('/' + id + link,
+           'POST',
            {
-              "message": message
+              'message': message
            },
            function(response) {
              if (response && !response.error) {
@@ -134,30 +140,6 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
            });
   };
 
-  var comment = function(id, deferred, message) {
-    console.log(message);
-    FB.api("/" + id + "/comments",
-           "POST",
-           {
-              "message": message
-           },
-           function(response) {
-             if (response && !response.error) {
-               FB.api("/" + response.id,
-                      function(response) {
-                        if (response && !response.error) {
-                          deferred.resolve(response);
-                        } else {
-                          deferred.reject();
-                        }
-                      });
-             } else {
-               console.log(response.error);
-               deferred.reject();
-             }
-           });
-  };
-
   var like = function(id, deferred, like) {
     console.log(id);
     var method;
@@ -166,7 +148,7 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     } else {
       method = 'DELETE';
     }
-    FB.api("/" + id + "/likes",
+    FB.api('/' + id + '/likes',
            method,
            function (response) {
              if (response && !response.error) {
@@ -180,8 +162,8 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
   };
 
   var changeAttendingStatus = function(action, id, deferred) {
-    FB.api("/" + id + "/" + action,
-           "POST",
+    FB.api('/' + id + '/' + action,
+           'POST',
            function(response) {
              if (response && !response.error) {
                deferred.resolve(true);
