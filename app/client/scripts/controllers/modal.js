@@ -339,6 +339,10 @@ angular.module('fbCal')
     $scope.interactWithFb = function(action, key, message) {
       if ($scope.settings.commenting) {
         var index;
+        if (!(action === 'like' && !$scope.feed[key].userLiked)) {
+          //prevents liking something you've liked already (only works for likes made in modal)
+          return;
+        }
         if (rsvp.indexOf(action) >= 0 || action === 'post') {
           key = $scope.eventId;
         } else if (action === 'like' || action === 'comment') {
@@ -403,9 +407,10 @@ angular.module('fbCal')
               var status = processStatus(response);
               $scope.feed.unshift(status);
             } else if (action === 'like') {
-              //update like
-            } else if (action === 'unlike') {
-              //update like
+              $scope.feed[index].numberLikes++;
+              $scope.feed[index].userLiked = true;
+            } else if (action === 'likeComment') {
+              //update comment like
             } else {
               var comment = processComments(response);
               $scope.feed[index].comments.push(comment);

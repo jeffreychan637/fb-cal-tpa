@@ -149,7 +149,10 @@
             <div class="block add-on" ng-show="status.comment && settings.commenting">
               <form class="input-group" ng-if="status.like && status.comment">
                 <span class="input-group-btn">
-                  <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)">Like</button>
+                  <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)">
+                    <span ng-hide="status.userLiked">Like</span>
+                    <span ng-show="status.userLiked">Liked</span>
+                  </button>
                 </span>
                 <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment">
                 <span class="input-group-btn">
