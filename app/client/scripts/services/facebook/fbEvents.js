@@ -130,6 +130,7 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
                         }
                       });
              } else {
+               console.log(response.error);
                deferred.reject();
              }
            });

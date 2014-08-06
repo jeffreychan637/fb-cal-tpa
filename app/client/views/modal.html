@@ -166,7 +166,7 @@
                 </span>
               </form>
             </div>
-            <div class="block add-on" ng-if="status.comments">
+            <div class="block add-on" ng-if="status.comments && status.comments.length > 0">
               <div ng-repeat="comment in status.comments">
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>

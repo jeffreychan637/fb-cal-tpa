@@ -240,9 +240,9 @@ angular.module('fbCal')
       if (data.sharedposts) {
         status.numberShares = data.sharedposts.data.length;
       }
+      status.comments = [];
+      status.extraComments = [];
       if (data.comments) {
-        status.comments = [];
-        status.extraComments = [];
         var comments = data.comments.data;
         if (comments) {
           for (var j = 0; j < comments.length; j++) {
@@ -308,9 +308,10 @@ angular.module('fbCal')
             $scope.feed[index].repliesMessage = 'Show more replies';
           }
            $scope.feed[index].gettingReplies = false;
-        } else {
+        } else if ($scope.feed[index].more){
           // var info = fbEvents.parseFbUrl($scope.feed.more);
           //get more replies from server.
+          $scope.feed[index].gettingReplies = false;
         }
       }
     };
@@ -339,6 +340,7 @@ angular.module('fbCal')
 
     //explain what key does for different actions (e.g. key is comment id when liking a comment)
     $scope.interactWithFb = function(action, key, message) {
+      console.log(message);
       if ($scope.settings.commenting) {
         console.log('running');
         var index;
@@ -355,9 +357,7 @@ angular.module('fbCal')
             key = $scope.feed[key].id;
         }
         if (action === 'post' || action === 'comment') {
-          if (message) {
-            message = $sanitize(message);
-          } else {
+          if (!message) {
             return;
           }
         }
@@ -420,7 +420,11 @@ angular.module('fbCal')
             } else {
               $scope.showMoreReplies(index);
               var comment = processComments(response);
-              $scope.feed[index].comments.push(comment);
+              if ($scope.$$phase) { // most of the time it is "$digest"
+                $scope.feed[index].comments.push(comment);
+              } else {
+                $scope.$apply($scope.feed[index].comments.push(comment));
+              }
             }
           }
         }, function() {
