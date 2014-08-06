@@ -104,22 +104,6 @@
               </strong>
             </div>
           </li>
-          <li wix-label="Comment Moderation" class="toggle-label">
-            <div class="onoffswitch">
-              <input type="checkbox" name="modSwitch" class="onoffswitch-checkbox" id="modSwitch" ng-change="handleToggles('moderating')" ng-model="moderating" ng-checked="settings.moderating">
-              <label class="onoffswitch-label" for="modSwitch">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
-              </label>
-            </div>
-            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'Turning this on means no posts from site visitors become public until you approve them from the editor. Even if you turn this off, you can still remove public posts from the event.'}">
-              <strong>
-                <a class="uilib-text toggle-question short-toggle-question">
-                  ?
-                </a>
-              </strong>
-            </div>
-          </li>
           <li wix-label="Show 'Hosted by'" class="toggle-label">
             <div class="onoffswitch">
               <input type="checkbox" name="hostedSwitch" class="onoffswitch-checkbox" id="hostedSwitch" ng-change="handleToggles('hostedBy')" ng-model="hostedBy" ng-checked="settings.hostedBy">
