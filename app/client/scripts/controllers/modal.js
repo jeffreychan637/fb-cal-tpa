@@ -352,6 +352,7 @@ angular.module('fbCal')
     var rsvp = ['attending', 'maybe', 'declined']; 
 
     //explain what key does for different actions (e.g. key is comment id when liking a comment)
+    //message is usally message except for like/unlike commment where it is the index
     $scope.interactWithFb = function(action, key, message) {
       console.log(message);
       if ($scope.settings.commenting) {
@@ -362,16 +363,23 @@ angular.module('fbCal')
           //prevents liking something you've liked already (only works for likes made in modal)
             return;
           }
+        } else if (action === 'post' || action === 'comment') {
+          if (!message) {
+            return;
+          }
         }
         if (rsvp.indexOf(action) >= 0 || action === 'post') {
           key = $scope.eventId;
         } else if (action === 'like' || action === 'comment') {
             index = key;
             key = $scope.feed[key].id;
-        }
-        if (action === 'post' || action === 'comment') {
-          if (!message) {
-            return;
+        } else if (action === 'likeComment' || action === 'unlikeComment') {
+          for (var i = 0; i < $scope.feed.length; i++) {
+            if ($scope.feed[i].comments[message] &&
+                $scope.feed[i].comments[message].id === key) {
+              index = i;
+              break;
+            }
           }
         }
         console.log('got to here');
@@ -428,9 +436,16 @@ angular.module('fbCal')
             } else if (action === 'like') {
               $scope.feed[index].numberLikes++;
               $scope.feed[index].userLiked = true;
+             } else if (action === 'unlike') {
+              $scope.feed[index].numberLikes--;
+              $scope.feed[index].userLiked = false;
             } else if (action === 'likeComment') {
-              //update comment like
-            } else {
+              $scope.feed[index].comments[message].numberLikes++;
+              $scope.feed[index].comments[message].userLiked = true;
+            } else if (action === 'unlikeComment') {
+              $scope.feed[index].comments[message].numberLikes--;
+              $scope.feed[index].comments[message].userLiked = false;
+            } else { 
               $scope.showMoreReplies(index);
               var comment = processComments(response);
               if ($scope.$$phase) { // most of the time it is "$digest"
@@ -438,6 +453,13 @@ angular.module('fbCal')
               } else {
                 $scope.$apply($scope.feed[index].comments.push(comment));
               }
+            }
+            if (action.match(/likeComment/)) {
+              console.log('yay');
+              $scope.feed[index].comments[message].liking = false;
+            } else if (action.match(/like/)) {
+              console.log('nay');
+              $scope.feed[index].liking = false;
             }
           }
         }, function() {

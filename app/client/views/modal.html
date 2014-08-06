@@ -179,7 +179,7 @@
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
                   {{comment.time}}
-                  <a class="push-left" ng-if="settings.commenting" ng-click="interactWithFb('likeComment', comment.id, undefined)">Like</a>
+                  <a class="push-left" ng-if="settings.commenting" ng-click="interactWithFb('likeComment', comment.id, $index)">Like</a>
                   <span class="push-left" ng-show="comment.numberLikes">{{comment.numberLikes}} Likes</span>
                 </blockquote>
               </div>
