@@ -95,9 +95,7 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     FB.ui({
            method: 'share',
            href: 'https://www.facebook.com/events/' + eventId,
-          }, function(response) {
-            console.log(response);
-          });
+          }, function() {});
   };
 
   var rsvp = ['attending', 'maybe', 'declined']; 
@@ -113,8 +111,10 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
       like(id, deferred, true);
     } else if (action === 'unlike' || action === 'unlikeComment') {
       like(id, deferred, false);
-    } else {
+    } else if (action === 'comment') {
       post(id, deferred, message, false);
+    } else {
+      deletePost(id, deferred);
     }
     return deferred.promise;
   };
@@ -148,6 +148,18 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
                deferred.reject();
              }
            });
+  };
+
+  var deletePost = function(id, deferred) {
+    FB.api('/' + id,
+           'DELETE',
+           function (response) {
+            if (response && !response.error) {
+              deferred.resolve(true);
+            } else {
+              deferred.reject();
+            }
+          });
   };
 
   var like = function(id, deferred, like) {

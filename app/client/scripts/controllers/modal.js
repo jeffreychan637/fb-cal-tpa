@@ -7,19 +7,19 @@ angular.module('fbCal')
                                      fbSetup, fbEvents, modalFbLogin) {
     $scope.eventId = eventId;
 
-    var eventInfo;
-    var feedObject;
+    var eventInfo = {};
+    var feedObject = {};
 
     $scope.feed = [];
     $scope.extraFeed = [];
 
-    var nextFeed;
+    var nextFeed = '';
     var notGettingMoreFeed = true;
 
     $scope.rsvpStatus = 'RSVP';
     
-    var curErrorType;
-    var interactionParams;
+    var curErrorType = '';
+    var interactionParams = {};
 
     // $scope.eventId = "1512622455616642";
 
@@ -36,8 +36,12 @@ angular.module('fbCal')
                   });
 
     $scope.shareFbEvent = function() {
-      console.log('hello');
-      fbEvents.shareEvent($scope.eventId);
+      if (fbSetup.getFbReady()) {
+        fbEvents.shareEvent($scope.eventId);
+      } else {
+        interactionParams.action = 'share';
+        $scope.showModal('wait');
+      }
     };
     
     var errorTypes = ['facebook', 'facebook login', 'load'];
@@ -120,9 +124,16 @@ angular.module('fbCal')
       } else if (curErrorType === 'load') {
         location.reload();
       } else if (curErrorType === 'wait') {
-        $timeout(function() {
-          tryInteractionAgain();
-        }, 2500);
+        if (interactionParams.action === 'share') {
+          $('#message').modal('hide');
+          $timeout(function() {
+            $scope.shareFbEvent();
+          }, 1500);
+        } else {
+          $timeout(function() {
+            tryInteractionAgain();
+          }, 1500);
+        }
       } else {
         tryInteractionAgain();
       }
@@ -214,10 +225,10 @@ angular.module('fbCal')
       }
       $timeout(function() {
         if ($($window).width() > 760) {
-          if ($('#time').height() > $('#rsvp').height()) {
-            $('#rsvp').height($('#time').height());
+          if ($('#time').outerHeight() > $('#rsvp').outerHeight()) {
+            $('#rsvp').outerHeight($('#time').outerHeight());
           } else {
-            $('#time').height($('#rsvp').height());
+            $('#time').outerHeight($('#rsvp').outerHeight());
           }
         }
       }, 500);
@@ -253,7 +264,6 @@ angular.module('fbCal')
       if (coverObject.cover && coverObject.cover.source) {
         var cover = coverObject.cover;
         var height = 296 + $scope.settings.borderWidth;
-
         height = 306;
         // cover.source = "https://fbcdn-sphotos-a-a.akamaihd.net/hphotos-ak-xfa1/t31.0-8/q71/s720x720/10286851_801238859907126_3448618267544264515_o.jpg";
         var cssClass = {'background-image' : 'url(' + cover.source + ')',
@@ -279,10 +289,10 @@ angular.module('fbCal')
       }
       $timeout(function() {
         if ($($window).width() > 760) {
-          if ($('#location').height() > $('#guests').height()) {
-            $('#guests').height($('#location').height());
+          if ($('#location').outerHeight() > $('#guests').outerHeight()) {
+            $('#guests').outerHeight($('#location').outerHeight());
           } else {
-            $('#location').height($('#guests').height());
+            $('#location').outerHeight($('#guests').outerHeight());
           }
         }
       }, 100);
@@ -544,13 +554,17 @@ angular.module('fbCal')
         if (!message) {
           return false;
         }
+      } else if (action === 'deletePost') {
+        index = key;
       }
       if (rsvp.indexOf(action) >= 0 || action === 'post') {
         key = $scope.eventId;
-      } else if (action === 'like' || action === 'unlike' || action === 'comment') {
+      } else if (action === 'like' || action === 'unlike' ||
+                action === 'comment' || action === 'deletePost') {
           index = key;
           key = $scope.feed[key].id;
-      } else if (action === 'likeComment' || action === 'unlikeComment') {
+      } else if (action === 'likeComment' || action === 'unlikeComment' ||
+                 action === 'deleteComment') {
         for (var i = 0; i < $scope.feed.length; i++) {
           if ($scope.feed[i].comments[message] &&
               $scope.feed[i].comments[message].id === key) {
@@ -587,6 +601,7 @@ angular.module('fbCal')
               switch(action) {
                 case 'post':
                   var status = processStatus(response);
+                  status.appPosted = true;
                   $scope.feed.unshift(status);
                   break;
                 case 'like':
@@ -608,11 +623,18 @@ angular.module('fbCal')
                 case 'comment':
                   $scope.showMoreReplies(index);
                   var comment = processComments(response);
+                  comment.appPosted = true;
                   if ($scope.$$phase) {
                     $scope.feed[index].comments.push(comment);
                   } else {
                     $scope.$apply($scope.feed[index].comments.push(comment));
                   }
+                  break;
+                case 'deletePost':
+                  $scope.feed.splice(index, 1);
+                  break;
+                case 'deleteComment':
+                  $scope.feed[index].comments.splice(message, 1);
               }
             }
             deferred.resolve();
@@ -635,7 +657,7 @@ angular.module('fbCal')
     };
 
     var setParams = function(action, key, message, index) {
-      var changedKeyActions = ['like' , 'unlike', 'comment'];
+      var changedKeyActions = ['like' , 'unlike', 'comment', 'deletePost'];
       if (changedKeyActions.indexOf(action) >= 0) {
         interactionParams = {action: action,
                              key: index,
