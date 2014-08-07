@@ -18,6 +18,14 @@ blockquote {
   top: 245px;
   left: 255px;
 }
+ 
+ @media all and (max-width: 475px) {
+  .loading{
+    top: 185px;
+    left: 5px;
+  }
+ }
+
 
 .app {
   border: 5px solid black;

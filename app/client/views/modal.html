@@ -1,6 +1,6 @@
 <div ng-controller="ModalCtrl">
-  <h2 class="text-center loading" ng-hide="displayModal">Loading Event Details...</h2>
-  <div class="app" ng-show="displayModal">
+  <h2 class="text-center loading" ng-hide="displayModal && false">Loading Event Details...</h2>
+  <div class="app" ng-show="displayModal && false">
     <div class="page-header" id="header">
       <h1 id="title" class="title"><a ng-href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
       <h5 id="host" class="host" ng-if="settings.hostedBy">
