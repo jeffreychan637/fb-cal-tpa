@@ -186,7 +186,7 @@
               </form>
             </div>
             <div class="block add-on" ng-if="status.comments && status.comments.length > 0">
-              <div ng-repeat="comment in status.comments" ng-mouseover="comment.hoverOver = true" ng-mouseleave="comment.hoverOver = false" class="animate-repeat">
+              <div ng-repeat="comment in status.comments" ng-mouseover="comment.hoverOver = true" ng-mouseleave="comment.hoverOver = false">
                 <button type="button" class="close" ng-click="interactWithFb('deleteComment', comment.id, $index)" ng-show="comment.appPosted && comment.hoverOver"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
