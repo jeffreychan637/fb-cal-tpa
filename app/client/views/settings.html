@@ -96,16 +96,7 @@
                 <span class="onoffswitch-switch"></span>
               </label>
             </div>
-          </li>
-          <li wix-label="Comment Moderation" class="toggle-label">
-            <div class="onoffswitch">
-              <input type="checkbox" name="modSwitch" class="onoffswitch-checkbox" id="modSwitch" ng-change="handleToggles('moderating')" ng-model="moderating" ng-checked="settings.moderating">
-              <label class="onoffswitch-label" for="modSwitch">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
-              </label>
-            </div>
-            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'Turning this means no posts from site visitors become public until you approve them from the editor. Even if you turn this off, you can still remove public posts from the event.'}">
+            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'Turning this on means that site visitors can post to the Facebook wall of your event as well as like and comment on the statuses there through the app. Turning this off removes those capabilities but still allows users to RSVP and share your event.'}">
               <strong>
                 <a class="uilib-text toggle-question short-toggle-question">
                   ?

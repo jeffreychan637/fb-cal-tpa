@@ -15,7 +15,8 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     return deferred.promise;
   };
 
-  var afterRegex = /after=([0-9=]+)/;
+  var commentIdRegex = /\/([0-9_]+)\/comments/;
+  var afterRegex = /after=([0-9a-zA-Z=]+)/;
   var untilRegex = /until=([0-9a-zA-Z]+)/;
 
   var getAllEvents = function(deferred, userId) {
@@ -64,32 +65,177 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
       }
     });
   };
+//look for after and until
+  var parseUrl = function(url, gettingFeed) {
+    var commentId;
+    var afterPattern = url.match(afterRegex);
+    if (afterPattern) {
+      if (gettingFeed) {
+        return {after : afterPattern[1]};
+      } else {
+        commentId = parseCommentId(url);
+        return {id : commentId, after : afterPattern[1]};
+      }
+    } else {
+      var untilPattern = url.match(untilRegex);
+      if (untilPattern) {
+        if (gettingFeed) {
+          return {until : untilPattern[1]};
+        } else {
+          commentId = parseCommentId(url);
+          return {id : commentId, until : untilPattern[1]};
+        }
+      } else {
+        console.error('Could not parse Url');
+      }
+    }
+  };
 
-  // FB.api("/fql?q="+encodeURIComponent('SELECT attending_count from event WHERE eid = 204048519630371'), function(response) {
-  //   if (!response || response.error) {
-  //      console.log('Error occurred: '+response.error.message);
-  //   } else {
-  //      console.log(response);
-  //   }
-  // });
+  var parseCommentId = function(url) {
+    var commentIdPattern = url.match(commentIdRegex);
+    if (commentIdPattern) {
+      return commentIdPattern[1];
+    } else {
+      console.error('Could not parse Url');
+    }
+  }; 
 
-  var post = function() {
+  var getRsvpStatus = function(eventId) {
+    var deferred = $q.defer();
+    FB.api('/fql',
+          {
+            'q' : 'SELECT rsvp_status FROM event_member WHERE eid = ' + eventId + ' AND uid=me()'
+          }, 
+          function(response) {
+            if (response && !response.error) {
+              var rsvp_status = response.data[0].rsvp_status;
+              if (rsvp_status === 'attending') {
+                deferred.resolve('Going');
+              } else if (rsvp_status === 'maybe') {
+                deferred.resolve('Maybe');
+              } else if (rsvp_status === 'declined') {
+                deferred.resolve('Declined');
+              } else {
+                deferred.resolve('RSVP');
+              }
+            } else {
+              deferred.reject();
+            }
+          });
+    return deferred.promise;
+  };
+
+  var shareEvent = function(eventId) {
+    console.log('running');
+    FB.ui({
+           method: 'share',
+           href: 'https://www.facebook.com/events/' + eventId,
+          }, function() {});
+  };
+
+  var rsvp = ['attending', 'maybe', 'declined']; 
+
+  var processInteraction = function(action, id, message) {
+    console.log('performing ' + action);
+    var deferred = $q.defer();
+    if (rsvp.indexOf(action) >= 0) {
+      changeAttendingStatus(action, id, deferred);
+    } else if (action === 'post') {
+      post(id, deferred, message, true);
+    } else if (action === 'like' || action === 'likeComment') {
+      like(id, deferred, true);
+    } else if (action === 'unlike' || action === 'unlikeComment') {
+      like(id, deferred, false);
+    } else if (action === 'comment') {
+      post(id, deferred, message, false);
+    } else {
+      deletePost(id, deferred);
+    }
+    return deferred.promise;
+  };
+
+  var post = function(id, deferred, message, post) {
+    var link;
+    console.log(message);
+    if (post) {
+      link = '/feed';
+    } else {
+      link = '/comments';
+    }
+    FB.api('/' + id + link,
+           'POST',
+           {
+              'message': message
+           },
+           function(response) {
+             if (response && !response.error) {
+               FB.api("/" + response.id,
+                      function(response) {
+                        if (response && !response.error) {
+                          deferred.resolve(response);
+                        } else {
+                          console.log(response.error);
+                          deferred.reject();
+                        }
+                      });
+             } else {
+              console.log(response.error);
+               deferred.reject();
+             }
+           });
+  };
+
+  var deletePost = function(id, deferred) {
+    FB.api('/' + id,
+           'DELETE',
+           function (response) {
+            if (response && !response.error) {
+              deferred.resolve(true);
+            } else {
+              deferred.reject();
+            }
+          });
+  };
+
+  var like = function(id, deferred, like) {
+    console.log(id);
+    var method;
+    if (like) {
+      method = 'POST';
+    } else {
+      method = 'DELETE';
+    }
+    FB.api('/' + id + '/likes',
+           method,
+           function (response) {
+             if (response && !response.error) {
+               deferred.resolve(true);
+             } else {
+               console.log(response.error);
+               deferred.reject();
+             }
+           });
 
   };
 
-  var comment = function() {
-
-  };
-
-  var like = function() {
-
-  };
-
-  var changeAttendingStatus = function() {
-
+  var changeAttendingStatus = function(action, id, deferred) {
+    FB.api('/' + id + '/' + action,
+           'POST',
+           function(response) {
+             if (response && !response.error) {
+               deferred.resolve(true);
+             } else {
+               console.log(response.error);
+               deferred.reject();
+             }
+           });
   };
 
   return {
-    getUserEventDetails: getUserEventDetails
+    shareEvent: shareEvent,
+    getUserEventDetails: getUserEventDetails,
+    processInteraction: processInteraction,
+    getRsvpStatus: getRsvpStatus,
+    parseUrl: parseUrl
   };
 });

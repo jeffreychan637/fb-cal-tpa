@@ -6,7 +6,6 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
     description: 'This is my description.',
     view: 'Month',
     commenting: true,
-    moderating: false,
     hostedBy: true,
     corners: '25',
     borderWidth: '5',

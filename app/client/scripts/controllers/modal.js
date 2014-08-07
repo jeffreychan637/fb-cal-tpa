@@ -1,26 +1,171 @@
 'use strict';
-/*global $:false, console:false */
+/*global $:false, console:false, location:false */
 
 angular.module('fbCal')
-  .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, 
-                                     $timeout, $window, eventId, server) {
+  .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, $q, 
+                                     $timeout, $window, eventId, server,
+                                     fbSetup, fbEvents, modalFbLogin) {
     $scope.eventId = eventId;
 
-    var eventInfo;
-    var feedObject;
+    var eventInfo = {};
+    var feedObject = {};
 
     $scope.feed = [];
+    $scope.extraFeed = [];
 
-    var nextFeed;
+    var nextFeed = '';
+    var notGettingMoreFeed = true;
+
+    $scope.rsvpStatus = 'RSVP';
+    
+    var curErrorType = '';
+    var interactionParams = {};
 
     // $scope.eventId = "1512622455616642";
 
-    var showErrorModal = function() {
-      $scope.messageTitle = "Oh no!";
-      $('#messageTitle').css('color', 'red');
-      $scope.messageBody = 'Something terrible happened. Please exit and try again.';
-      $('#message').modal('show');
+    var watchFb = $scope.$watch(function() {
+                    return fbSetup.getFbReady();
+                  }, function() {
+                      if (fbSetup.getFbReady()) {
+                        watchFb();
+                        fbEvents.getRsvpStatus($scope.eventId)
+                        .then(function(response) {
+                          $scope.rsvpStatus = response;
+                        });
+                      }
+                  });
+
+    $scope.shareFbEvent = function() {
+      if (fbSetup.getFbReady()) {
+        fbEvents.shareEvent($scope.eventId);
+      } else {
+        interactionParams.action = 'share';
+        $scope.showModal('wait');
+      }
     };
+    
+    var errorTypes = ['facebook', 'facebook login', 'load'];
+
+    var errorModal = {title: 'Oh no!',
+                      css: {'color' : 'red'},
+                      message: 'Something terrible happened. Please try again or reload the page.',
+                      modalButton: 'Try Again'
+                     };
+
+    var waitModal = {title: 'Please wait...',
+                     message: 'We are still connecting to Facebook. Please wait a few seconds and then click try again.',
+                     modalButton: 'Try Again'
+                    };
+
+    var permissionModal = {title: 'Hello there!',
+                           modalButton: 'Grant Permission',
+                           declinedMessage: 'We can’t perform your request regarding this Facebook event unless you don’t give us permission to.',
+                           notLoggedInMessage: 'We need your permission to fulfill your request regarding this Facebook event. If you’re not logged in, you can’t grant your permission.',
+                           declinedPermissionMessage: 'You might be wondering why we need these permissions to fulfill your request.'
+                          };
+
+    var solveModal = {title: 'Trying again...',
+                      message: 'Giving our best effort!'
+                     };
+
+    var linkModal = {title: 'Share'};
+
+    $scope.showModal = function(type, message) {
+      $('#messageTitle').css({'color' : '#09F'});
+      curErrorType = type;
+      $scope.showLink = false;
+      $scope.postError = false;
+      $scope.permissionError = false;
+      if (errorTypes.indexOf(type) >= 0) {
+        $scope.messageTitle = errorModal.title;
+        $('#messageTitle').css(errorModal.css);
+        $scope.messageBody = errorModal.message;
+        $scope.modalButton = errorModal.modalButton;
+        if (message) {
+          $scope.postError = true;
+          $scope.userPost = message;
+        }
+      } else if (type === 'link') {
+        $scope.messageTitle = linkModal.title;
+        $scope.showLink = true;
+      }
+        else if (type === 'wait') {
+        $scope.messageTitle = waitModal.title;
+        $scope.messageBody = waitModal.message;
+        $scope.modalButton = waitModal.modalButton;
+      } else {
+        $scope.permissionError = true;
+        $scope.messageTitle = permissionModal.title;
+        $scope.modalButton = permissionModal.modalButton;
+        switch(type) {
+          case 'declined permission':
+            $scope.messageBody = permissionModal.declinedPermissionMessage;
+            break;
+          case 'declined':
+            $scope.messageBody = permissionModal.declinedMessage;
+            break;
+          case 'not logged in':
+            $scope.messageBody = permissionModal.notLoggedInMessage;
+        }
+      }
+      $timeout(function() {
+        $('#message').modal('show');
+      }, 500);
+    };
+
+    $scope.solveError = function() {
+      $scope.postError = false;
+      $scope.permissionError = false;
+      $scope.messageTitle = solveModal.title;
+      $('#messageTitle').css({'color' : '#09F'});
+      $scope.messageBody = solveModal.message;
+      if (curErrorType === 'declined permission') {
+        getDeniedPermission();
+      } else if (curErrorType === 'load') {
+        location.reload();
+      } else if (curErrorType === 'wait') {
+        if (interactionParams.action === 'share') {
+          $('#message').modal('hide');
+          $timeout(function() {
+            $scope.shareFbEvent();
+          }, 1500);
+        } else {
+          $timeout(function() {
+            tryInteractionAgain();
+          }, 1500);
+        }
+      } else {
+        tryInteractionAgain();
+      }
+    };
+
+    var getDeniedPermission = function() {
+      var permission;
+      if (rsvp.indexOf(interactionParams.action) >= 0) {
+        permission = 'rsvp_event';
+      } else {
+        permission = 'publish_actions';
+      }
+      modalFbLogin.loginWithPermission(permission, true)
+        .then(function() {
+          tryInteractionAgain();
+        }, function() {
+          $('#message').modal('hide');
+          $timeout(function() {
+            $scope.showModal('declined permission');
+          }, 1000);
+        });
+    };
+
+    var tryInteractionAgain = function() {
+      $scope.interactWithFb(interactionParams.action, interactionParams.key,
+                            interactionParams.message)
+        .then(function() {
+          $scope.messageBody = 'Success!';
+        }, function() {
+          $('#message').modal('hide');
+        });
+      };
 
     // var showPleaseWait = function(message) {
     //   $scope.messageTitle = "Please wait...";
@@ -33,10 +178,11 @@ angular.module('fbCal')
       $scope.id = eventInfo.id;
       $scope.name = eventInfo.name;
       $scope.owner = eventInfo.owner.name;
-      console.log($scope.name);
+      $scope.ownerId = eventInfo.owner.id;
       processDesciption();
       processTime();
       processLocation();
+      $scope.displayModal = true;
       //display modal info here - before this just show some loading screen
     };
 
@@ -79,13 +225,13 @@ angular.module('fbCal')
       }
       $timeout(function() {
         if ($($window).width() > 760) {
-          if ($('#time').height() > $('#rsvp').height()) {
-            $('#rsvp').height($('#time').height());
+          if ($('#time').outerHeight() > $('#rsvp').outerHeight()) {
+            $('#rsvp').outerHeight($('#time').outerHeight());
           } else {
-            $('#time').height($('#rsvp').height());
+            $('#time').outerHeight($('#rsvp').outerHeight());
           }
         }
-      }, 1000);
+      }, 500);
     };
 
     var isSameDay = function(a, b) {
@@ -115,11 +261,9 @@ angular.module('fbCal')
     };
 
     var processCover = function(coverObject) {
-      console.log('processing cover');
       if (coverObject.cover && coverObject.cover.source) {
         var cover = coverObject.cover;
         var height = 296 + $scope.settings.borderWidth;
-
         height = 306;
         // cover.source = "https://fbcdn-sphotos-a-a.akamaihd.net/hphotos-ak-xfa1/t31.0-8/q71/s720x720/10286851_801238859907126_3448618267544264515_o.jpg";
         var cssClass = {'background-image' : 'url(' + cover.source + ')',
@@ -128,12 +272,12 @@ angular.module('fbCal')
                                                 cover.offset_y + '%'
                        };
         $('#header').css(cssClass);
+        $('#title').addClass('name');
+        $('#host').addClass('name');
       }
     };
 
     var processGuest = function(guestObject) {
-      console.log('processing guest');
-      console.log(guestObject);
       if (guestObject.data) {
         var stats = guestObject.data[0];
         stats.attending_count = processNumber(stats.attending_count);
@@ -145,65 +289,76 @@ angular.module('fbCal')
       }
       $timeout(function() {
         if ($($window).width() > 760) {
-          if ($('#location').height() > $('#guests').height()) {
-            $('#guests').height($('#location').height());
+          if ($('#location').outerHeight() > $('#guests').outerHeight()) {
+            $('#guests').outerHeight($('#location').outerHeight());
           } else {
-            $('#location').height($('#guests').height());
+            $('#location').outerHeight($('#guests').outerHeight());
           }
         }
-      }, 1000);
+      }, 100);
     };
 
     var processNumber = function(number) {
       if (number >= 100000) {
-          console.log('hello');
-          number = (number/1000000).toString().substring(0, 3);
-          var index = number.indexOf(".");
-          if (!(index === 0 || index === 1)) {
-            number = number.substring(0, 2);
-          } 
-          number += "M";
-        } else if (number >= 1000) {
-          number = +(number/1000).toString().substring(0, 3);
-          var decimal = number.indexOf(".");
-          if (!(decimal === 0 || decimal === 1)) {
-            number = number.substring(0, 2);
-          } 
-          number += "K";
-        }
+        number = (number/1000000).toString().substring(0, 3);
+        var index = number.indexOf(".");
+        if (!(index === 0 || index === 1)) {
+          number = number.substring(0, 2);
+        } 
+        number += "M";
+      } else if (number >= 1000) {
+        number = (number/1000).toString().substring(0, 3);
+        var decimal = number.indexOf(".");
+        if (!(decimal === 0 || decimal === 1)) {
+          number = number.substring(0, 2);
+        } 
+        number += "K";
+      }
       return number;
     };
 
     var processFeed = function() {
       $scope.loadMoreFeed = false;
-      console.log('processing feed');
-      console.log(feedObject);
       if (feedObject.paging && feedObject.paging.next) {
         nextFeed = feedObject.paging.next;
-        $scope.loadMoreFeed = true;
+        $scope.moreFeedMessage = "Show more posts";
       } else {
-        $scope.endOfFeed = true;
+        nextFeed = false;
+        $scope.moreFeedMessage = "";
       }
       var data = feedObject.data;
       if (data) {
         for (var i = 0; i < data.length; i++) {
           if (data[i].message) {
-            var status = { picture : data[i].picture,
-                           name: data[i].from.name,
-                           link: data[i].link,
-                           linkName: data[i].name,
-                           caption: data[i].caption,
-                           description : data[i].description,
-                           id: data[i].id
-                         };
-            status = processActions(status, data[i]);
-            $scope.feed.push(status);
+            var status = processStatus(data[i]);
+            if ($scope.feed.length < 5 || i < 5) {
+              $scope.feed.push(status);
+            } else {
+              $scope.extraFeed.push(status);
+            }
           }
         }
-        console.log($scope.feed);
+        if ($scope.extraFeed.length > 0) {
+          $scope.moreFeedMessage = "Show more posts";
+        }
       } else {
-        $scope.endOfFeed = true;
+        $scope.moreFeedMessage = "";
+        nextFeed = false;
       }
+      $scope.displayFeed = true;
+    };
+
+    var processStatus = function(data) {
+      var status = { picture : data.picture,
+                     name: data.from.name,
+                     link: data.link,
+                     linkName: data.name,
+                     caption: data.caption,
+                     description : data.description,
+                     id: data.id
+                   };
+      status = processActions(status, data);
+      return status;
     };
 
     var processActions = function(status, data) {
@@ -222,44 +377,65 @@ angular.module('fbCal')
       }
       if (data.likes) {
         status.numberLikes = data.likes.data.length;
+      } else {
+        status.numberLikes = 0;
       }
       if (data.sharedposts) {
         status.numberShares = data.sharedposts.data.length;
+      } else {
+        status.numberShares = 0;
       }
+      status.comments = [];
+      status.extraComments = [];
       if (data.comments) {
-        status.comments = [];
-        status.extraComments = [];
-        var comments = data.comments.data;
-        if (comments) {
-          for (var j = 0; j < comments.length; j++) {
-            var comment = { id : comments[j].id,
-                            can_remove : comments[j].can_remove,
-                            message : comments[j].message,
-                            numberLikes : comments[j].like_count,
-                            name: comments[j].from.name,
-                            time: postCreatedTime(new Date(comments[j].created_time))
-                          };
-            if (comments[j].message) {
-              comment.message = $sanitize(comments[j].message.replace(/\r?\n/g, "<br>"));
-              $sce.trustAsHtml(comment.message);
-            }
-            if (status.comments.length < 5) { 
-              status.comments.push(comment);
-            } else {
-              status.extraComments.push(comment);
-            }
-          }
-        }
-        if (data.comments.paging) {
-          if (data.comments.paging.next) {
-              status.more = data.comments.paging.next;
-          }
-        }
-        if (status.more || status.extraComments) {
-          status.repliesMessage = 'Show more replies';
-        }
+        status = processAllComments(status, data.comments);
       }
       return status;
+    };
+
+    var processAllComments = function(status, comments) {
+      var data = comments.data;
+      if (data) {
+        for (var j = 0; j < data.length; j++) {
+          var comment = processComments(data[j]);
+          if (status.comments.length < 5 || j < 5) { 
+            status.comments.push(comment);
+          } else {
+            status.extraComments.push(comment);
+          }
+        }
+      } else {
+        status.more = false;
+      }
+      if (comments.paging) {
+        if (comments.paging.next) {
+            status.more = comments.paging.next;
+        } else {
+          status.more = false;
+        }
+      } else {
+        status.more = false;
+      }
+      if (status.more || status.extraComments.length > 0) {
+        status.repliesMessage = 'Show more replies';
+      } else {
+        status.repliesMessage = "";
+      }
+      return status;
+    };
+
+    var processComments = function(data) {
+      var comment = {id : data.id,
+                     can_remove : data.can_remove,
+                     numberLikes : data.like_count,
+                     name: data.from.name,
+                     time: postCreatedTime(new Date(data.created_time))
+                    };
+      if (data.message) {
+        comment.message = $sanitize(data.message.replace(/\r?\n/g, "<br>"));
+        $sce.trustAsHtml(comment.message);
+      }
+      return comment;
     };
 
     var postCreatedTime = function(time) {
@@ -279,30 +455,267 @@ angular.module('fbCal')
 
     $scope.showMoreReplies = function(index) {
       if (!$scope.feed[index].gettingReplies) {
-         $scope.feed[index].gettingReplies = true;
-         $scope.feed[index].repliesMessage = 'Getting more replies';
-        if ($scope.feed[index].extraComments) {
+        $scope.feed[index].gettingReplies = true;
+        $scope.feed[index].repliesMessage = 'Getting more replies';
+        if ($scope.feed[index].extraComments.length > 0) {
           $scope.feed[index].comments = $scope.feed[index].comments.concat($scope.feed[index].extraComments);
           $scope.feed[index].extraComments = [];
           if (!$scope.feed[index].more) {
-            $scope.feed[index].repliesMessage = 'End of post';
+            $scope.feed[index].repliesMessage = '';
           } else {
             $scope.feed[index].repliesMessage = 'Show more replies';
           }
            $scope.feed[index].gettingReplies = false;
-        } else {
-          //get more replies from server.
+        } else if ($scope.feed[index].more){
+          var params = fbEvents.parseUrl($scope.feed[index].more, false);
+          server.getModalFeed(params, 'comments', $scope.eventId)
+            .then(function(response) {
+              $scope.feed[index] = processAllComments($scope.feed[index], response);
+            }, function(response) {
+              $scope.feed[index].repliesMessage = 'Failed to get more replies; Try Again';
+            })['finally'](function() {
+              $scope.feed[index].gettingReplies = false;
+            });
         }
+      }
+    };
+
+    $scope.showMoreFeed = function() {
+      if (notGettingMoreFeed) {
+        notGettingMoreFeed = false;
+        $scope.moreFeedMessage = "Getting more posts";
+        if ($scope.extraFeed.length > 0) {
+          $scope.feed = $scope.feed.concat($scope.extraFeed);
+          $scope.extraFeed = [];
+          if (nextFeed) {
+            $scope.moreFeedMessage = 'Show more posts';
+          } else {
+            $scope.moreFeedMessage = '';
+          }
+          notGettingMoreFeed = true;
+        } else if (nextFeed) {
+          $scope.moreFeedMessage = 'Getting more posts';
+          console.log('asmdasmdals');
+          var params = fbEvents.parseUrl(nextFeed, true);
+          params.id = $scope.eventId;
+          server.getModalFeed(params, 'feed', $scope.eventId)
+            .then(function(response) {
+              console.log(response);
+              feedObject = response;
+              processFeed();
+            }, function() {
+              $scope.moreFeedMessage = 'Failed to get more posts; Try again';
+            })['finally'](function() {
+              notGettingMoreFeed = true;
+            });
+        }
+      }
+    };
+
+    var rsvp = ['attending', 'maybe', 'declined']; 
+
+    //explain what key does for different actions (e.g. key is comment id when liking a comment)
+    //message is usally message except for like/unlike commment where it is the index
+    $scope.interactWithFb = function(action, key, message) {
+      var deferred = $q.defer();
+      console.log(message);
+      var index;
+      if ($scope.settings.commenting) {
+        console.log('running');
+        var processed = processAction(action, key, message);
+        if (!processed) {
+          deferred.reject();
+          return;
+        } else {
+          key = processed.key;
+          index = processed.index;
+          console.log('got to here');
+          if (fbSetup.getFbReady()) {
+            if (modalFbLogin.checkFirstTime()) {
+              modalFbLogin.checkLoginState()
+                .then(function() {
+                  handleFbInteraction(action, key, message, index, deferred);
+                }, function(response) {
+                  deferred.reject();
+                  setParams(action, key, message, index);
+                  handleFailedFbLogin(response);
+                });
+            } else {
+              var permission;
+              if (rsvp.indexOf(action) >= 0) {
+                permission = 'rsvp_event';
+              } else {
+                permission = 'publish_actions';
+              }
+              if (modalFbLogin.checkPermission(permission)) {
+                console.log('all permissions met');
+                handleFbInteraction(action, key, message, index, deferred);
+              } else {
+                modalFbLogin.loginWithPermission(permission, false)
+                  .then(function() {
+                    handleFbInteraction(action, key, message, index, deferred);
+                  }, function(response) {
+                    deferred.reject();
+                    setParams(action, key, message, index);
+                    handleFailedFbLogin(response);
+                  });
+              }
+            }
+          } else {
+            deferred.reject();
+            setParams(action, key, message, index);
+            $scope.showModal('wait');
+          }
+        }
+      } else {
+        deferred.reject();
+        location.reload();
+      }
+      return deferred.promise;
+    };
+
+    var processAction = function(action, key, message) {
+      var index;
+      if (action === 'like' || action === 'unlike') {
+        if($scope.feed[key].liking) {
+        //prevents problems if user mashes like button
+          return false;
+        } else {
+          $scope.feed[key].liking = true;
+        }
+      } else if (action === 'post' || action === 'comment') {
+        if (!message) {
+          return false;
+        }
+      } else if (action === 'deletePost') {
+        index = key;
+      }
+      if (rsvp.indexOf(action) >= 0 || action === 'post') {
+        key = $scope.eventId;
+      } else if (action === 'like' || action === 'unlike' ||
+                action === 'comment' || action === 'deletePost') {
+          index = key;
+          key = $scope.feed[key].id;
+      } else if (action === 'likeComment' || action === 'unlikeComment' ||
+                 action === 'deleteComment') {
+        for (var i = 0; i < $scope.feed.length; i++) {
+          if ($scope.feed[i].comments[message] &&
+              $scope.feed[i].comments[message].id === key) {
+            index = i;
+            break;
+          }
+        }
+        if ($scope.feed[index].comments[message].liking) {
+          return false;
+        } else {
+          $scope.feed[index].comments[message].liking = true;
+        }
+      }
+      return {key: key, index: index};
+    };
+
+    var handleFbInteraction = function(action, key, message, index, deferred) {
+      fbEvents.processInteraction(action, key, message)
+        .then(function(response) {
+          if (response) {
+            console.log('Successful!  ' + action);
+            if (rsvp.indexOf(action) >= 0) {
+              switch(action) {
+                case 'attending':
+                  $scope.rsvpStatus = 'Going';
+                  break;
+                case 'maybe':
+                  $scope.rsvpStatus = 'Maybe';
+                  break;
+                case 'declined':
+                  $scope.rsvpStatus = 'Declined';
+              }
+            } else {
+              switch(action) {
+                case 'post':
+                  var status = processStatus(response);
+                  status.appPosted = true;
+                  $scope.feed.unshift(status);
+                  break;
+                case 'like':
+                  $scope.feed[index].numberLikes++;
+                  $scope.feed[index].userLiked = true;
+                  break;
+                case 'unlike':
+                  $scope.feed[index].numberLikes--;
+                  $scope.feed[index].userLiked = false;
+                  break;
+                case 'likeComment':
+                  $scope.feed[index].comments[message].numberLikes++;
+                  $scope.feed[index].comments[message].userLiked = true;
+                  break;
+                case 'unlikeComment':
+                  $scope.feed[index].comments[message].numberLikes--;
+                  $scope.feed[index].comments[message].userLiked = false;
+                  break;
+                case 'comment':
+                  $scope.showMoreReplies(index);
+                  var comment = processComments(response);
+                  comment.appPosted = true;
+                  if ($scope.$$phase) {
+                    $scope.feed[index].comments.push(comment);
+                  } else {
+                    $scope.$apply($scope.feed[index].comments.push(comment));
+                  }
+                  break;
+                case 'deletePost':
+                  $scope.feed.splice(index, 1);
+                  break;
+                case 'deleteComment':
+                  $scope.feed[index].comments.splice(message, 1);
+              }
+            }
+            deferred.resolve();
+          }
+        }, function() {
+          setParams(action, key, message, index);
+          deferred.reject();
+          if (action === 'post' || action === 'comment') {
+            $scope.showModal('facebook', message);
+          } else {
+            $scope.showModal('facebook');
+          }
+        })['finally'](function() {
+            if (action.match(/likeComment/)) {
+              $scope.feed[index].comments[message].liking = false;
+            } else if (action.match(/like/)) {
+              $scope.feed[index].liking = false;
+            }
+        });
+    };
+
+    var setParams = function(action, key, message, index) {
+      var changedKeyActions = ['like' , 'unlike', 'comment', 'deletePost'];
+      if (changedKeyActions.indexOf(action) >= 0) {
+        interactionParams = {action: action,
+                             key: index,
+                             message: message
+                            };
+      } else {
+        interactionParams = {action: action,
+                             key: key,
+                             message: message
+                            };
+      }
+    };
+
+    var handleFailedFbLogin = function(response) {
+      if (['declined', 'not logged in', 'declined permission'].indexOf(response) >= 0) {
+        $scope.showModal(response);
+      } else {
+        $scope.showModal('facebook login');
       }
     };
 
 
 
     if (!$scope.eventId) {
-      showErrorModal();
-      $timeout(function() {
-        $wix.closeWindow('Closed Modal');
-      }, 7000);
+      $scope.showModal('load');
     } else {
       server.getModalEvent($scope.eventId, "all")
         .then(function(response) {
@@ -331,7 +744,7 @@ angular.module('fbCal')
           $scope.settings = response.settings;
           processEventInfo();
         }, function() {
-          showErrorModal();
+          $scope.showModal('load');
         });
       // eventInfo = {
       //               "description": "OMG this is the story of my life. Narwhal bicycle rights aesthetic fanny pack, art party ennui Brooklyn twee typewriter polaroid chia lo-fi Carles drinking vinegar pour-over. Chambray Pinterest ethical banjo church-key whatever hashtag XOXO. American Apparel Banksy twee, paleo bicycle rights readymade bitters. Seitan Wes.\n\nHoodie pork belly DIY pug VHS messenger bag, readymade four loko wolf occupy. Pop-up aesthetic Pitchfork Tumblr. Mumblecore hella DIY, McSweeney's lo-fi meggings yr banh mi trust fund Odd Future cardigan disrupt sartorial kale chips. Pitchfork organic keytar, roof party street art PBR&B Tumblr church-key High Life beard +1.", 

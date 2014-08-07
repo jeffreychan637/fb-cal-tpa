@@ -19,6 +19,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var getSettingsSettingsURL = '/GetSettingsSettings/' + compId;
   var getAllEventsURL = '/GetAllEvents/' + compId;
   var getModalEventURL = '/GetModalEvent/' + compId;
+  var getModalFeedURL = '/GetModalFeed/' + compId;
   var saveSettingsURL = '/SaveSettings/' + compId;
   var saveAccessTokenURL = '/SaveAccessToken/' + compId;
   var logoutURL = '/Logout/' + compId;
@@ -57,6 +58,24 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
       return {'X-Wix-Instance' : instance};
     } else {
       return {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'};
+    }
+  };
+
+  var getFeedHeader = function(params, desiredData, eventId) {
+    if (params.after) {
+      return {'X-Wix-Instance' : instance,
+              'object_id' : params.id,
+              'desired_data' : desiredData,
+              'event_id' : eventId,
+              'after' : params.after
+             };
+    } else {
+      return {'X-Wix-Instance' : instance,
+              'object_id' : params.id,
+              'desired_data' : desiredData,
+              'event_id' : eventId,
+              'until' : params.until
+             };
     }
   };
 
@@ -125,7 +144,8 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var getModalEvent = function(eventId, desiredData) {
     var modalHeader = {'X-Wix-Instance' : instance, 
                        'event_id' : eventId.toString(),
-                       'desired_data' : desiredData};
+                       'desired_data' : desiredData
+                      };
     var deferred = $q.defer();
     $http({
            method: 'GET',
@@ -142,7 +162,31 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
             } else {
               console.log('The server is returning an incorrect status.');
               deferred.reject();
-              //i don't really know what the fb_event_data looks like
+            }
+          }).error(function (message, status) {
+            console.error(status, message);
+            deferred.reject();
+          });
+    return deferred.promise;
+  };
+
+  var getModalFeed = function(params, desiredData, eventId) {
+    var deferred = $q.defer();
+    console.log('prints printer');
+    console.log(params, desiredData, eventId);
+    $http({
+           method: 'GET',
+           url: getModalFeedURL,
+           headers: getFeedHeader(params, desiredData, eventId),
+           timeout: 15000
+         }).success(function (data, status) {
+            if (status === 200) {
+              var response = jQuery.parseJSON(jQuery.parseJSON(data));  
+              console.log(response);
+              deferred.resolve(response);
+            } else {
+              console.log('The server is returning an incorrect status.');
+              deferred.reject();
             }
           }).error(function (message, status) {
             console.error(status, message);
@@ -206,6 +250,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     getUserInfo: getUserInfo,
     getAllEvents: getAllEvents,
     getModalEvent: getModalEvent,
+    getModalFeed: getModalFeed,
     saveData: saveData,
     logout: logout
   };

@@ -13,6 +13,12 @@ blockquote {
   margin: 0;
 }
 
+.loading {
+  position: absolute;
+  top: 245px;
+  left: 255px;
+}
+
 .app {
   border: 5px solid black;
   padding: 20px;
@@ -145,7 +151,7 @@ blockquote {
 }
 
 .going {
-  left: 1.57em;
+  left: 1.52em;
 }
 
 .maybe {
@@ -210,6 +216,10 @@ textarea {
   outline: none;
 }
 
+.load-feed {
+  margin: 0;
+}
+
 .push-left {
   padding-left: 15px;
 }
@@ -219,7 +229,7 @@ textarea {
 }
 
 
-.like-btn {
+.comment-btn {
   min-height: 34px;
 }
 
@@ -240,5 +250,38 @@ textarea {
   color: black !important;
 }
 
+.modal-btn-primary {
+  color: white !important;
+}
 
+.share-link {
+  color: #2A6496;
+}
 
+.share-link:hover {
+  color: #2A6496;
+}
+
+.animate-repeat {
+  box-sizing:border-box;
+}
+
+.animate-repeat.ng-move,
+.animate-repeat.ng-enter,
+.animate-repeat.ng-leave {
+  -webkit-transition:all linear 0.5s;
+  transition:all linear 0.5s;
+}
+
+.animate-repeat.ng-leave.ng-leave-active,
+.animate-repeat.ng-move,
+.animate-repeat.ng-enter {
+  opacity:0;
+  max-height:0;
+}
+
+.animate-repeat.ng-leave,
+.animate-repeat.ng-move.ng-move-active,
+.animate-repeat.ng-enter.ng-enter-active {
+  opacity:1;
+}

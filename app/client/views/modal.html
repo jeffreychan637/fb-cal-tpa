@@ -1,10 +1,11 @@
 <div ng-controller="ModalCtrl">
-  <div class="app" ng-show="eventInfo || true">
+  <h2 class="text-center loading" ng-hide="displayModal">Loading Event Details...</h2>
+  <div class="app" ng-show="displayModal">
     <div class="page-header" id="header">
-      <h1 class="name title"><a href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
-      <h6 class="name host">
-        <em>Hosted by <strong>{{owner}}</strong></em>
-      </h6>
+      <h1 id="title" class="title"><a ng-href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
+      <h5 id="host" class="host" ng-if="settings.hostedBy">
+        <em>Hosted by <strong><a ng-href="https://www.facebook.com/{{ownerId}}" target="blank">{{owner}}</a></strong></em>
+      </h5>
     </div>
     <div class="container-fluid">
       <div class="row">
@@ -14,13 +15,19 @@
               <span class="icon-mail icon"></span>
               <div class="dropdown rsvp">
                 <button class="btn btn-default dropdown-toggle" type="button" id="rsvp" data-toggle="dropdown">
-                  RSVP
+                  {{rsvpStatus}}
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Going</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Maybe</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Decline</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="interactWithFb('attending', undefined)">
+                    Going
+                  </a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="interactWithFb('maybe', undefined)">
+                    Maybe
+                  </a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="interactWithFb('declined', undefined)">
+                    Decline
+                  </a></li>
                 </ul>
               </div>
               <div class="dropdown rsvp">
@@ -29,8 +36,8 @@
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Via Facebook</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Get Event Link</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="shareFbEvent()">Via Facebook</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" ng-click="showModal('link')">Get Event Link</a></li>
                 </ul>
               </div>
             </div>
@@ -40,29 +47,29 @@
               <h4 class="main-text">
                 <span class="icon-friend icon friend" data-icon="e"></span>
                 <span ng-hide="stats || guestFailed">
-                  Getting Guest Stats...
+                  Loading Guest Stats...
                 </span>
                 <span ng-show="guestFailed">
                   No Guest Stats Available
                 </span>
-                <span class="event-stat going" ng-show="stats.attending_count >= 0">
+                <span class="event-stat going" ng-show="stats.attending_count || stats.attending_count >= 0">
                   {{stats.attending_count}}
                 </span>
-                <span class="event-stat maybe" ng-show="stats.unsure_count >= 0">
+                <span class="event-stat maybe" ng-show="stats.unsure_count || stats.unsure_count >= 0">
                   {{stats.unsure_count}}
                 </span>
-                <span class="event-stat invited" ng-show="stats.not_replied_count >= 0">
+                <span class="event-stat invited" ng-show="stats.not_replied_count || stats.not_replied_count >= 0">
                   {{stats.not_replied_count}}
                 </span>
               </h4>
               <h6 class="sub-text" ng-show="stats">
-                <span class="stat-label" ng-show="stats.attending_count >= 0">
+                <span class="stat-label" ng-show="stats.attending_count || stats.attending_count >= 0">
                   Going
                 </span>
-                <span class="stat-label" ng-show="stats.unsure_count >= 0">
+                <span class="stat-label" ng-show="stats.unsure_count || stats.unsure_count >= 0">
                   Maybe
                 </span>
-                <span class="stat-label" ng-show="stats.not_replied_count >= 0">
+                <span class="stat-label" ng-show="stats.not_replied_count || stats.not_replied_count >= 0">
                   Invited
                 </span>
               </h6>
@@ -104,25 +111,42 @@
           </div>
         </div>
       </div>
-      <div class="row">
+      <div class="row" ng-show="settings.commenting">
         <div class="col-sm-12 middle-col">
           <div class="block">
-            <form class="input-group">
-              <textarea placeholder="Post to event's Facebook page..." class="form-control"></textarea>
+            <form class="input-group" ng-model="postForm" id="postForm" name="postForm">
+              <textarea name="post" id="post" placeholder="Post to event's Facebook page..." class="form-control" ng-model="post"></textarea>
               <span class="input-group-btn">
-                <button type="submit" class="btn btn-default post-btn" type="button">Post!</button>
+                <button type="submit" class="btn btn-default post-btn" ng-click="interactWithFb('post', undefined, post); post = '';">Post!</button>
               </span>
             </form>
           </div>
         </div>
       </div>
-      <div ng-repeat="status in feed">
+      <div class="row" ng-hide="displayFeed || feedFailed">
+         <div class="col-sm-4 col-sm-offset-4">
+          <div class="block">
+            <h4 class="text-center load-feed">Loading Event Feed...</h4>
+            </div>
+        </div>
+      </div>
+      <div class="row" ng-show="feedFailed">
+         <div class="col-sm-4 col-sm-offset-4">
+          <div class="block">
+            <h4 class="text-center load-feed">Could not load Event Feed</h4>
+            </div>
+        </div>
+      </div>
+      <div ng-repeat="status in feed" ng-show="displayFeed" class="animate-repeat">
         <div class="row">
           <div class="col-sm-10 col-sm-offset-1">
-            <div class="block">
+            <div class="block" ng-mouseover="status.hoverOver = true" ng-mouseleave="status.hoverOver = false">
+              <button type="button" class="close" ng-click="interactWithFb('deletePost', $index, undefined)" ng-show="status.appPosted && status.hoverOver"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
               <blockquote><strong>{{status.name}}</strong> posted <em><span ng-bind-html="status.message"></span></em>
                 <br>
                 {{status.time}}
+                <a class="push-left" ng-show="status.like && !status.comment && settings.commenting && !status.userliked" ng-click="interactWithFb('like', $index, undefined)">Like</a>
+                 <a class="push-left" ng-show="status.like && !status.comment && settings.commenting && status.userliked" ng-click="interactWithFb('unlike', $index, undefined)">Unlike</a>
                 <span class="push-left" ng-show="status.numberLikes">
                   {{status.numberLikes}} Likes
                 </span>
@@ -139,20 +163,36 @@
                 <span ng-if="status.description">{{status.description}}</span>
               </blockquote>
             </div>
-            <div class="block add-on">
-              <div class="input-group">
+            <div class="block add-on" ng-show="status.comment && settings.commenting">
+              <form class="input-group" ng-if="status.like && status.comment">
                 <span class="input-group-btn">
-                  <button class="btn btn-default like-btn" type="button">Like</button>
+                  <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)" ng-hide="status.userLiked">
+                    Like
+                  </button>
+                  <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('unlike', $index, undefined)" ng-show="status.userLiked">
+                    Unlike
+                  </button>
                 </span>
-                <input type="text" class="form-control" placeholder="Comment...">
-              </div>
+                <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment">
+                <span class="input-group-btn">
+                  <button class="btn btn-default comment-btn" type="submit" ng-click="interactWithFb('comment', $index, visitorComment); visitorComment = '';">Post!</button>
+                </span>
+              </form>
+              <form class="input-group" ng-if="!status.like && status.comment">
+                <input type="text" class="form-control" placeholder="Comment..." ng-model="visitorComment">
+                <span class="input-group-btn">
+                  <button class="btn btn-default comment-btn" type="submit" ng-click="interactWithFb('comment', $index, vistorComment); visitorComment = '';">Post!</button>
+                </span>
+              </form>
             </div>
-            <div class="block add-on" ng-if="status.comments">
-              <div ng-repeat="comment in status.comments">
-                <blockquote><strong>{{comment.name}}</strong> replied <em>{{comment.message}}</em>
+            <div class="block add-on" ng-if="status.comments && status.comments.length > 0">
+              <div ng-repeat="comment in status.comments" ng-mouseover="comment.hoverOver = true" ng-mouseleave="comment.hoverOver = false">
+                <button type="button" class="close" ng-click="interactWithFb('deleteComment', comment.id, $index)" ng-show="comment.appPosted && comment.hoverOver"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
                   {{comment.time}}
-                  <a class="push-left">Like</a>
+                  <a class="push-left" ng-show="settings.commenting && !comment.userLiked" ng-click="interactWithFb('likeComment', comment.id, $index)">Like</a>
+                  <a class="push-left" ng-show="settings.commenting && comment.userLiked" ng-click="interactWithFb('unlikeComment', comment.id, $index)">Unlike</a>
                   <span class="push-left" ng-show="comment.numberLikes">{{comment.numberLikes}} Likes</span>
                 </blockquote>
               </div>
@@ -163,25 +203,71 @@
       </div>
       <div class="row">
          <div class="col-sm-4 col-sm-offset-4">
-          <div class="block">
-            <p class="text-center load-posts" ng-show="loadMoreFeed">Load more posts</p>
+          <div class="block" ng-if="moreFeedMessage">
+            <h4 class="text-center load-posts" ng-click="showMoreFeed()">{{moreFeedMessage}}</h4>
             </div>
         </div>
       </div>
     </div>
-    <div class="modal fade" id="message" tabindex="-1" role="dialog" aria-labelledby="messageTitle" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="messageTitle">{{messageTitle}}</h4>
-          </div>
-          <div class="modal-body">
+  </div>
+  <div class="modal fade" id="message" tabindex="-1" role="dialog" aria-labelledby="messageTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="messageTitle">{{messageTitle}}</h4>
+        </div>
+        <div class="modal-body">
+          <p>
             {{messageBody}}
+            <a class="share-link" ng-show="showLink" ng-href="https://www.facebook.com/events/{{id}}" target="blank">
+              https://www.facebook.com/events/{{id}}
+            </a>
+          </p>
+          <p ng-show="postError">
+            Potential Reasons for Error
+            <ol ng-show="postError">
+              <li>
+                If your RVSP status is not <strong>going</strong> or <strong>maybe</strong>, Facebook does not allow you to post or comment.
+              </li>
+              <li>
+                If you granted us permission to post but to only share these posts with <em>yourself</em>, then we cannot post to an event page for you where <em>posts are open to all event invitees</em>. You can change this through your Facebook account settings.
+              </li>
+            </ol>
+          </p>
+          <div ng-show="postError">
+            <p>
+              If it helps, here's your post so you don't have to retype it again. Or just click <em>Try Again</em> to auto retry.
+            </p>
+            <p>
+              {{userPost}}
+            </p>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default modal-btn" data-dismiss="modal">Close</button>
+          <div ng-show="permissionError">
+            <p>
+              Here’s a quick explanation of the permissions we need access to.
+            </p>
+            <ul>
+              <li>
+                <strong>Public Profile:</strong> All requests to Facebook for permissions grants us this. We don’t use this information at all, but Facebook gives us no choice but to request for it.
+              </li>
+              <br>
+              <li>
+                <strong>Managing your events:</strong> This gives us permission to change your RSVP status to the Facebook event.
+              </li>
+              <br>
+              <li>
+                <strong>Posting:</strong> This gives permission to post on the event wall as well as like/comment on other posts.
+              </li>
+            </ul>
+            <p>
+              Feel free to only grant permissions for the actions you want to do on this webpage. We only perform the actions you request and will never misuse your trust.
+            </p>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-btn" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary modal-btn-primary" ng-hide="messageTitle === 'Trying again...' || showLink" ng-click="solveError()">{{modalButton}}</button>
         </div>
       </div>
     </div>
