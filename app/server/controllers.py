@@ -3,7 +3,7 @@ from app import flask_app
 from status_codes import STATUS
 from wix_verifications import instance_parser
 from fb import get_long_term_token, get_event_data, get_user_name, \
-               get_all_event_data, get_specific_event
+               get_all_event_data, get_specific_event, get_more_feed
 from models import save_settings, get_settings, delete_info
 from flask.ext.restful import Resource, Api, abort
 import json
@@ -28,11 +28,16 @@ class GetSettingsSettings(Resource):
 
 class GetAllEvents(Resource):
     def get(self, compID):
-        return get_event(request, compID, True)
+        return get_event(request, compID, "all")
 
 class GetModalEvent(Resource):
     def get(self, compID):
-        return get_event(request, compID, False)
+        return get_event(request, compID, "specific")
+
+class GetModalFeed(Resource):
+    def get(self, compID):
+        return get_event(request, compID, "feed")
+
 
 class Logout(Resource):
     def put(self, compID):
@@ -49,6 +54,7 @@ api.add_resource(GetSettingsWidget, "/GetSettingsWidget/<string:compID>")
 api.add_resource(GetSettingsSettings, "/GetSettingsSettings/<string:compID>")
 api.add_resource(GetAllEvents, "/GetAllEvents/<string:compID>")
 api.add_resource(GetModalEvent, "/GetModalEvent/<string:compID>")
+api.add_resource(GetModalFeed, "/GetModalFeed/<string:compID>")
 api.add_resource(Logout, "/Logout/<string:compID>")
 
 def validate_put_request(request, datatype):
@@ -97,18 +103,33 @@ def validate_get_request(request, request_from):
             window = request.headers["URL"]
             if window != "editor.wix.com":
                 abort(STATUS["Forbidden"], message="Not Inside Editor")
-        if request_from == "modal":
+        if request_from == "modal" or request_from == "modalNeedingMoreFeed":
             event_id = request.headers["event_id"]
             desired_data = request.headers["desired_data"]
+        if request_from == "modalNeedingMoreFeed":
+            object_id = request.headers["object_id"]
+            if "until" in request.headers:
+                until = request.headers["until"]
+                after = None
+            else:
+                after = request.headers["after"]
+                until = None
     except AttributeError:
         abort(STATUS["Unauthorized"], message="Request Incomplete")
     except KeyError:
         abort(STATUS["Unauthorized"], message="Missing Value")
     if not instance_parser(instance):
         abort(STATUS["Forbidden"], message="Invalid Instance")
-    if request_from == "modal":
-        return {"instance" : instance, "event_id" : event_id, \
+    if request_from == "modal" or request_from == "modalNeedingMoreFeed":
+        info = {"instance" : instance, "event_id" : event_id, \
                 "desired_data" : desired_data}
+        if not (request_from == "modalNeedingMoreFeed"):
+            return info
+        else:
+            info["object_id"] = object_id
+            info["until"] = until
+            info["after"] = after
+            return info
     else:
         return instance
 
@@ -187,14 +208,21 @@ def get_data(request, compID, request_from_widget):
         full_json = json.dumps(full_settings)
         return full_json
 
-def get_event(request, compID, all_events):
-    if (all_events):
+def get_event(request, compID, datatype):
+    if (datatype == "all"):
         instance = validate_get_request(request, "settings")
-    else:
+    elif (datatype == "specific"):
         info = validate_get_request(request, "modal")
+    else:
+        info = validate_get_request(request, "modalNeedingMoreFeed")
+    if (datatype != "all"):
         instance = info["instance"]
         event_id = info["event_id"]
         desired_data = info["desired_data"]
+    if (datatype == "feed"):
+        object_id = info["object_id"]
+        after = info["after"]
+        until = info["until"]
     db_entry = get_settings(compID, instance)
     if db_entry is None:
         abort(STATUS["Internal_Server_Error"], \
@@ -202,9 +230,10 @@ def get_event(request, compID, all_events):
     if not (db_entry and db_entry.access_token_data):
         abort(STATUS["Not_Found"], message= "Could not find User")
     access_token_data = json.loads(db_entry.access_token_data)
-    if (all_events):
+    if (datatype == "all"):
         event_data = get_all_event_data(access_token_data)
     else:
+        access_token = access_token_data["access_token"]
         if not (db_entry.events):
             abort(STATUS["Not_Found"], message= "User has no events to display")
         events = json.loads(db_entry.events)
@@ -214,8 +243,12 @@ def get_event(request, compID, all_events):
                 found = True
                 break;
         if (found):
-            event_data = get_specific_event(event_id, access_token_data["access_token"], \
+            if (datatype == "specific"):
+                event_data = get_specific_event(event_id, access_token, \
                                             desired_data)
+            else:
+                event_data = get_more_feed(object_id, access_token, \
+                                           desired_data, after, until)
             if not event_data:
                 abort(STATUS["Bad_Gateway"],
                 message="Couldn't receive data from Facebook")

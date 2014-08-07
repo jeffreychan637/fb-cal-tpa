@@ -323,6 +323,7 @@ angular.module('fbCal')
         nextFeed = feedObject.paging.next;
         $scope.moreFeedMessage = "Show more posts";
       } else {
+        nextFeed = false;
         $scope.moreFeedMessage = "";
       }
       var data = feedObject.data;
@@ -330,7 +331,7 @@ angular.module('fbCal')
         for (var i = 0; i < data.length; i++) {
           if (data[i].message) {
             var status = processStatus(data[i]);
-            if ($scope.feed.length < 5) {
+            if ($scope.feed.length < 5 || i < 5) {
               $scope.feed.push(status);
             } else {
               $scope.extraFeed.push(status);
@@ -342,6 +343,7 @@ angular.module('fbCal')
         }
       } else {
         $scope.moreFeedMessage = "";
+        nextFeed = false;
       }
       $scope.displayFeed = true;
     };
@@ -386,25 +388,38 @@ angular.module('fbCal')
       status.comments = [];
       status.extraComments = [];
       if (data.comments) {
-        var comments = data.comments.data;
-        if (comments) {
-          for (var j = 0; j < comments.length; j++) {
-            var comment = processComments(comments[j]);
-            if (status.comments.length < 5) { 
-              status.comments.push(comment);
-            } else {
-              status.extraComments.push(comment);
-            }
+        status = processAllComments(status, data.comments);
+      }
+      return status;
+    };
+
+    var processAllComments = function(status, comments) {
+      var data = comments.data;
+      if (data) {
+        for (var j = 0; j < data.length; j++) {
+          var comment = processComments(data[j]);
+          if (status.comments.length < 5 || j < 5) { 
+            status.comments.push(comment);
+          } else {
+            status.extraComments.push(comment);
           }
         }
-        if (data.comments.paging) {
-          if (data.comments.paging.next) {
-              status.more = data.comments.paging.next;
-          }
+      } else {
+        status.more = false;
+      }
+      if (comments.paging) {
+        if (comments.paging.next) {
+            status.more = comments.paging.next;
+        } else {
+          status.more = false;
         }
-        if (status.more || status.extraComments.length > 0) {
-          status.repliesMessage = 'Show more replies';
-        }
+      } else {
+        status.more = false;
+      }
+      if (status.more || status.extraComments.length > 0) {
+        status.repliesMessage = 'Show more replies';
+      } else {
+        status.repliesMessage = "";
       }
       return status;
     };
@@ -452,9 +467,15 @@ angular.module('fbCal')
           }
            $scope.feed[index].gettingReplies = false;
         } else if ($scope.feed[index].more){
-          // var info = fbEvents.parseFbUrl($scope.feed.more);
-          //get more replies from server.
-          $scope.feed[index].gettingReplies = false;
+          var params = fbEvents.parseUrl($scope.feed[index].more, false);
+          server.getModalFeed(params, 'comments', $scope.eventId)
+            .then(function(response) {
+              $scope.feed[index] = processAllComments($scope.feed[index], response);
+            }, function(response) {
+              $scope.feed[index].repliesMessage = 'Failed to get more replies; Try Again';
+            })['finally'](function() {
+              $scope.feed[index].gettingReplies = false;
+            });
         }
       }
     };
@@ -472,9 +493,21 @@ angular.module('fbCal')
             $scope.moreFeedMessage = '';
           }
           notGettingMoreFeed = true;
-        } else {
-          // var info = fbEvents.parseFbUrl(nextFeed);
-          //make server call
+        } else if (nextFeed) {
+          $scope.moreFeedMessage = 'Getting more posts';
+          console.log('asmdasmdals');
+          var params = fbEvents.parseUrl(nextFeed, true);
+          params.id = $scope.eventId;
+          server.getModalFeed(params, 'feed', $scope.eventId)
+            .then(function(response) {
+              console.log(response);
+              feedObject = response;
+              processFeed();
+            }, function() {
+              $scope.moreFeedMessage = 'Failed to get more posts; Try again';
+            })['finally'](function() {
+              notGettingMoreFeed = true;
+            });
         }
       }
     };

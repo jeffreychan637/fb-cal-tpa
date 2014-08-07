@@ -161,3 +161,16 @@ def get_user_name(access_token_data):
     except facebook.GraphAPIError, e:
         print e.message
         return ""
+
+def get_more_feed(object_id, access_token, desired_data, after, until):
+    try:
+        graph = facebook.GraphAPI(access_token)
+        if after:
+            feed = graph.get_object("/" + object_id + "/" + desired_data, after = after)
+        else:
+            feed = graph.get_object("/" + object_id + "/" + desired_data, until = until)
+        print feed
+        return feed
+    except facebook.GraphAPIError, e:
+        print e.message
+        return {}

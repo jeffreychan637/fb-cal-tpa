@@ -15,7 +15,8 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     return deferred.promise;
   };
 
-  var afterRegex = /after=([0-9=]+)/;
+  var commentIdRegex = /\/([0-9_]+)\/comments/;
+  var afterRegex = /after=([0-9a-zA-Z=]+)/;
   var untilRegex = /until=([0-9a-zA-Z]+)/;
 
   var getAllEvents = function(deferred, userId) {
@@ -64,6 +65,40 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
       }
     });
   };
+//look for after and until
+  var parseUrl = function(url, gettingFeed) {
+    var commentId;
+    var afterPattern = url.match(afterRegex);
+    if (afterPattern) {
+      if (gettingFeed) {
+        return {after : afterPattern[1]};
+      } else {
+        commentId = parseCommentId(url);
+        return {id : commentId, after : afterPattern[1]};
+      }
+    } else {
+      var untilPattern = url.match(untilRegex);
+      if (untilPattern) {
+        if (gettingFeed) {
+          return {until : untilPattern[1]};
+        } else {
+          commentId = parseCommentId(url);
+          return {id : commentId, until : untilPattern[1]};
+        }
+      } else {
+        console.error('Could not parse Url');
+      }
+    }
+  };
+
+  var parseCommentId = function(url) {
+    var commentIdPattern = url.match(commentIdRegex);
+    if (commentIdPattern) {
+      return commentIdPattern[1];
+    } else {
+      console.error('Could not parse Url');
+    }
+  }; 
 
   var getRsvpStatus = function(eventId) {
     var deferred = $q.defer();
@@ -200,6 +235,7 @@ angular.module('fbCal').factory('fbEvents', function ($log, $q) {
     shareEvent: shareEvent,
     getUserEventDetails: getUserEventDetails,
     processInteraction: processInteraction,
-    getRsvpStatus: getRsvpStatus
+    getRsvpStatus: getRsvpStatus,
+    parseUrl: parseUrl
   };
 });
