@@ -137,7 +137,7 @@
             </div>
         </div>
       </div>
-      <div ng-repeat="status in feed" ng-show="displayFeed">
+      <div ng-repeat="status in feed" ng-show="displayFeed" class="animate-repeat">
         <div class="row">
           <div class="col-sm-10 col-sm-offset-1">
             <div class="block" ng-mouseover="status.hoverOver = true" ng-mouseleave="status.hoverOver = false">
@@ -186,7 +186,7 @@
               </form>
             </div>
             <div class="block add-on" ng-if="status.comments && status.comments.length > 0">
-              <div ng-repeat="comment in status.comments" ng-mouseover="comment.hoverOver = true" ng-mouseleave="comment.hoverOver = false">
+              <div ng-repeat="comment in status.comments" ng-mouseover="comment.hoverOver = true" ng-mouseleave="comment.hoverOver = false" class="animate-repeat">
                 <button type="button" class="close" ng-click="interactWithFb('deleteComment', comment.id, $index)" ng-show="comment.appPosted && comment.hoverOver"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
