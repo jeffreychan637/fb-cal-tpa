@@ -5,7 +5,9 @@
  *
  * User: Sergey Romanov <serg4172@mail.ru>
  *
- * Adapted by: Jeffrey Chan
+ * Adapted and Updated for Use in Wix Facebook Calendar by: Jeffrey Chan
+ *
+ * This file handles all the rendering of the calendar used in the widget.
  */
 "use strict";
 
@@ -1279,11 +1281,8 @@ if(!String.prototype.formatNum) {
 	}
 
 	var openModal = function(eventId) {
-		var url = 'http://localhost:5000/modal/' + eventId;
-		var onClose = function(message) { 
-  		console.log("modal closed", message);
-		};
-		console.debug('hello open modal', url);
-     Wix.openModal(url, 850, 600, onClose);
+		var url = window.location.protocol + '//' + window.location.host + '/modal/' + eventId;
+		var onClose = function(message) {};
+    Wix.openModal(url, 850, 600, onClose);
 	}
 }(jQuery));
