@@ -1,6 +1,14 @@
 'use strict';
 /*global $:false, console:false, location:false */
 
+/**
+ * This is the Controller of the Modal. It is the main file that sends
+ * info to be displayed on the DOM to the user and calls different functions
+ * across different files to do so.
+ *
+ * @author Jeffrey Chan
+ */
+
 angular.module('fbCal')
   .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, $q, 
                                      $timeout, $window, eventId, server,
@@ -22,6 +30,8 @@ angular.module('fbCal')
     var interactionParams = {};
 
     // $scope.eventId = "1512622455616642";
+ 
+    // MOVE ALL PROCESS STUFF OUT AND SHOW MODAL
 
     var watchFb = $scope.$watch(function() {
                     return fbSetup.getFbReady();
@@ -84,17 +94,18 @@ angular.module('fbCal')
         if (message) {
           $scope.postError = true;
           $scope.userPost = message;
+          //call some prepareModal function elsewhere but leave this line here
         }
       } else if (type === 'link') {
         $scope.messageTitle = linkModal.title;
-        $scope.showLink = true;
+        $scope.showLink = true; // also this type === 'link'
       }
         else if (type === 'wait') {
         $scope.messageTitle = waitModal.title;
         $scope.messageBody = waitModal.message;
         $scope.modalButton = waitModal.modalButton;
       } else {
-        $scope.permissionError = true;
+        $scope.permissionError = true; //also this or maybe just return what to do in prepareModal
         $scope.messageTitle = permissionModal.title;
         $scope.modalButton = permissionModal.modalButton;
         switch(type) {
@@ -108,7 +119,7 @@ angular.module('fbCal')
             $scope.messageBody = permissionModal.notLoggedInMessage;
         }
       }
-      $timeout(function() {
+      $timeout(function() { //leave this here
         $('#message').modal('show');
       }, 500);
     };
@@ -394,6 +405,7 @@ angular.module('fbCal')
     };
 
     var processAllComments = function(status, comments) {
+      console.log(comments);
       var data = comments.data;
       if (data) {
         for (var j = 0; j < data.length; j++) {
@@ -466,7 +478,7 @@ angular.module('fbCal')
             $scope.feed[index].repliesMessage = 'Show more replies';
           }
            $scope.feed[index].gettingReplies = false;
-        } else if ($scope.feed[index].more){
+        } else if ($scope.feed[index].more) {
           var params = fbEvents.parseUrl($scope.feed[index].more, false);
           server.getModalFeed(params, 'comments', $scope.eventId)
             .then(function(response) {
@@ -476,6 +488,8 @@ angular.module('fbCal')
             })['finally'](function() {
               $scope.feed[index].gettingReplies = false;
             });
+        } else {
+          $scope.feed[index].repliesMessage = '';
         }
       }
     };
@@ -495,7 +509,6 @@ angular.module('fbCal')
           notGettingMoreFeed = true;
         } else if (nextFeed) {
           $scope.moreFeedMessage = 'Getting more posts';
-          console.log('asmdasmdals');
           var params = fbEvents.parseUrl(nextFeed, true);
           params.id = $scope.eventId;
           server.getModalFeed(params, 'feed', $scope.eventId)
