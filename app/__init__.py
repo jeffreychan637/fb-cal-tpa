@@ -1,5 +1,6 @@
 """This file defines the Flask server that this app runs on."""
 
+from os import environ
 from flask import Flask
 
 __author__ = "Jeffrey Chan"
@@ -19,7 +20,11 @@ class MyFlask(Flask):
             return 0
         return Flask.get_send_file_max_age(self, name)
 
-flask_app = MyFlask(__name__, static_folder="client", template_folder="client");
+if "HEROKU" in environ:
+    flask_app = Flask(__name__)
+else:
+    flask_app = MyFlask(__name__, static_folder="client", 
+                                  template_folder="client")
 
 """These imports allow the Flask app to work. It allows us to start the server
 in this file where we can see the "client" directory rather than in the server
