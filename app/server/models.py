@@ -2,19 +2,36 @@
 package.
 """
 
+from os import environ
+from urlparse import uses_netloc, urlparse
 from peewee import Model, MySQLDatabase, CharField, TextField, \
                    CompositeKey, PostgresqlDatabase
 
 __author__ = "Jeffrey Chan"
 
 """The database type is defined here. For development, I have used a MySQL DB,
-but the production version of this app uses a Postgres DB. If you need to change
-the DB for whatever reason, just change the line defining "db".
+but the production version of this app uses a Heroku Postgres DB. If you need to
+change the DB for whatever reason, just change the line defining "db", providing
+the neccesary information to connect to that database.
 """
-db = MySQLDatabase('fbCalDB', user='root')
-#db = PostgresqlDatabase('my_database', user='code')
-# if your Postgres template doesn't use UTF8, you can set the connection encoding like so:
-#db.get_conn().set_client_encoding('UTF8')
+
+if "HEROKU" in environ:
+    uses_netloc.append("postgres")
+    url = urlparse(environ["DATABASE_URL"])
+    DATABASE = {
+        "name": url.path[1:],
+        "user": url.username,
+        "password": url.password,
+        "host": url.hostname,
+        "port": url.port,
+    }
+    db = PostgresqlDatabase(DATABASE["name"], user=DATABASE["user"], 
+                                              password=DATABASE["password"],
+                                              host=DATABASE["host"],
+                                              port=DATABASE["port"])
+    db.get_conn().set_client_encoding('UTF8')
+else:
+    db = MySQLDatabase("fbCalDB", user="root")
 
 
 class BaseModel(Model):

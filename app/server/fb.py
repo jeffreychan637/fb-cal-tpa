@@ -1,11 +1,16 @@
 """This file handles all interactions with Facebook on the server."""
 
 from json import loads
+from os import environ
 from re import compile, sub
 from time import time
 import facebook
-from secrets import fb_keys
 from models import get_settings
+
+if "HEROKU" in environ:
+  fb_keys = environ["fb_keys"]
+else:
+  from secrets import fb_keys
 
 __author__ = "Jeffrey Chan"
 

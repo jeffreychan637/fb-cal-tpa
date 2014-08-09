@@ -2,7 +2,12 @@
 this app.
 """
 
-from secrets import wix_keys
+from os import environ
+
+if "HEROKU" in environ:
+  wix_keys = environ["wix_keys"]
+else:
+  from secrets import wix_keys
 
 __author__ = "Jeffrey Chan"
 
