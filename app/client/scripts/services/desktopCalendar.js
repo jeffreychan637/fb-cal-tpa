@@ -1,30 +1,56 @@
 'use strict';
 /*global $:false */
 
-angular.module('fbCal').factory('desktopCalendar', function ($log, $wix, $rootScope) {
+/**
+ * This factory is used for initializing the calendar of events in the widget.
+ *
+ * @author Jeffrey Chan
+ */
 
-  var setup = function(eventData, scope) {
+angular.module('fbCal').factory('desktopCalendar', function ($wix, $rootScope) {
+
+  /**
+   * This function initializes the calendar in the widget with the provided 
+   * event data. It also sets up the navigation buttons and makes the border
+   * an appropiate width based on the user's settings.
+   *
+   * To start the calendar, you need to provide:
+   *   The path to the template files
+   *   The event data
+   *
+   * Optionally you can provide:
+   *   1. A function on what to do after each event load. The commented out code
+   *      right now is a function to build an event list. This feature is never
+   *      used but can be created by simply commenting this code and the 
+   *      corresponding line (also commented out) in the widget HTML file
+   *   2. A function to call after the view is loaded (Reloads happen when the
+   *      user navigates to anther month). Right now the function just tells the
+   *      DOM element what the month the Calendar is on so it can display it
+   *      to the user.
+   * 
+   * @param  {Array} eventData The events to be placed on the calendar
+   */
+  var setup = function(eventData) {
     var processedData = processEventData(eventData);
     var calendar = $("#calendar").calendar(
         {
-           tmpl_path: "client/bower_components/bootstrap-calendar/tmpls/",
+           tmpl_path: "client/views/tmpls/",
            events_source: processedData,
-            onAfterEventsLoad: function(events) {
-              if(!events) {
-                return;
-              }
-              var list = $('#eventlist');
-              list.html('');
+            // onAfterEventsLoad: function(events) {
+            //   if(!events) {
+            //     return;
+            //   }
+            //   var list = $('#eventlist');
+            //   list.html('');
 
-              $.each(events, function(key, val) {
-                $(document.createElement('li'))
-                  .html('<a href="' + val.url + '">' + val.title + '</a>')
-                  .appendTo(list);
-              });
-            },
+            //   $.each(events, function(key, val) {
+            //     $(document.createElement('li'))
+            //       .html('<a href="' + val.url + '">' + val.title + '</a>')
+            //       .appendTo(list);
+            //   });
+            // },
             onAfterViewLoad: function(view) {
               $('#current-view').text(this.getTitle());
-              $rootScope.$broadcast('View Loaded');
             }
           });
     $('.btn-group button[data-calendar-nav]').each(function() {
@@ -40,11 +66,16 @@ angular.module('fbCal').factory('desktopCalendar', function ($log, $wix, $rootSc
                        'margin-bottom' : '10px'
                       };
     $('#header').css(borderStyle);
-    //add something using addAttr to add ng-change to urls
-    //remove url atttrubutes too
-
   };
 
+  /**
+   * Proceses the event data so it is usuable by the calendar. This calendar
+   * only accepts events with times provided in milliseconds. It also sets the
+   * color of the event on the calendar based on user preferences.
+   * 
+   * @param  {Array} events List of events to be processed
+   * @return {Array}        List of processed events
+   */
   var processEventData = function(events) {
     var processedEvents = [];
     var processedEvent;

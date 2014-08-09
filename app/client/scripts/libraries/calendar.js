@@ -5,7 +5,9 @@
  *
  * User: Sergey Romanov <serg4172@mail.ru>
  *
- * Adapted by: Jeffrey Chan
+ * Adapted and Updated for Use in Wix Facebook Calendar by: Jeffrey Chan
+ *
+ * This file handles all the rendering of the calendar used in the widget.
  */
 "use strict";
 
@@ -480,11 +482,22 @@ if(!String.prototype.formatNum) {
 			var s = new Date(parseInt(e.start));
 			var f = new Date(parseInt(e.end));
 
+			if (!isSameDay(s, f)) {
+				e.start_day = s.toLocaleDateString() + ' ';
+			} else {
+				e.start_day = '';
+			}
 			e.start_hour = convert_to_12_hours_format(s);
 			e.end_hour = convert_to_12_hours_format(f);
 			data.events.push(e);
 		});
 	};
+
+		var isSameDay = function(a, b) {
+		return (a.getDate() === b.getDate() &&
+						a.getMonth() === b.getMonth() &&
+						a.getFullYear() === b.getFullYear());
+		};
 
 	var convert_to_12_hours_format = function(event_time) {
 		var AM_PM;
@@ -1279,11 +1292,8 @@ if(!String.prototype.formatNum) {
 	}
 
 	var openModal = function(eventId) {
-		var url = 'http://localhost:5000/modal/' + eventId;
-		var onClose = function(message) { 
-  		console.log("modal closed", message);
-		};
-		console.debug('hello open modal', url);
-     Wix.openModal(url, 850, 600, onClose);
+		var url = window.location.protocol + '//' + window.location.host + '/modal/' + eventId;
+		var onClose = function(message) {};
+    Wix.openModal(url, 850, 600, onClose);
 	}
 }(jQuery));

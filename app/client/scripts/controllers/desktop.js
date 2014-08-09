@@ -1,52 +1,65 @@
 'use strict';
-/*global $:false, console:false */
+/*global $:false */
+
+/**
+ * This is the Controller of the Widget. It is the main file that sends
+ * info to be displayed on the DOM to the user and calls different functions
+ * across different files to do so.
+ *
+ * @author Jeffrey Chan
+ */
 
 angular.module('fbCal')
-  .controller('DesktopCtrl', function ($scope, $wix, api, $log,
-                                       desktopCalendar, list, fbSetup, server) {
+  .controller('DesktopCtrl', function ($scope, $wix, $window, desktopCalendar,
+                                       list, server) {
 
-    var eventData;
+    var eventData = [];
 
-
+    /**
+     * Calls the appropriate function in List.js to get appropriate style for
+     * the event object.
+     * 
+     * @param  {Boolean} last Whether or not this is the last item in the list
+     * @return {Object}       Appropriate CSS style for this Event object
+     */
     $scope.listStyle = function(last) {
       return list.listStyle(last);
     };
 
-    $scope.openModal = function(location) {
-      var eventId;
-      if ($scope.settings.view === 'Month') {
-        console.log(eventData);
-        eventId = location;
-      } else {
-        eventId = $scope.eventList[location].id;
-      }
-      var url = 'http://localhost:5000/modal/' + eventId;
-      var onClose = function(message) { 
-        console.log("modal closed", message);
-        api.modalEvent = undefined;
-      };
-      console.debug('hello open modal');
+    /**
+     * Opens the Modal. This function is only used in List View. In calendar.js,
+     * there is a corresponding function that opens the modal in Calendar View.
+     * 
+     * @param  {Number} index The index of the event that we want to open the
+     *                        modal of in the eventList array.
+     */
+    $scope.openModal = function(index) {
+      var eventId = $scope.eventList[index].id;
+      var url = $window.location.protocol + '//' + $window.location.host + '/modal/' + eventId;
+      var onClose = function(message) {};
       $wix.openModal(url, 850, 600, onClose);
     };
 
-
-    $scope.$on('View Loaded', function() {
-      for (var i = 0; i < eventData.length; i++) {
-        $('#day' + eventData[i].id).click(function() {
-          $scope.openModal(this.id.replace(/day/, ''));
-        });
-      }
-    });
-
+    /**
+     * Gets the settings from the Server.
+     */
     var getSettings = function() {
       server.getUserInfo('widget').then(function(response) {
         setSettings(response);
       }, function(response) {
-        console.error("Server failed to get settings");
         setSettings(response);
       });
     };
 
+    /**
+     * Sets the settings from the server and sends the event data to the
+     * appropriate setup function (based on the view) to be processed. The
+     * setup functions setup the list or calendar so that they contain the
+     * events in the event data.
+     * 
+     * @param {Object} response The reponse from the server containing the
+     *                          settings and the event data.
+     */
     var setSettings = function(response) {
       $scope.settings = response.settings;
       /**
@@ -57,9 +70,6 @@ angular.module('fbCal')
        *    Active stuff here to tell user to active app.
        * }
        */
-      response.fb_event_data = response.fb_event_data.concat([{name: 'My Event (Demo for Wix App)', start_time: '2014-07-11T19:00:00-0700', location: '', timezone: 'America/Los_Angeles', id: '1512622455616642', end_time: '2014-07-11T22:00:00-0700', eventColor: '#234323'}, 
-      {'name': 'IHS INTERACT Second Semester adsdasd asdasd asdasdas Board Applications', start_time: '2014-07-19T23:50:00-0700', location: '', timezone: 'America/Los_Angeles', id: '539472619397830', end_time: '2014-07-19T23:55:00-0700', eventColor: '#87683F'}]);
-      console.debug(response.fb_event_data);
       eventData = response.fb_event_data;
       if ($scope.settings.view === "Month") {
         desktopCalendar.setup(eventData);
@@ -71,10 +81,11 @@ angular.module('fbCal')
     /** 
      * When the site owner updates the settings, this added event listener
      * allows the widget to implement these changes immediately.
+     *
+     * View changes in the settings panel results in the appropriate setup
+     * funtion being called.
      */
     $wix.addEventListener($wix.Events.SETTINGS_UPDATED, function(message) {
-      console.log('message');
-      console.log(message);
       if (message.settings.view === 'Month' && $scope.settings.view === 'List') {
         desktopCalendar.setup(eventData);
       } else if (message.settings.view === 'List' && $scope.settings.view === 'Month') {

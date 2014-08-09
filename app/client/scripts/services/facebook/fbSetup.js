@@ -1,20 +1,46 @@
 'use strict';
-/*global FB:false, console:false */
+/*global FB:false, document:false */
 
-angular.module('fbCal').factory('fbSetup', function ($log, $window, server, $rootScope) {
+/**
+ * The factory handles the setup of the Facebook SDK.
+ *
+ * @author Jeffrey Chan
+ */
+
+angular.module('fbCal').factory('fbSetup', function ($window, server, $rootScope) {
 
   var fbReady = false;
 
+  /**
+   * Valid Hosts to save Access Token.
+   * @type {Array}
+   */
   var validHosts = ['editor.wix.com', 'localhost'];
 
+  /**
+   * Checks whether the current host is valid.
+   * 
+   * @param  {String} currentHost Current Host
+   * @return {Boolean}            Whether the current host is valid.
+   */
   var  checkValidHost = function(currentHost) {
    return validHosts.indexOf(currentHost) > 0;
   };
 
+  /**
+   * Tells if Facebook SDK is ready to be used.
+   * 
+   * @return {Boolean} Represents if Facebook SDK is ready to be used
+   */
   var getFbReady = function() {
     return fbReady;
   };
 
+  /**
+   * Initializes the Facebook SDK. After initalizing, SDK, it try to get the
+   * access token of the current site visitor. If successful and we are in a
+   * valid host, it sends the access token to the server to be saved.
+   */
   $window.fbAsyncInit = function() {
     FB.init({
       appId      : '790467867660486',
@@ -30,8 +56,6 @@ angular.module('fbCal').factory('fbSetup', function ($log, $window, server, $roo
         server.saveData({access_token: response.authResponse.accessToken}, "access token");
       }
     });
-
-    $log.log('done');
   };
 
   (function(d, s, id){

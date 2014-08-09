@@ -1,8 +1,13 @@
 'use strict';
 /**
- * This directive binds an event listener to all the relevant elements whose
+ * These directives binds an event listener to all the relevant elements whose
  * border width can be adjusted by the user. This means all changes in the
  * settings will immediately be reflected in the widget.
+ *
+ * The header needs a specific directive because the border width is only
+ * affected by the user settings in list view.
+ *
+ * @author Jeffrey Chan
  */
 angular.module('fbCal')
   .directive('borderWidth', function() {

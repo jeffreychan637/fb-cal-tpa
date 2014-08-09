@@ -1,3 +1,9 @@
+/**
+ * CSS File for the Settings Panel
+ *
+ * @author: Jeffrey Chan
+ */
+
 [ng-cloak].loading {
   display: block !important;
 }

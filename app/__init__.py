@@ -1,20 +1,29 @@
+"""This file defines the Flask server that this app runs on."""
+
 from flask import Flask
 
+__author__ = "Jeffrey Chan"
+
 class MyFlask(Flask):
+    """This is a class based on the Flask class. The only difference is that
+    in this class all the front end files are not cached. This is highly useful
+    when developing but should be removed from production code where just the
+    Flask class is works great.
+    """
     def get_send_file_max_age(self, name):
         if name.lower().endswith('.js'):
-            print "oh yes!"
             return 0
         elif name.lower().endswith('.css'):
-            print "hell yeah!"
             return 0
         elif name.lower().endswith('.html'):
-            print "I'm a winner!"
             return 0
         return Flask.get_send_file_max_age(self, name)
 
 flask_app = MyFlask(__name__, static_folder="client", template_folder="client");
 
+"""These imports allow the Flask app to work. It allows us to start the server
+in this file where we can see the "client" directory rather than in the server
+directory where we have complications seeing our frontend files. 
+"""
 from app.server import views
 from app.server import controllers
-
