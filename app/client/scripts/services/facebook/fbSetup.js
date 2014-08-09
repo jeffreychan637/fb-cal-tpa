@@ -15,7 +15,7 @@ angular.module('fbCal').factory('fbSetup', function ($window, server, $rootScope
    * Valid Hosts to save Access Token.
    * @type {Array}
    */
-  var validHosts = ['editor.wix.com', 'localhost'];
+  var validHosts = ['editor.wix.com'];
 
   /**
    * Checks whether the current host is valid.
