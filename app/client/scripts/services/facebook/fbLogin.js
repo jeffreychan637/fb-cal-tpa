@@ -1,8 +1,20 @@
 'use strict';
-/*global $:false, FB:false, console:false */
+/*global $:false, FB:false */
 
-angular.module('fbCal').factory('fbLogin', function ($log, $q, server) {
+/**
+ * This factory handles all logins to Facebook in the settings panel.
+ *
+ * @author Jeffrey Chan
+ */
 
+angular.module('fbCal').factory('fbLogin', function ($q, server) {
+
+  /**
+   * This checks the login state of the user.
+   * 
+   * @return {Object} Promise to return the login state of the user and log
+   *                  her in if necessary
+   */
   var checkLoginState = function() {
     var deferred = $q.defer();
     FB.getLoginStatus(function(response) {
@@ -11,25 +23,37 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q, server) {
     return deferred.promise;
   };
 
+  /**
+   * Reads the login state response from Facebook. If logged in, it tests the
+   * Facebook API to get the user's name (to display in the settings panel) as
+   * well as verifies that the user granted all necessary permissions.
+   * 
+   * @param  {Object} response Login state response from Facebook
+   * @param  {Object} deferred The promise object - it's passed into other
+   *                           functions to be fulfilled later
+   */
   var loginCallback = function(response, deferred) {
     if (response.status === 'connected') {
-      // Logged into your app and Facebook.
-      console.log(response);
-      testAPI(deferred);
+      testAPI(deferred, response.authResponse.accessToken);
     } else {
-      $log.info('logging in');
       login(deferred);
     }
   };
 
+  /**
+   * Tests whether the user is actually connected with Facebook through the app
+   * by getting the user's name. As a side effect, this name is also used in the
+   * settings panel to show the user which account she is logged into. If
+   * succesful, it makes a call to check the permissions granted.
+   * 
+   * @param  {Object} deferred    The promise object - it's passed into other
+   *                              functions to be fulfilled later unless an
+   *                              error occurs
+   * @param  {String} accessToken The access token to the user's Facebook data
+   */
   var testAPI = function(deferred, accessToken) {
-    console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
-      console.log(response);
       if (!response || response.error) {
-        console.log(response, 'response');
-        console.log(response.error, 'error');
-        $log.log('rejected');
         deferred.reject('unknown');
       } else {
         checkPermissions(deferred, response.name, accessToken);
@@ -37,11 +61,22 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q, server) {
     });
   };
 
+  /**
+   * Checks whether or not the user has granted the ability for the app to get
+   * her events. If yes, then the user's access token is saved to the database.
+   * If not the user is logged out and shown an appropriate message in the
+   * settings panel.
+   * 
+   * @param  {Object} deferred     The promise object - Resolved with the name
+   *                               if events permission granted; otherwise
+   *                               rejected
+   * @param  {String} name         Name of the user whose Facebook account is
+   *                               connected to the app
+   * @param  {String} accessToken  The access token to the user's Facebook data
+   */
   var checkPermissions = function(deferred, name, accessToken) {
     FB.api('/me/permissions', function(response) {
-      console.log(response);
       if (!response || response.error) {
-        console.log(response.error, 'error');
         deferred.reject('unknown');
       } else {
         var permissionGranted;
@@ -71,33 +106,35 @@ angular.module('fbCal').factory('fbLogin', function ($log, $q, server) {
     });
   };
 
+  /**
+   * Connects the user's Facebook account with the app. If sucessful, it checks
+   * the permissions granted by the user.
+   * 
+   * @param  {Object} deferred The promise object
+   */
   var login = function(deferred) {
     FB.login(function(response) {
       if (!response.error) {
         if (response.status === 'connected') {
-          console.log('login successful');
           testAPI(deferred, response.authResponse.accessToken);
         } else if (response.status === 'not_authorized') {
-          console.log('login declined');
-          //show you must authorize to use this app message
           deferred.reject('declined');
         } else {
-          //tell user that they have to be logged into facebook to authorize app
           deferred.reject('not logged in');
         }
       } else {
-        //show something went wrong message
         deferred.reject('unknown');
       }
     }, {scope: 'public_profile, user_events'});
   };
 
+  /**
+   * Disconnects the user's Facebook account with the app.
+   */
   var logout = function() {
     var deferred = $q.defer();
     FB.api('/me/permissions', 'DELETE', function(response) {
       if (response && !response.error) {
-        $log.info('logged out successful');
-        //change back to connect account pane in settings
         deferred.resolve();
       } else if (response.error && response.error.type === 'OAuthException') {
         deferred.reject('login');

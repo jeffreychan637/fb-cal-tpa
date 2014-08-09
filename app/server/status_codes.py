@@ -1,3 +1,10 @@
+"""These status codes are used when replying to requests from the client side.
+They are placed here with corresponding names that explain their meaning in
+order to make the server code for the REST API more reader friendly.
+"""
+
+__author__ = "Jeffrey Chan"
+
 STATUS = {
   "OK" : 200,
   "Bad_Request" : 400,

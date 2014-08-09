@@ -1,22 +1,51 @@
 'use strict';
-/*global $:false, , console:false, JSON:false , location:false*/
+/*global $:false, JSON:false , location:false*/
+
+/**
+ * This is the Controller of the Settings Panel. It is the main file that sends
+ * info to be displayed on the DOM to the user and calls different functions
+ * across different files to do so.
+ *
+ * @author Jeffrey Chan
+ */
 
 angular.module('fbCal')
-  .controller('SettingsCtrl', function ($scope, $wix, api, $http, fbSetup,
-                                        fbLogin, $timeout, server, $log,
-                                        fbEvents) {
-    var checkedEventsList;
-    var eventsInfoList;
-    var eventChange;
-    var userId;
+  .controller('SettingsCtrl', function ($scope, $wix, fbSetup, fbLogin,
+                                        $timeout, server, fbEvents, messages) {
+    /**
+     * allEventsList - A list containing all the events the user created on
+     *                 Facebook that we were able to pull
+     * @type {Array}
+     * checkedEventsList - Events that the user has "checked" (She wants it
+     *                     on her calendar/list).
+     * @type {Array}
+     * eventChange - Whether or not the change that the user made in
+     *               the settings involves adding/deleting an event or
+     *               changing the color of an event. If this is true
+     *               the widget is refreshed after the change is made.
+     * @type {Boolean}
+     * userId - The facebook ID of the app user.
+     * @type {String}
+     */
     $scope.allEventsList = [];
+    var checkedEventsList;
+    var eventChange;  
+    var userId;
     
+    /**
+     * This function watches for when all the facebook events are done being
+     * added to the DOM. When this is complete, the function goes through the
+     * DOM and adds the Wix "checked" attribute to all the events the user has
+     * saved to be added to her calendar.
+     * 
+     * Then, the settings panel is initialized. 
+     * 
+     * Lastly, the function parses the list again and sets the
+     * color of all the events in the list to the ones that the user has saved.
+     */
     $scope.$on('Render Finished', function() {
-        console.log("finished");
         for (var i = 0; i < checkedEventsList.length; i++) {
-          if (($scope.allEventsList.map(function (elem) {
-                return elem.id;
-              }).indexOf(checkedEventsList[i].eventId)) >= 0) {
+          if (($scope.allEventsList.map(getElemId).indexOf(checkedEventsList[i].eventId)) >= 0) {
           $('#event' + checkedEventsList[i].eventId).attr('wix-options', 
                                                         '{checked:true}');
           }
@@ -26,30 +55,48 @@ angular.module('fbCal')
           $('#event' + $scope.allEventsList[j].id + 'Color .color-box-inner').css('background', '#0088CB');
         }
         for (var k = 0; k < checkedEventsList.length; k++) {
-          var index = ($scope.allEventsList.map(function (elem) {
-                        return elem.id;
-                      }).indexOf(checkedEventsList[k].eventId));
+          var index = ($scope.allEventsList.map(getElemId).indexOf(checkedEventsList[k].eventId));
           if (index >= 0) {
              $('#event' + checkedEventsList[k].eventId + 'Color .color-box-inner').css('background', checkedEventsList[k].eventColor);
           }
-          // $('#event' + $scope.allEventsList[i].id).attr('wix-options', '{checked:true}');
         }
     });
 
     /**
-     * Sends the settings to the widget as well as starting the process of
-     * saving the settings to the database.
+     * Returns the element ID of the given element. Used when determining what
+     * events to apply the check mark and colors on.
+     * 
+     * @param  {Object} elem Given element to get ID of
+     * @return {String}      The ID of the given element
+     */
+    var getElemId = function(elem) {
+      return elem.id;
+    };
+
+    /**
+     * Sends the settings to the widget so that they can be reflected to the
+     * user.
      */
     var sendSettings = function() {
-      $wix.Settings.triggerSettingsUpdatedEvent({settings: $scope.settings,
-                                                 events: checkedEventsList,
-                                                 eventsInfo: eventsInfoList
-                                                },
+      $wix.Settings.triggerSettingsUpdatedEvent({settings: $scope.settings},
                                                 $wix.Utils.getOrigCompId());
     };
 
+    /**
+     * This is an event listener that watches for any changes in the settings
+     * panel except for changes to the toggle switches. Based on the setting 
+     * being changed, it performs the appropriate actions and then calls the
+     * function to save the settings.
+     *
+     * For changes involving events, all are saved except for changes to an
+     * event color where that event has not been checked. Only checked events
+     * have their color saved. 
+     * 
+     * @param  {String, Object, Number} value The new value of the changed
+     *                                        setting
+     * @param  {String} key                   The name of the changed setting
+     */ 
     $wix.UI.onChange('*', function (value, key) {
-      console.log(key, value);
       var eventId = key.match(/([0-9]+)$/);
       if (eventId) {
         if (value) {
@@ -67,7 +114,6 @@ angular.module('fbCal')
         eventId = key.match(/([0-9]+)/);
         var found;
         for (var i = 0; i < checkedEventsList.length; i++) {
-          console.log(i);
           if (checkedEventsList[i].eventId === eventId[1]) {
             found = true;
             eventChange = true;
@@ -92,7 +138,12 @@ angular.module('fbCal')
       saveSettingsDebounce();
     });
 
-    /** Hack to get value of colorpicker */
+    /**
+     * This gets the color of the event with the provided event ID.
+     * 
+     * @param  {String} eventId The event ID of the event we want
+     * @return {String}         The Hex value of the event we want.
+     */
     var getColor = function(eventId) {
       var style = $('#event' + eventId + 'Color .color-box-inner').attr('style');
       var colorRGB = style.match(/rgb\(([0-9]+), ([0-9]+), ([0-9]+)\);$/);
@@ -100,10 +151,24 @@ angular.module('fbCal')
                           parseInt(colorRGB[3], 10));
     };
 
+    /**
+     * Converts RGB values to Hex.
+     * 
+     * @param  {Number} r Red Value
+     * @param  {Number} g Green Value
+     * @param  {Number} b Blue Value
+     * @return {String}   The Hex value of the RGB values
+     */
     var convertToHex = function(r, g, b) {
       return ("#" + componentToHex(r) + componentToHex(g) + componentToHex(b));
     };
 
+    /**
+     * Converts a number to Hex (base 16) format.
+     * 
+     * @param  {Number} c Number we want to convert to Hex
+     * @return {Number}   The Hex version of the given number
+     */
     var componentToHex = function(c) {
       var hex = c.toString(16).toUpperCase();
       if (hex.length === 1) {
@@ -113,6 +178,13 @@ angular.module('fbCal')
       }
     };
 
+    /**
+     * This handles all changes to the toggles in the settings panel.
+     * Once it figures out which toggle is being changed, it makes the change
+     * to the settings and then calls the function to save the settings.
+     * 
+     * @param  {String} toggle The toggle being changed
+     */
     $scope.handleToggles = function(toggle) {
       if (toggle === 'view') {
         if ($scope.settings.view === 'List') {
@@ -132,20 +204,21 @@ angular.module('fbCal')
       saveSettingsDebounce();
     };
 
+    /**
+     * Logins in the user. If successful, the settings are reloaded the user's
+     * events can be displayed. Else, it displays an error message.
+     */
     $scope.login = function() {
       $scope.connectDisabled = true;
       $scope.loginMessage = '';
       if (fbSetup.getFbReady()) {
         fbLogin.checkLoginState()
           .then(function(response) {
-            console.log(response);
-            console.log('running');
             $scope.userName = response;
             $scope.loggedIn = true;
             location.reload();
           }, 
           function(error) {
-            console.log('got login error');
             handlingFbMessages(error);
           })['finally'](function() {
             $scope.connectDisabled = false;
@@ -156,10 +229,18 @@ angular.module('fbCal')
       }
     };
 
+    /**
+     * Logs the user out of the app. If the call to logout of Facebook is
+     * successful, the user's access token and saved events are deleted from
+     * the database. Else, an appropriate error message is displayed.
+     * 
+     * @param  {Boolean} disconnectDisabled Whether the user can logout right
+     *                                      now - this prevents error when the
+     *                                      user mashes the logout link.
+     */
     $scope.logout = function(disconnectDisabled) {
       if (!disconnectDisabled) {
         $scope.disconnectDisabled = true;
-        console.log('disconnectDisabled');
         fbLogin.logout()
           .then(function() {
             server.logout()
@@ -181,57 +262,74 @@ angular.module('fbCal')
         }
     };
 
+    /**
+     * This function is used to display all the messages to the user in the
+     * settings panel. After 7 seconds, the message automatically fades away.
+     * 
+     * @param  {String} message The type of message to display.
+     */
     var handlingFbMessages = function(message) {
       $('.error').removeAttr('style');
-      if (message === 'not connected') {
-        $scope.loginMessage = "We haven't connected to the Facebook server " +
-                             "yet. Try connecting again in a minute or " + 
-                             "reload the page.";
-      } else if (message === 'logout successful') {
-        $('.error').css('color', '#0099FF');
-        $scope.loginMessage = 'Logout successful.';
-      } else if (message === 'unknown') {
-        $scope.loginMessage = 'Oh no! Something went wrong; please try ' +
-                            'again.';
-      } else if (message === 'declined') {
-        $scope.loginMessage = 'To use this app, you must connect it with ' +
-                            'your Facebook account.';
-      } else if (message === 'denied') {
-        $scope.loginMessage = 'To use this app, you must give access to your' +
-                              ' events. Please login again.';
-      } else if (message === 'not logged in') {
-        $scope.loginMessage = 'You must log into Facebook before you can ' +
-                            'connect.';
-      } else if (message === 'login') {
-        $scope.loginMessage = 'You are not logged out. You must be logged' +
-                              ' into Facebook before you can disconnect.' +
-                              ' Login and try again.';
+      switch(message) {
+        case 'not connected':
+          $scope.loginMessage = messages.notConnected;
+          break;
+        case 'logout successful':
+          $('.error').css('color', '#0099FF');
+          $scope.loginMessage = messages.logoutSucessful;
+          break;
+        case 'unknown':
+          $scope.loginMessage = messages.unknown;
+          break;
+        case 'declined':
+          $scope.loginMessage = messages.declined;
+          break;
+        case 'denied':
+          $scope.loginMessage = messages.denied;
+          break;
+        case 'not logged in':
+          $scope.loginMessage = messages.notLoggedIn;
+          break;
+        case 'login':
+          $scope.loginMessage = messages.login;
+          break;
       }
       $timeout(function() {
           $scope.loginMessage = false; 
         }, 7000);
     };
 
+    /**
+     * Gets the settings from the server. Regardless of success or failure from
+     * the server, some settings are retrieved (failure or empty settings
+     * results in a response containing the default settings). 
+     */
     var getSettings = function() {
       server.getUserInfo('settings')
         .then(function (response) {
-          $log.info('got settings');
           setSettings(response);
         }, function(response) {
-          $log.warn('rejected');
           setSettings(response);
         });
     };
 
+    /**
+     * Sets the settings based on the response from the server.
+     * 
+     * @param {Object} response Response from the server
+     */
     var setSettings = function(response) {
       $scope.settings = response.settings;
       checkedEventsList = response.events;
       $scope.loggedIn = response.active;
       $scope.userName = response.name;
-      console.log(response);
       userId = response.user_id;
     };
 
+    /**
+     * Saves the settings to the database. If the settings change involved
+     * changing the events or their color, the widget is reloaded.
+     */
     var saveSettings = function() {
       var data = JSON.stringify({'settings': $scope.settings, 'events' : checkedEventsList});
       server.saveData(data, 'settings')
@@ -242,6 +340,21 @@ angular.module('fbCal')
         });
     };
 
+    /**
+     * A function that returns a function to call whenever we want to run the
+     * provided function (func) in debounced fashion. This allows us to
+     * debounce the saving of the settings.
+     * 
+     * @param  {Function} func      The function we want to call in dobounced
+     *                              fashion
+     * @param  {Number} wait        The amount of time to debounce by in
+     *                              milliseconds
+     * @param  {Boolean} immediate  Whether we want to run the function
+     *                              immediately
+     * @return {Function}           The function to call whenever we want to run
+     *                              provided function (func) in debounced
+     *                              fashion.
+     */
     var debounce = function(func, wait, immediate) {
         var timeout;
         return function() {
@@ -256,15 +369,21 @@ angular.module('fbCal')
         };
       };
 
+    /**
+     * This call returns a function that we call when we want to save the
+     * settings in debounced fashion.
+     * @type {function}
+     */
     var saveSettingsDebounce = debounce(saveSettings, 1000);
 
     /**
      * These lines of code essentially watch for when we get the access token
-     * for the user from Facebook on the client side. Once we get that, we pull
-     * all event data and the user's ID from Facebook. Then we compare this user
-     * ID with the user ID from the database that is sent with the settings. If
-     * they match, we show the event data in the settings panel. If they don't,
-     * we make an extra call to the server to get the actual user's event data.
+     * for the user from Facebook on the client side. If and once we get that,
+     * we pull all event data and the user's ID from Facebook. Then we compare
+     * this user ID with the user ID from the database that is sent with the
+     * settings. If they match, we show the event data in the settings panel.
+     * If they don't, we make an extra call to the server to get the actual
+     * user's event data.
      *
      * For the most part, users tend to stay signed into their Facebook accounts
      * so this technique will result in simultanenous loading of event details
@@ -280,7 +399,6 @@ angular.module('fbCal')
       return fbSetup.getFbReady();
       }, function() {
         if (fbSetup.getFbReady()) {
-          console.log('fb is ready');
           fbInitWatch();
           fbEvents.getUserEventDetails()
             .then(function(eventDetailsFromClient) {
@@ -289,10 +407,6 @@ angular.module('fbCal')
                   watchServerforUserInfo();
                   if (userId === eventDetailsFromClient.userId) {
                     $scope.allEventsList = eventDetailsFromClient.data;
-                    // for (var i = 0; i < eventDetailsFromClient.length; i++) {
-                    //   $scope.allEventsList.push(eventDetailsFromClient)
-                    // }
-                    console.log($scope.allEventsList);
                   } else if ($scope.loggedIn) {
                     getAllEventsFromServer();
                   }
@@ -301,7 +415,6 @@ angular.module('fbCal')
                 }
               });
             }, function(response) {
-              console.warn('called from here');
               var watchServerforActiveInfo = $scope.$watch('userName', function() {
                 if ($scope.userName !== undefined) {
                   if ($scope.userName) {
@@ -316,13 +429,18 @@ angular.module('fbCal')
         }
     });
 
+    /**
+     * This function gets all the event details from the server. It should only
+     * be called if getting the access token on the client side fails.
+     * On success, the data is added to the allEventsList to be shown in the
+     * DOM. Else, the Wix UI is initialized (as opposed to later when the DOM
+     * has finished rendering the events in the allEventsList).
+     */
     var getAllEventsFromServer = function() {
       server.getAllEvents()
         .then(function(eventDetailsFromServer) {
           $scope.allEventsList = eventDetailsFromServer;
-          console.log($scope.allEventsList);
         }, function() {
-          console.warn('initializing from here');
           $wix.UI.initialize($scope.settings);
         });
     };

@@ -1,5 +1,5 @@
 'use strict';
-/*global $:false, console:false, location:false */
+/*global $:false, location:false */
 
 /**
  * This is the Controller of the Modal. It is the main file that sends
@@ -10,29 +10,70 @@
  */
 
 angular.module('fbCal')
-  .controller('ModalCtrl', function ($scope, $sce, $sanitize, $wix, $log, $q, 
-                                     $timeout, $window, eventId, server,
-                                     fbSetup, fbEvents, modalFbLogin) {
+  .controller('ModalCtrl', function ($scope, $q, $timeout, $window, eventId,
+                                     server, fbSetup, fbEvents, modalFbLogin,
+                                     processor) {
+    /**
+     * Passed in from the server on page load, this is the event ID of the
+     * event this modal will display.
+     * @type {[type]}
+     */
     $scope.eventId = eventId;
 
+    /**
+     * The info about the current event.
+     * @type {Object}
+     */
     var eventInfo = {};
+
+    /**
+     * The current feed object that we are working with. Changes as the visitor
+     * forces us to pull more feed from Facebook on the server side. 
+     * @type {Object}
+     */
     var feedObject = {};
 
+    /**
+     * Current Feed being displayed to visitor. By clicking "Get more feed",
+     * they can get any extra feed or pull more feed from the server.
+     * @type {Array}
+     */
     $scope.feed = [];
     $scope.extraFeed = [];
 
+    /**
+     * Link from Facebook to the next page of the feed
+     * @type {String}
+     */
     var nextFeed = '';
+    /**
+     * Whether or not we are getting more feed right now.
+     * @type {Boolean}
+     */
     var notGettingMoreFeed = true;
 
-    $scope.rsvpStatus = 'RSVP';
-    
+    /**
+     * The current error being shown to the user
+     * @type {String}
+     */
     var curErrorType = '';
+
+    /**
+     * The parameters for the current Facebook interaction the user is trying
+     * to make. It is stored so in case of errors, the program can offer a
+     * "Try again" option to retry to evaluate their request.
+     * @type {Object}
+     */
     var interactionParams = {};
 
-    // $scope.eventId = "1512622455616642";
  
-    // MOVE ALL PROCESS STUFF OUT AND SHOW MODAL
+    $scope.rsvpStatus = 'RSVP';
 
+    /**
+     * This watches for when the Facebook SDK is ready for use. On ready, it
+     * tries to get the RSVP status of the user and sets that to the current
+     * RSVP status. On failures, the status is just set to "RSVP".
+     */
     var watchFb = $scope.$watch(function() {
                     return fbSetup.getFbReady();
                   }, function() {
@@ -45,6 +86,13 @@ angular.module('fbCal')
                       }
                   });
 
+    /**
+     * This function pulls up the modal that will allow the user to share the
+     * event to her own Facebook account.
+     *
+     * If the Facebook SDK isn't ready yet, then a modal asking for the user to
+     * wai appears. 
+     */
     $scope.shareFbEvent = function() {
       if (fbSetup.getFbReady()) {
         fbEvents.shareEvent($scope.eventId);
@@ -53,184 +101,37 @@ angular.module('fbCal')
         $scope.showModal('wait');
       }
     };
-    
-    var errorTypes = ['facebook', 'facebook login', 'load'];
 
-    var errorModal = {title: 'Oh no!',
-                      css: {'color' : 'red'},
-                      message: 'Something terrible happened. Please try again or reload the page.',
-                      modalButton: 'Try Again'
-                     };
-
-    var waitModal = {title: 'Please wait...',
-                     message: 'We are still connecting to Facebook. Please wait a few seconds and then click try again.',
-                     modalButton: 'Try Again'
-                    };
-
-    var permissionModal = {title: 'Hello there!',
-                           modalButton: 'Grant Permission',
-                           declinedMessage: 'We can’t perform your request regarding this Facebook event unless you don’t give us permission to.',
-                           notLoggedInMessage: 'We need your permission to fulfill your request regarding this Facebook event. If you’re not logged in, you can’t grant your permission.',
-                           declinedPermissionMessage: 'You might be wondering why we need these permissions to fulfill your request.'
-                          };
-
-    var solveModal = {title: 'Trying again...',
-                      message: 'Giving our best effort!'
-                     };
-
-    var linkModal = {title: 'Share'};
-
-    $scope.showModal = function(type, message) {
-      $('#messageTitle').css({'color' : '#09F'});
-      curErrorType = type;
-      $scope.showLink = false;
-      $scope.postError = false;
-      $scope.permissionError = false;
-      if (errorTypes.indexOf(type) >= 0) {
-        $scope.messageTitle = errorModal.title;
-        $('#messageTitle').css(errorModal.css);
-        $scope.messageBody = errorModal.message;
-        $scope.modalButton = errorModal.modalButton;
-        if (message) {
-          $scope.postError = true;
-          $scope.userPost = message;
-          //call some prepareModal function elsewhere but leave this line here
-        }
-      } else if (type === 'link') {
-        $scope.messageTitle = linkModal.title;
-        $scope.showLink = true; // also this type === 'link'
-      }
-        else if (type === 'wait') {
-        $scope.messageTitle = waitModal.title;
-        $scope.messageBody = waitModal.message;
-        $scope.modalButton = waitModal.modalButton;
-      } else {
-        $scope.permissionError = true; //also this or maybe just return what to do in prepareModal
-        $scope.messageTitle = permissionModal.title;
-        $scope.modalButton = permissionModal.modalButton;
-        switch(type) {
-          case 'declined permission':
-            $scope.messageBody = permissionModal.declinedPermissionMessage;
-            break;
-          case 'declined':
-            $scope.messageBody = permissionModal.declinedMessage;
-            break;
-          case 'not logged in':
-            $scope.messageBody = permissionModal.notLoggedInMessage;
-        }
-      }
-      $timeout(function() { //leave this here
-        $('#message').modal('show');
-      }, 500);
-    };
-
-    $scope.solveError = function() {
-      $scope.postError = false;
-      $scope.permissionError = false;
-      $scope.messageTitle = solveModal.title;
-      $('#messageTitle').css({'color' : '#09F'});
-      $scope.messageBody = solveModal.message;
-      if (curErrorType === 'declined permission') {
-        getDeniedPermission();
-      } else if (curErrorType === 'load') {
-        location.reload();
-      } else if (curErrorType === 'wait') {
-        if (interactionParams.action === 'share') {
-          $('#message').modal('hide');
-          $timeout(function() {
-            $scope.shareFbEvent();
-          }, 1500);
-        } else {
-          $timeout(function() {
-            tryInteractionAgain();
-          }, 1500);
-        }
-      } else {
-        tryInteractionAgain();
-      }
-    };
-
-    var getDeniedPermission = function() {
-      var permission;
-      if (rsvp.indexOf(interactionParams.action) >= 0) {
-        permission = 'rsvp_event';
-      } else {
-        permission = 'publish_actions';
-      }
-      modalFbLogin.loginWithPermission(permission, true)
-        .then(function() {
-          tryInteractionAgain();
-        }, function() {
-          $('#message').modal('hide');
-          $timeout(function() {
-            $scope.showModal('declined permission');
-          }, 1000);
-        });
-    };
-
-    var tryInteractionAgain = function() {
-      $scope.interactWithFb(interactionParams.action, interactionParams.key,
-                            interactionParams.message)
-        .then(function() {
-          $scope.messageBody = 'Success!';
-        }, function() {
-          $('#message').modal('hide');
-        });
-      };
-
-    // var showPleaseWait = function(message) {
-    //   $scope.messageTitle = "Please wait...";
-    //   $('#messageTitle').css('color', '#09F');
-    //   $scope.messageBody = 'We\'re currently loading your replies.';
-    //   $('#message').modal('show');
-    // };
-
+    /**
+     * Processes all the event info from Facebook (except for the feed). Once
+     * processing is done, the loading message disappears and the event details
+     * are displayed to the user.
+     */
     var processEventInfo = function() {
       $scope.id = eventInfo.id;
       $scope.name = eventInfo.name;
       $scope.owner = eventInfo.owner.name;
       $scope.ownerId = eventInfo.owner.id;
-      processDesciption();
+      $scope.description = processor.processDesciption(eventInfo.description);
+      if ($scope.description) {
+        $scope.displayDescription = true;
+      }
       processTime();
       processLocation();
       $scope.displayModal = true;
-      //display modal info here - before this just show some loading screen
     };
 
-    var processDesciption = function() {
-      $scope.description = eventInfo.description.replace(/\r?\n/g, "<br>");
-      $scope.description = $sanitize($scope.description);
-      $sce.trustAsHtml($scope.description);
-      $scope.showDescription = true;
-    };
-
+    /**
+     * Processes the time of the Facebook event. Once done processing, the
+     * height of the boxes for the time and the RSVP/Share buttons are
+     * adjusted so they match in height.
+     */
     var processTime = function() {
       if (eventInfo.start_time) {
-        var startTime = new Date(eventInfo.start_time);
-        var startHour = startTime.toLocaleTimeString().toLowerCase();
-        startHour = startHour.replace(/:\d\d /, "");
-        var startDateString = startTime.toLocaleDateString();
-        var startDayString = startTime.toString().replace(/ .+/, ", ");
-        if (eventInfo.end_time) {
-          var endTime = new Date(eventInfo.end_time);
-          var endHour = endTime.toLocaleTimeString().toLowerCase();
-          endHour = endHour.replace(/:\d\d /, "");
-          
-          if (isSameDay(startTime, endTime)) {
-            $scope.shortTime = startDayString + startDateString + " at " +
-                               startHour + "-" + endHour;
-          } else {
-            var endDateString = endTime.toLocaleDateString();
-            var endDayString = endTime.toString().replace(/ .+/, ", ");
-            $scope.shortTime = startDayString + startDateString + " - " + endDayString + endDateString;
-            $scope.longTime = startDayString + startDateString + " at " + startHour +
-                              " to " + endDayString + endDateString + " at " +
-                              endHour;
-          }
-        } else {
-          $scope.shortTime = startDayString + startDateString + " at " +
-                             startHour;
-        }
+        var times = processor.processTime(eventInfo.start_time,
+                                          eventInfo.end_time);
+        $scope.shortTime = times.shortTime;
+        $scope.longTime = times.longTime;
       } else {
         $scope.shortTime = 'No time specified';
       }
@@ -245,56 +146,51 @@ angular.module('fbCal')
       }, 500);
     };
 
-    var isSameDay = function(a, b) {
-      return (a.getDate() === b.getDate() &&
-              a.getMonth() === b.getMonth() &&
-              a.getFullYear() === b.getFullYear());
-    };
-
+    /**
+     * Processes the location and venue for the event.
+     */
     var processLocation = function() {
       if (eventInfo.location) {
         $scope.location = eventInfo.location;
-        if (eventInfo.venue && (eventInfo.venue.street || eventInfo.venue.city ||
-                                eventInfo.venue.state || 
-                                eventInfo.venue.country)) {
-          $scope.venue = eventInfo.venue.street + ", " + eventInfo.venue.city + 
-                           ", " + eventInfo.venue.state + ", " +
-                           eventInfo.venue.country + " " + eventInfo.venue.zip;
-          $scope.venue = $scope.venue.replace(/, undefined/, "")
-                                         .replace(/undefined, /, "")
-                                         .replace(/undefined/, "")
-                                         .replace(/ $/, "")
-                                         .replace(/, $/, "");
-        }
+        $scope.venue = processor.processVenue(eventInfo.venue);
       } else {
         $scope.location = "No location specified";
       }
     };
 
+    /**
+     * Adds the cover photo into the modal and adjusts the header height to
+     * display the photo. The title text is also given a dark background so
+     * it can be shown against the photo.
+     * 
+     * @param  {Object} coverObject Cover photo object from Facebook
+     */
     var processCover = function(coverObject) {
       if (coverObject.cover && coverObject.cover.source) {
         var cover = coverObject.cover;
-        var height = 296 + $scope.settings.borderWidth;
-        height = 306;
-        // cover.source = "https://fbcdn-sphotos-a-a.akamaihd.net/hphotos-ak-xfa1/t31.0-8/q71/s720x720/10286851_801238859907126_3448618267544264515_o.jpg";
+        var height = 296 + ($scope.settings.borderWidth * 2);
         var cssClass = {'background-image' : 'url(' + cover.source + ')',
                         'height' : height + 'px',
                         'background-position' : cover.offset_x + '% ' +
                                                 cover.offset_y + '%'
                        };
         $('#header').css(cssClass);
-        $('#title').addClass('name');
-        $('#host').addClass('name');
+        $('#title').addClass('dark-background');
+        $('#host').addClass('dark-background');
       }
     };
 
-    var processGuest = function(guestObject) {
+    /**
+     * Processes the guest statatics from Facebook. Once done processing, the
+     * height of the boxes for the guest statistics and the location are
+     * adjusted so they match in height.
+     * 
+     * @param  {Object} guestObject Guest object from Facebook.
+     * @return {[type]}             [description]
+     */
+    var processGuests = function(guestObject) {
       if (guestObject.data) {
-        var stats = guestObject.data[0];
-        stats.attending_count = processNumber(stats.attending_count);
-        stats.unsure_count = processNumber(stats.unsure_count);
-        stats.not_replied_count = processNumber(stats.not_replied_count);
-        $scope.stats = stats;
+        $scope.stats = processor.processGuests(guestObject);
       } else {
         $scope.guestFailed = true;
       }
@@ -309,25 +205,12 @@ angular.module('fbCal')
       }, 100);
     };
 
-    var processNumber = function(number) {
-      if (number >= 100000) {
-        number = (number/1000000).toString().substring(0, 3);
-        var index = number.indexOf(".");
-        if (!(index === 0 || index === 1)) {
-          number = number.substring(0, 2);
-        } 
-        number += "M";
-      } else if (number >= 1000) {
-        number = (number/1000).toString().substring(0, 3);
-        var decimal = number.indexOf(".");
-        if (!(decimal === 0 || decimal === 1)) {
-          number = number.substring(0, 2);
-        } 
-        number += "K";
-      }
-      return number;
-    };
-
+    /**
+     * Processes the feed of the event from Facebook. Each individual status and
+     * comment on status is processed by various functions in the processor.js
+     * file. Once done, the "Loading feed" message is hidden and the feed is
+     * displayed.
+     */
     var processFeed = function() {
       $scope.loadMoreFeed = false;
       if (feedObject.paging && feedObject.paging.next) {
@@ -341,7 +224,7 @@ angular.module('fbCal')
       if (data) {
         for (var i = 0; i < data.length; i++) {
           if (data[i].message) {
-            var status = processStatus(data[i]);
+            var status = processor.processStatus(data[i]);
             if ($scope.feed.length < 5 || i < 5) {
               $scope.feed.push(status);
             } else {
@@ -359,112 +242,17 @@ angular.module('fbCal')
       $scope.displayFeed = true;
     };
 
-    var processStatus = function(data) {
-      var status = { picture : data.picture,
-                     name: data.from.name,
-                     link: data.link,
-                     linkName: data.name,
-                     caption: data.caption,
-                     description : data.description,
-                     id: data.id
-                   };
-      status = processActions(status, data);
-      return status;
-    };
-
-    var processActions = function(status, data) {
-      var postTime = new Date(data.created_time);
-      status.time = postCreatedTime(postTime);
-      status.message = $sanitize(data.message.replace(/\r?\n/g, "<br>"));
-      $sce.trustAsHtml(status.message);
-      if (data.actions) {
-        for (var i = 0; i < data.actions.length; i++) {
-          if (data.actions[i].name === 'Like') {
-            status.like = data.actions[i].link;
-          } else if (data.actions[i].name === 'Comment') {
-            status.comment = data.actions[i].link;
-          }
-        }
-      }
-      if (data.likes) {
-        status.numberLikes = data.likes.data.length;
-      } else {
-        status.numberLikes = 0;
-      }
-      if (data.sharedposts) {
-        status.numberShares = data.sharedposts.data.length;
-      } else {
-        status.numberShares = 0;
-      }
-      status.comments = [];
-      status.extraComments = [];
-      if (data.comments) {
-        status = processAllComments(status, data.comments);
-      }
-      return status;
-    };
-
-    var processAllComments = function(status, comments) {
-      console.log(comments);
-      var data = comments.data;
-      if (data) {
-        for (var j = 0; j < data.length; j++) {
-          var comment = processComments(data[j]);
-          if (status.comments.length < 5 || j < 5) { 
-            status.comments.push(comment);
-          } else {
-            status.extraComments.push(comment);
-          }
-        }
-      } else {
-        status.more = false;
-      }
-      if (comments.paging) {
-        if (comments.paging.next) {
-            status.more = comments.paging.next;
-        } else {
-          status.more = false;
-        }
-      } else {
-        status.more = false;
-      }
-      if (status.more || status.extraComments.length > 0) {
-        status.repliesMessage = 'Show more replies';
-      } else {
-        status.repliesMessage = "";
-      }
-      return status;
-    };
-
-    var processComments = function(data) {
-      var comment = {id : data.id,
-                     can_remove : data.can_remove,
-                     numberLikes : data.like_count,
-                     name: data.from.name,
-                     time: postCreatedTime(new Date(data.created_time))
-                    };
-      if (data.message) {
-        comment.message = $sanitize(data.message.replace(/\r?\n/g, "<br>"));
-        $sce.trustAsHtml(comment.message);
-      }
-      return comment;
-    };
-
-    var postCreatedTime = function(time) {
-      var today = new Date();
-      if (isSameDay(today, time)) {
-        if (today.getHours() - time.getHours()) {
-           return (today.getHours() - time.getHours()).toString() + ' hours ago';
-        } else if (today.getMinutes() - time.getMinutes()) {
-          return (today.getMinutes() - time.getMinutes()).toString() + ' minutes ago';
-        } else {
-          return 'Just now';
-        }
-      } else {
-        return time.toLocaleString().replace(/:\d\d /, '').toLowerCase();
-      }
-    };
-
+    /**
+     * Gets more comments to a Facebook status. If there are extra comments
+     * that were initally hidden away (only a max of 5 comments are shown
+     * initially), they are shown first. If the user wants to see more and
+     * Facebook has provided a link to the next page of comments, this
+     * function makes a call to the server to get that next page. If there are
+     * more pages after that, this stores the link to the next page.
+     * 
+     * @param  {Number} index The index of the status in the event feed array
+     *                        that we are getting more comments for.
+     */
     $scope.showMoreReplies = function(index) {
       if (!$scope.feed[index].gettingReplies) {
         $scope.feed[index].gettingReplies = true;
@@ -482,7 +270,7 @@ angular.module('fbCal')
           var params = fbEvents.parseUrl($scope.feed[index].more, false);
           server.getModalFeed(params, 'comments', $scope.eventId)
             .then(function(response) {
-              $scope.feed[index] = processAllComments($scope.feed[index], response);
+              $scope.feed[index] = processor.processAllComments($scope.feed[index], response);
             }, function(response) {
               $scope.feed[index].repliesMessage = 'Failed to get more replies; Try Again';
             })['finally'](function() {
@@ -494,6 +282,14 @@ angular.module('fbCal')
       }
     };
 
+    /**
+     * Gets more statuses to the event feed. If there are extra statuses
+     * that were initally hidden away (only a max of 5 statuses are shown
+     * initially), they are shown first. If the user wants to see more and
+     * Facebook has provided a link to the next page of statuses, this
+     * function makes a call to the server to get that next page. If there are
+     * more pages after that, this stores the link to the next page.
+     */
     $scope.showMoreFeed = function() {
       if (notGettingMoreFeed) {
         notGettingMoreFeed = false;
@@ -513,7 +309,6 @@ angular.module('fbCal')
           params.id = $scope.eventId;
           server.getModalFeed(params, 'feed', $scope.eventId)
             .then(function(response) {
-              console.log(response);
               feedObject = response;
               processFeed();
             }, function() {
@@ -527,14 +322,29 @@ angular.module('fbCal')
 
     var rsvp = ['attending', 'maybe', 'declined']; 
 
-    //explain what key does for different actions (e.g. key is comment id when liking a comment)
-    //message is usally message except for like/unlike commment where it is the index
+    /**
+     * Makes the call to Facebook to perform the action that the user has
+     * requested.
+     * 
+     * @param  {String} action  The Facebook action the user has requested
+     *                          (e.g. liking a comment)
+     * @param  {String} key     Data needed to either tell Facebook to perform
+     *            or            the action (e.g. a status ID) or data needed to
+     *         {Number}         get the former or get other data that will be
+     *                          needed to show the result of the action on the
+     *                          modal (e.g. an index to an array where the
+     *                          comment that is being liked can be found)
+     * @param  {String} message For posting and commenting, this is the message
+     *            or            to be posted/commented. For liking and unliking,
+     *         {Number}         the comment is actually the index of the comment
+     *                          in the status's array of comments (while the
+     *                          key is the id of the comment)
+     * @return {Object}         A promise to perform the action
+     */
     $scope.interactWithFb = function(action, key, message) {
       var deferred = $q.defer();
-      console.log(message);
       var index;
       if ($scope.settings.commenting) {
-        console.log('running');
         var processed = processAction(action, key, message);
         if (!processed) {
           deferred.reject();
@@ -542,7 +352,6 @@ angular.module('fbCal')
         } else {
           key = processed.key;
           index = processed.index;
-          console.log('got to here');
           if (fbSetup.getFbReady()) {
             if (modalFbLogin.checkFirstTime()) {
               modalFbLogin.checkLoginState()
@@ -561,7 +370,6 @@ angular.module('fbCal')
                 permission = 'publish_actions';
               }
               if (modalFbLogin.checkPermission(permission)) {
-                console.log('all permissions met');
                 handleFbInteraction(action, key, message, index, deferred);
               } else {
                 modalFbLogin.loginWithPermission(permission, false)
@@ -587,6 +395,30 @@ angular.module('fbCal')
       return deferred.promise;
     };
 
+    /**
+     * This function processes the action by making sure all necessary
+     * components (e.g. the message in a post) are there. If not, it returns
+     * false and the action will never be performed.
+     *
+     * In addition, in some cases, the function takes the key and uses it to 
+     * get the data need either for Facebook to perform the action or later
+     * when the results of the action need to be shown to the user (e.g. need
+     * to figure out which comment is being liked so we can incrememnt the
+     * like counter).
+     * 
+     * @param  {String} action  Facebook action being performed
+     * @param  {String} key     Either a necessary data piece to perform the
+     *            or            interaction or data necessary to get another
+     *         {Number}         piece of neccessary data to perform the action
+     * @param  {String} message For posting and commenting, this is the message
+     *            or            to be posted/commented. For liking and unliking,
+     *         {Number}         the comment is actually the index of the comment
+     *                          in the status's array of comments (while the
+     *                          key is the id of the comment)
+     * @return {Object}         An object containing the data necessary to
+     *                          perform the Facebook action the user is
+     *                          requesting
+     */
     var processAction = function(action, key, message) {
       var index;
       if (action === 'like' || action === 'unlike') {
@@ -627,11 +459,34 @@ angular.module('fbCal')
       return {key: key, index: index};
     };
 
+    /**
+     * Makes a call to Facebook to do the action that the user wants. Then, on
+     * success, it updates the modal to reflect the action (e.g. new status
+     * is added to the feed or "like" button becomes "unlike" button). On
+     * failure, an error message is displayed in a modal with the option to
+     * try again.
+     * 
+     * @param  {String} action   Facebook action to be performed
+     * @param  {String} key      Data needed by Facebook to perform the action
+     * @param  {String} message  For posting and commenting, this is the message
+     *            or             to be posted/commented. For liking and 
+     *         {Number}          unliking the comment is actually the index of
+     *                           the comment in the status's array of comments
+     *                           (while the key is the id of the comment)  
+     * @param  {Number} index    The index of some component whose location in
+     *                           an array must be known to modify the modal
+     *                           (e.g. the index of the status in the feed array
+     *                           for a comment (whose own index in the status
+     *                           array is in the message variable) that is being
+     *                           liked)
+     * @param  {Object} deferred Promise object to be resolved or reject
+     *                           depending on whether the action was
+     *                           performed successfully on Facebook
+     */
     var handleFbInteraction = function(action, key, message, index, deferred) {
       fbEvents.processInteraction(action, key, message)
         .then(function(response) {
           if (response) {
-            console.log('Successful!  ' + action);
             if (rsvp.indexOf(action) >= 0) {
               switch(action) {
                 case 'attending':
@@ -646,7 +501,7 @@ angular.module('fbCal')
             } else {
               switch(action) {
                 case 'post':
-                  var status = processStatus(response);
+                  var status = processor.processStatus(response);
                   status.appPosted = true;
                   $scope.feed.unshift(status);
                   break;
@@ -668,7 +523,7 @@ angular.module('fbCal')
                   break;
                 case 'comment':
                   $scope.showMoreReplies(index);
-                  var comment = processComments(response);
+                  var comment = processor.processComments(response);
                   comment.appPosted = true;
                   if ($scope.$$phase) {
                     $scope.feed[index].comments.push(comment);
@@ -702,6 +557,30 @@ angular.module('fbCal')
         });
     };
 
+    /**
+     * When an error occurs, the parameters that were used in calling the
+     * interactWithFb function in the first place are saved so that in the
+     * error modal that shows up, we can give the user a one-click option to
+     * "Try again".
+     *
+     * This function makes sure the correct paramters are saved correctly.
+     * 
+     * @param {String} action    Facebook action user was trying to perform
+     * @param {[type]} key       Some important piece of data that varies
+     *                           depending on the action. In some cases (e.g.
+     *                           liking), it has been modified such that it 
+     *                           isn't necessary to start the interactWithFb
+     *                           function up again.
+     * @param  {String} message  For posting and commenting, this is the message
+     *            or             to be posted/commented. For liking and 
+     *         {Number}          unliking the comment is actually the index of
+     *                           the comment in the status's array of comments
+     *                           (while the key is the id of the comment) 
+     * @param {Number} index     For some actions (e.g. commenting), this is
+     *                           actually the original key that was passed into
+     *                           the interactWithFb function, so we save this
+     *                           instead of the "key" variable.
+     */
     var setParams = function(action, key, message, index) {
       var changedKeyActions = ['like' , 'unlike', 'comment', 'deletePost'];
       if (changedKeyActions.indexOf(action) >= 0) {
@@ -717,6 +596,13 @@ angular.module('fbCal')
       }
     };
 
+    /**
+     * This function shows the appropriate error message modal when connecting
+     * the user's Facebook account with the app fails.
+     * 
+     * @param  {Object} response The response from Facebook explaining why the
+     *                           connecting attempt failed
+     */
     var handleFailedFbLogin = function(response) {
       if (['declined', 'not logged in', 'declined permission'].indexOf(response) >= 0) {
         $scope.showModal(response);
@@ -725,8 +611,154 @@ angular.module('fbCal')
       }
     };
 
+    /**
+     * This function makes sure the modal with the correct message shows up in
+     * the correct situation.
+     * @param  {String} type    The current sitation (e.g. "declined" when the
+     *                          user refused to connect her Facebook account
+     *                          with the app)
+     * @param  {String} message The message the user was trying to post or
+     *                          comment. This is stored so it can be displayed
+     *                          in the modal. Thus, if the user doesn't want to
+     *                          auto "Try again", they can just copy their
+     *                          message and reload the page or just go to the
+     *                          actual Facebook event page and paste it rather
+     *                          than having to type it all over again.
+     */
+    $scope.showModal = function(type, message) {
+      curErrorType = type;
+      $scope.showLink = false;
+      $scope.postError = false;
+      $scope.permissionError = false;
+      if (message) {
+        $scope.postError = true;
+        $scope.userPost = message;
+      }
+      var modal = processor.processModal(type);
+      $scope.messageTitle = modal.messageTitle;
+      $('#messageTitle').css(modal.css);
+      $scope.messageBody = modal.messageBody;
+      $scope.modalButton = modal.modalButton;
+      $scope.showLink = modal.showLink;
+      $scope.permissionError = modal.permissionError;
+      $timeout(function() {
+        $('#message').modal('show');
+      }, 500);
+    };
 
+    var solveModal = {title: 'Trying again...',
+                      message: 'Giving our best effort!'
+                     };
 
+    /**
+     * If the user clicks "Try again" on the error message modal, this function
+     * is called and tries to resolve the problem by calling the original
+     * Facebook interaction function again. It also changes the modal message
+     * to reflect the fact that the program is trying to resolve the problem.
+     */
+    $scope.solveError = function() {
+      $scope.postError = false;
+      $scope.permissionError = false;
+      $scope.messageTitle = solveModal.title;
+      $('#messageTitle').css({'color' : '#09F'});
+      $scope.messageBody = solveModal.message;
+      if (curErrorType === 'declined permission') {
+        getDeniedPermission();
+      } else if (curErrorType === 'load') {
+        location.reload();
+      } else if (curErrorType === 'wait') {
+        if (interactionParams.action === 'share') {
+          $('#message').modal('hide');
+          $timeout(function() {
+            $scope.shareFbEvent();
+          }, 1500);
+        } else {
+          $timeout(function() {
+            tryInteractionAgain();
+          }, 1500);
+        }
+      } else {
+        tryInteractionAgain();
+      }
+    };
+
+    /**
+     * This function makes a call to Facebook asking for a permission that
+     * the user has denied. This is done uniquely in this function rather than
+     * the original interactWithFb function because Facebook has unique protocol
+     * when asking again for a permission that the user has denied.
+     *
+     * On successfully attaining the permission, the original Facebook
+     * interation the user wanted to perform is tried again. On failure, an
+     * appropriate error message modal is shown.
+     */
+    var getDeniedPermission = function() {
+      var permission;
+      if (rsvp.indexOf(interactionParams.action) >= 0) {
+        permission = 'rsvp_event';
+      } else {
+        permission = 'publish_actions';
+      }
+      modalFbLogin.loginWithPermission(permission, true)
+        .then(function() {
+          tryInteractionAgain();
+        }, function(response) {
+          $('#message').modal('hide');
+          $timeout(function() {
+            handleFailedFbLogin(response);
+          }, 1000);
+        });
+    };
+
+    /**
+     * This function tries the Facebook interaction that the user requested
+     * again. It is only called if an error happens on the previous attempt
+     * and the user clicks the "Try again" button.
+     * 
+     * On success, a success message is shown and the modal fades. Else, the
+     * modal just fades and a new modal appears (triggered by the
+     * interactWithFb function failing again) showing the appropriate error
+     * message.
+     */
+    var tryInteractionAgain = function() {
+      $scope.interactWithFb(interactionParams.action, interactionParams.key,
+                            interactionParams.message)
+        .then(function() {
+          $scope.messageBody = 'Success!';
+          $timeout(function() {
+            $('#message').modal('hide');
+          }, 1500);
+        }, function() {
+          $('#message').modal('hide');
+        });
+      };
+
+    /**
+     * Called on load, this massive block of server calls and promises basically
+     * says that if we have the event ID, then make a call to the server for
+     * the appropriate basic event data. After getting the basic event data, go
+     * get the cover photo data. After getting the cover photo data, get the
+     * guest statistics, and finally get the feed.
+     *
+     * The reason for 4 consecutive calls to the server rather than just one is
+     * because this allows the client to use some of the waiting time to start
+     * processing the data it already has so it can be shown to the visitor,
+     * giving the illusion of a faster program (e.g. the basic event data is
+     * being processed while the client waits for the server to return the cover
+     * photo).
+     *
+     * If anything fails, either an error modal appears or some message is
+     * shown to the user in the current modal to alert them of the situation.
+     * 
+     * Unfortunately, right now, the server calls are stacked so that they are
+     * dependent on the previous call (e.g. failure to get the cover results in
+     * guest statistics and feed never getting fetched). This could be resolved
+     * by not calling the next server call on success, but rather regardless
+     * of success and error (as a "finally" function). But to maintain our
+     * 4 vs. 1 call advantage, we would have to include the process functions in
+     * the "finally" function as well and make sure they can handle error
+     * responses being passed into them.
+     */
     if (!$scope.eventId) {
       $scope.showModal('load');
     } else {
@@ -741,50 +773,19 @@ angular.module('fbCal')
                       feedObject = response;
                       processFeed();
                     }, function(response) {
-                      console.log('could not get feed');
                       $scope.feedFailed = true;
                     });
-                  processGuest(response);
+                  processGuests(response);
                 }, function(response) {
-                  console.log('could not get guests');
                   $scope.guestFailed = true;
                 });
               processCover(response);
-            }, function(response) {
-              console.log('could not get cover');
-            });
+            }, function(response) {});
           eventInfo = response.event_data;
           $scope.settings = response.settings;
           processEventInfo();
         }, function() {
           $scope.showModal('load');
         });
-      // eventInfo = {
-      //               "description": "OMG this is the story of my life. Narwhal bicycle rights aesthetic fanny pack, art party ennui Brooklyn twee typewriter polaroid chia lo-fi Carles drinking vinegar pour-over. Chambray Pinterest ethical banjo church-key whatever hashtag XOXO. American Apparel Banksy twee, paleo bicycle rights readymade bitters. Seitan Wes.\n\nHoodie pork belly DIY pug VHS messenger bag, readymade four loko wolf occupy. Pop-up aesthetic Pitchfork Tumblr. Mumblecore hella DIY, McSweeney's lo-fi meggings yr banh mi trust fund Odd Future cardigan disrupt sartorial kale chips. Pitchfork organic keytar, roof party street art PBR&B Tumblr church-key High Life beard +1.", 
-      //               "end_time": "2014-08-09T22:00:00-0700", 
-      //               "is_date_only": false, 
-      //               "location": "The Shark Tank - Sap Center", 
-      //               "name": "My Event (Demo for Wix App)", 
-      //               "owner": {
-      //                 "id": "671074532971418", 
-      //                 "name": "Jeffrey Chan"
-      //               }, 
-      //               "privacy": "SECRET", 
-      //               "start_time": "2014-08-08T19:00:00-0700", 
-      //               "timezone": "America/Los_Angeles", 
-      //               "updated_time": "2014-08-01T23:38:37+0000", 
-      //               "venue": {
-      //                 "id": "411435258956162", 
-      //                 "city": "San Jose", 
-      //                 "country": "United States", 
-      //                 "latitude": 37.332655187978, 
-      //                 "longitude": -121.90106628747, 
-      //                 "state": "CA", 
-      //                 "zip": "95113"
-      //               }, 
-      //               "id": "1512622455616642"
-      //             };
-      // processEventInfo();
     }
-
 });

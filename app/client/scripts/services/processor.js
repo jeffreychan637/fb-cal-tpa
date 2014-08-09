@@ -168,6 +168,11 @@ angular.module('fbCal').factory('processor', function ($sanitize, $sce, messages
     /**
      * Continues the process of gathering the data from a Facebook post object
      * into a status object that the modal can display.
+     *
+     * Initially, only a max of 5 statuses are displayed on the feed. If the
+     * user would like, she can click to view more replies as well as pull more
+     * from the server if the client knows there is another page of comments to
+     * get.
      * 
      * @param  {Object} status Status object being processed
      * @param  {Object} data   Facebook post object
@@ -207,10 +212,13 @@ angular.module('fbCal').factory('processor', function ($sanitize, $sce, messages
 
     /**
      * Processes all the comments in a Facebook post object into a status
-     * object the modal can display. Initially, only a max of 5 comments
-     * are displayed on each status for the user. If the user would like, they
-     * can click to view more replies as well as pull more from the server if
-     * the client knows there is another page of comments to get.
+     * object the modal can display.
+     * 
+     * Initially, only a max of 5 comments are displayed on each status. If the
+     * user would like, she can click to view more replies as well as pull more
+     * from the server if the client knows there is another page of comments to
+     * get.
+     * 
      * @param  {Object} status   Status object being processed
      * @param  {Object} comments Comments object from Facebook post object
      * @return {Object}          Processed status object

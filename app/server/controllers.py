@@ -1,45 +1,75 @@
+"""This file is essentially the REST API for the app. It handles all requests
+from the client side as well as all requests to save data. It is built on the
+Flask-Restful package.
+"""
+
+import json
 from flask import request
+from flask.ext.restful import Resource, Api, abort
 from app import flask_app
 from status_codes import STATUS
 from wix_verifications import instance_parser
 from fb import get_long_term_token, get_event_data, get_user_name, \
                get_all_event_data, get_specific_event, get_more_feed
 from models import save_settings, get_settings, delete_info
-from flask.ext.restful import Resource, Api, abort
-import json
 
+__author__ = "Jeffrey Chan"
+
+"""Sets up the flask app with the Flask-Restful package"""
 api = Api(flask_app)
 
 class SaveSettings(Resource):
+    """This class handles put requests to save settings to the database."""
     def put(self, compID):
         return save_data(request, compID, 'settings')
 
 class SaveAccessToken(Resource):
+    """This class handles put requests to save access tokens to the database."""
     def put(self, compID):
         return save_data(request, compID, 'access_token')
 
 class GetSettingsWidget(Resource):
+    """This class handles get requests for the settings and event data from the
+    widget.
+    """
     def get(self, compID):
         return get_data(request, compID, True)
 
 class GetSettingsSettings(Resource):
+    """This class handles get requests for the settings from the settings panel.
+    """
     def get(self, compID):
         return get_data(request, compID, False)
 
 class GetAllEvents(Resource):
+    """This class handles get requests from the settings panel to get event data
+    when trying to do so on the client side fails.
+    """
     def get(self, compID):
         return get_event(request, compID, "all")
 
 class GetModalEvent(Resource):
+    """This class handles all get requests from the modal for basic event data,
+    cover photos, the first page of the event feed, as well as guest stats.
+    """
     def get(self, compID):
         return get_event(request, compID, "specific")
 
 class GetModalFeed(Resource):
+    """This class handles all get requests from the modal for additional pages
+    of the event feed as well as additional pages for a specific status. This is
+    needed when the site visitor wants to see more statuses in the event feed
+    or more comments for a specific status.
+    """
     def get(self, compID):
         return get_event(request, compID, "feed")
 
 
 class Logout(Resource):
+    """This class handles put requests from the settings panel to delete the
+    user's access token and saved events data from the database after she logs
+    out of the app.
+    """
     def put(self, compID):
         info = validate_put_request(request, "logout")
         if not delete_info(compID, info["instance"]):
@@ -48,6 +78,7 @@ class Logout(Resource):
         else:
             return { "message" : "User Logged Out Successfully"}
 
+"""This sets the URLs of the app's REST API."""
 api.add_resource(SaveSettings, "/SaveSettings/<string:compID>")
 api.add_resource(SaveAccessToken, "/SaveAccessToken/<string:compID>")
 api.add_resource(GetSettingsWidget, "/GetSettingsWidget/<string:compID>")
@@ -58,6 +89,20 @@ api.add_resource(GetModalFeed, "/GetModalFeed/<string:compID>")
 api.add_resource(Logout, "/Logout/<string:compID>")
 
 def validate_put_request(request, datatype):
+    """This function validates all put requests to the server.
+    
+    It makes sure that each request comes with a valid Wix instance and the
+    window where the request is being performed on the client side is the
+    editor.
+
+    It also makes sure that, depending on the datatype being stored, all the
+    needed information to perform the put request has been provided by the
+    client.
+
+    It returns the data from the client if successful. Otherwise, it replies
+    to the client with an appropiate error status code and corresponding
+    message.
+    """
     try:
         instance = request.headers["X-Wix-Instance"]
         window = request.headers["URL"]
@@ -97,6 +142,21 @@ def validate_put_request(request, datatype):
     return info
 
 def validate_get_request(request, request_from):
+    """This function validates all get requests to the server.
+    
+    It makes sure that each request comes with a valid Wix instance. And if the
+    client is making requests that only the settings can make, it also checks
+    the window where the request is being performed on the client side to
+    verify that it is in the editor.
+
+    It also makes sure that, depending on the datatype being requested, all the
+    needed information to perform the get request has been provided by the
+    client.
+
+    It returns the provided data from the client if successful. Otherwise, it
+    replies to the client with an appropiate error status code and corresponding
+    message.
+    """
     try:
         instance = request.headers["X-Wix-Instance"]
         if request_from == "settings":
@@ -134,6 +194,14 @@ def validate_get_request(request, request_from):
         return instance
 
 def save_data(request, compID, datatype):
+    """This function saves the data from the client to the database.
+
+    If saving an access token, it first exchanges it for a long term one while
+    doing various security checks on the token.
+
+    It returns an appropiate error status code and corresponding message if
+    anything fails while attempting to save.
+    """
     info = validate_put_request(request, datatype)
     if datatype == "access_token":
         long_term_token = get_long_term_token(info["access_token"], compID, \
@@ -152,6 +220,21 @@ def save_data(request, compID, datatype):
         return {"message" : "Saved " + datatype + " Successfully"}
 
 def get_data(request, compID, request_from_widget):
+    """This function handles all the getting of data from widget and settings
+    panel (exception: getting event data for settings panel).
+
+    Using the component ID and instance ID, it calls functions that make a
+    request to the database for the appropiate row. If no row exists, it returns
+    empty settings to the client (where they will be replaced with the
+    default settings).
+
+    Otherwise, depending on where the request is coming from (widget or
+    settings), it returns the appropiate data in a JSON format to the 
+    client side.
+
+    It returns an appropiate error status code and corresponding message if
+    anything fails while getting the data.
+    """
     if (request_from_widget):
         instance = validate_get_request(request, "widget")
     else:
@@ -181,8 +264,7 @@ def get_data(request, compID, request_from_widget):
             access_token_data = json.loads(db_entry.access_token_data)
         if request_from_widget:
             if access_token_data:
-                fb_event_data = get_event_data(events, access_token_data, \
-                                               request_from_widget)
+                fb_event_data = get_event_data(events, access_token_data)
                 if (not fb_event_data) and (fb_event_data != []):
                     abort(STATUS["Bad_Gateway"], 
                         message="Couldn't receive data from Facebook")
@@ -208,6 +290,21 @@ def get_data(request, compID, request_from_widget):
         return full_json
 
 def get_event(request, compID, datatype):
+    """This function handles all requests from the modal as well as gets event
+    data for the settings panel.
+
+    For the modal, it can get specific data on the event (e.g. cover photo,
+    event feed) as well as any basic event data.
+
+    It makes the assumption that if this request is being made, the user has
+    an entry in the database and will return an error is there is no entry.
+
+    Once it gets the appropiate data, it returns it to the client in a JSON
+    format.
+
+    It returns an appropiate error status code and corresponding message if
+    anything fails while getting the data.
+    """
     if (datatype == "all"):
         instance = validate_get_request(request, "settings")
     elif (datatype == "specific"):

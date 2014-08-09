@@ -1,3 +1,11 @@
+/**
+ * CSS File for Calendar in Widget
+ *
+ * Originally from Bootstrap-Calendar Package
+ *
+ * Updated by Jeffrey Chan
+ */
+
 [class*="cal-cell"] {
   float: left;
   margin-left: 0;

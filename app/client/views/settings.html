@@ -1,4 +1,8 @@
+<!-- This the main HTML file for the Settings panel. -->
+
 <div ng-controller="SettingsCtrl">
+
+  <!-- Header -->
   <header class="box">
     <div class="logo">
       <img width="86" src="../client/images/wix_icon.png">
@@ -38,7 +42,11 @@
         </a>
     </div>
   </header>
+
+
   <div wix-ctrl="Accordion">
+
+    <!-- First Accordian - Events -->
     <div class="acc-pane">
       <h3 class="events">
         Events
@@ -68,6 +76,8 @@
         </ul>
       </div>
     </div>
+
+    <!-- Second Accordian Settings -->
     <div class="acc-pane">
       <h3>Settings</h3>
       <div class="acc-content">
@@ -129,6 +139,8 @@
         </ul>
       </div>
     </div>
+
+    <!-- Third Accordian - Design -->
     <div class="acc-pane">
       <h3>Design</h3>
       <div class="acc-content">

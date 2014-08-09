@@ -1,6 +1,18 @@
 'use strict';
 
+/**
+ * This factory holds some defaults settings and the function to get the Wix
+ * unparsed instance.
+ *
+ * @author Jeffrey Chan
+ */
+
 angular.module('fbCal').factory('api', function ($wix, $location, $log) {
+
+  /**
+   * The default settings for the app.
+   * @type {Object}
+   */
   var defaults = {
     title: 'This is my title.',
     description: 'This is my description.',
@@ -11,6 +23,12 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
     borderWidth: '5',
   };
 
+  /**
+   * Gets the unparsed instance from the URL. It is parsed on the server side
+   * to verify that requests are being sent from authenticated sources.
+   * 
+   * @return {String} The unparsed instance
+   */
   var getInstance = function() {
     var instanceId;
     var url = $location.absUrl();
@@ -20,11 +38,10 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
       instanceId = instance[1]; //instanceId is actually the unparsed instance
     } else {
       $log.error('Getting Instance ID failed');
-      //BREAK STUFF! THIS SHOULD NEVER HAPPEN.
-      //Probably in a hacker situation - disable functions and display error message
-      //display none the entire app
+      //This should never happen. It means the user is accessing the app outside
+      //of Wix.
     }
-    return instanceId; //returns the unparsed instance
+    return instanceId;
   };
 
   return {

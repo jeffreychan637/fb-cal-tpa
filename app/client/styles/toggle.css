@@ -1,4 +1,8 @@
-/* This CSS class is for the toggle switchs used in the Settings pane. */
+/**
+ * This CSS class is for the toggle switchs used in the Settings panel.
+ *
+ * The toggle switch is from Proto.io (http://proto.io/freebies/onoff/)
+ */
 
 .onoffswitch {
     position: relative; width: 67px;

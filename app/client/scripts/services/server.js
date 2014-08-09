@@ -1,20 +1,34 @@
 'use strict';
-/*global $:false, FB:false, console:false, jQuery:false */
+/*global $:false, FB:false, jQuery:false */
 
-angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $window, $q) {
+/**
+ * This factory makes all the calls to the server and sends any requested data
+ * back to the controllers/factories that use it.
+ *
+ * @author Jeffrey Chan
+ */
+
+angular.module('fbCal').factory('server', function ($log, $http, $wix, api, 
+                                                    $window, $q) {
   
   /**
    * IN PRODUCTION MODE, CHANGE HEADER URLS TO $window.location.hostname INSTEAD
    * OF editor.wix.com
    */
   
-  var compId = $wix.Utils.getCompId(); //get orig comp id?;
+  /**
+   * The Wix IDs needed for verification on the server
+   */
+  var compId = $wix.Utils.getOrigCompId() || $wix.Utils.getCompId();
   var instance = api.getInstance();
 
   compId = 45;
   instance = 47;
 
-  
+  /**
+   * All the URLs for communicating with the Server.
+   * @type {String}
+   */
   var getSettingsWidgetURL = '/GetSettingsWidget/' + compId;
   var getSettingsSettingsURL = '/GetSettingsSettings/' + compId;
   var getAllEventsURL = '/GetAllEvents/' + compId;
@@ -24,11 +38,23 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   var saveAccessTokenURL = '/SaveAccessToken/' + compId;
   var logoutURL = '/Logout/' + compId;
 
+  /**
+   * Default Settings in case the Server returns an error.
+   * @type {Object}
+   */
   var defaultSettingsWidget = {settings : api.defaults,
                                fb_event_data : [], active : true};
   var defaultSettingsSettings = {settings : api.defaults, events : [],
                                  active : true, name: "", user_id: ""};
 
+  /**
+   * Returns the appropriate URL based on the type of request and who is
+   * making.
+   * 
+   * @param  {String} requestType Type of request
+   * @param  {String} from        Who is making the request (Widget or Settings)
+   * @return {String}             The appropriate URL
+   */
   var getURL = function(requestType, from) {
     if (requestType === 'get') {
       if (from === 'widget') {
@@ -45,6 +71,12 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     }
   };
 
+  /**
+   * Returns the appriate default settings based on who is requesting.
+   * 
+   * @param  {String} from Who is making the request (Server or Widget)
+   * @return {Object}        The default settings
+   */
   var getDefault = function(from) {
     if (from === 'widget') {
       return defaultSettingsWidget;
@@ -53,6 +85,12 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     }
   };
 
+  /**
+   * Returns the appriate header based on who is requesting.
+   * 
+   * @param  {String} from   Who is making the request (Server or Widget)
+   * @return {Object}        The appropriate header
+   */
   var getHeader = function(from) {
     if (from === 'widget') {
       return {'X-Wix-Instance' : instance};
@@ -61,6 +99,17 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
     }
   };
 
+  /**
+   * Returns the correct header depending on the FB api parameter provided.
+   * 
+   * @param  {Object} params      Contains the FB api param needed to get next
+   *                              part of feed or comments
+   * @param  {String} desiredData The type of data wanted (Either more posts
+   *                              or comments)
+   * @param  {String} eventId     Event Id for the event that we are requesting
+   *                              data about
+   * @return {Object}             The appropriate header
+   */
   var getFeedHeader = function(params, desiredData, eventId) {
     if (params.after) {
       return {'X-Wix-Instance' : instance,
@@ -82,7 +131,11 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
   /**
    * This function makes a call to the backend database to get the
    * latest user settings. It's called whenever the widget or settings panal
-   * is first loaded. On errors, the default settings are loaded.
+   * is first loaded. On errors or empty settings from the server, the default
+   * settings are loaded.
+   * 
+   * @param  {String} from        Who is making the request (Widget or Settings)
+   * @return {Object}             A promise to return the settings
    */
   var getUserInfo = function(from) {
     var deferred = $q.defer();
@@ -104,19 +157,23 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
                 response.fb_event_data = [];
               }
               deferred.resolve(response);
-              console.debug("Got Settings for " + from);
             } else {
-              console.log('The server is returning an incorrect status.');
+              $log.warn('The server is returning an incorrect status.');
               deferred.reject(getDefault(from));
-              //i don't really know what the fb_event_data looks like
             }
           }).error(function (message, status) {
-            // console.warn(status, message);
             deferred.reject(getDefault(from));
           });
     return deferred.promise;
   };
 
+  /**
+   * This is used by the Settings panel to get all the events created by the
+   * user on her Facebook account. It is only used if trying to get the event
+   * data from the client side fails.
+   * 
+   * @return {Object} Promise to return the event data from Server
+   */
   var getAllEvents = function() {
     var deferred = $q.defer();
     $http({
@@ -125,22 +182,26 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
            headers: getHeader('settings'),
            timeout: 15000
           }).success(function (data, status) {
-            console.log(status, data);
             if (status === 200) {
-              console.log(data); 
               deferred.resolve(jQuery.parseJSON(jQuery.parseJSON(data)));
             } else {
-              console.log('The server is returning an incorrect status.');
+              $log.warn('The server is returning an incorrect status.');
               deferred.reject();
-              //i don't really know what the fb_event_data looks like
             }
           }).error(function (message, status) {
-            console.warn(status, message);
             deferred.reject();
           });
     return deferred.promise;
   };
 
+  /**
+   * Gets the event data for a specific event for the Modal.
+   * 
+   * @param  {String} eventId     The event ID for the event you want data about
+   * @param  {String} desiredData The desired data you want about this event
+   *                              (e.g. cover photo, feed)
+   * @return {Object}             Promise to return the event data
+   */
   var getModalEvent = function(eventId, desiredData) {
     var modalHeader = {'X-Wix-Instance' : instance, 
                        'event_id' : eventId.toString(),
@@ -160,20 +221,28 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
               }
               deferred.resolve(response);
             } else {
-              console.log('The server is returning an incorrect status.');
+              $log.warn('The server is returning an incorrect status.');
               deferred.reject();
             }
           }).error(function (message, status) {
-            console.error(status, message);
             deferred.reject();
           });
     return deferred.promise;
   };
 
+  /**
+   * Get additional feed data for the Modal.
+   * 
+   * @param  {Object} params      The params that will need to be provided to
+   *                              the Facebook SDK to get the specific event
+   *                              data
+   * @param  {String} desiredData The type of event data you want (more feed or
+   *                              more comments)
+   * @param  {String} eventId     The event ID for the event you want
+   * @return {Object}             Promise to return data from server
+   */
   var getModalFeed = function(params, desiredData, eventId) {
     var deferred = $q.defer();
-    console.log('prints printer');
-    console.log(params, desiredData, eventId);
     $http({
            method: 'GET',
            url: getModalFeedURL,
@@ -182,19 +251,26 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
          }).success(function (data, status) {
             if (status === 200) {
               var response = jQuery.parseJSON(jQuery.parseJSON(data));  
-              console.log(response);
               deferred.resolve(response);
             } else {
-              console.log('The server is returning an incorrect status.');
+              $log.warn('The server is returning an incorrect status.');
               deferred.reject();
             }
           }).error(function (message, status) {
-            console.error(status, message);
             deferred.reject();
           });
     return deferred.promise;
   };
 
+  /**
+   * Saves data to the database on the server.
+   * 
+   * @param  {Object} data     The data to be saved
+   * @param  {String} dataType The type of data to save
+   *                            (Access Token or Settings)
+   * @return {Object}          Promise to tell you if data was saved
+   *                           successfully
+   */
   var saveData = function(data, dataType) {
     var deferred = $q.defer();
     $http({
@@ -205,21 +281,23 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
             data: data
           }).success(function (message, status) {
             if (status === 200) {
-              console.debug(dataType + ' saved successfully.');
               deferred.resolve();
             } else {
-              console.log('The server is returning an incorrect status.');
+              $log.warn('The server is returning an incorrect status.');
               deferred.reject();
             }
           }).error(function (message, status) {
-            console.log(dataType + ' failed to save.');
-            console.log(status);
-            console.log(message);
             deferred.reject();
           });
     return deferred.promise;
   };
 
+  /**
+   * Deletes the access token and saved events data from the database. Called
+   * when the user logs out of her Facebook account in the settings panel.
+   * 
+   * @return {Object} Promise to tell if deletion was successfully
+   */
   var logout = function() {
     var deferred = $q.defer();
     $http({
@@ -229,18 +307,13 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api, $win
             timeout: 10000,
             data: {}
           }).success(function (message, status) {
-            console.log(status, message);
             if (status === 200) {
-              console.log('Logged out successfully.');
               deferred.resolve();
             } else {
-              console.log('The server is returning an incorrect status.');
+              $log.warn('The server is returning an incorrect status.');
               deferred.resolve();
             }
           }).error(function (message, status) {
-            console.log('Failed to logout.');
-            console.log(status);
-            console.log(message);
             deferred.reject();
           });
       return deferred.promise;

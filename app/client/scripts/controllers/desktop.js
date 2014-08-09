@@ -1,15 +1,23 @@
 'use strict';
 /*global $:false */
 
+/**
+ * This is the Controller of the Widget. It is the main file that sends
+ * info to be displayed on the DOM to the user and calls different functions
+ * across different files to do so.
+ *
+ * @author Jeffrey Chan
+ */
+
 angular.module('fbCal')
-  .controller('DesktopCtrl', function ($scope, $wix, api, $log, $window,
-                                       desktopCalendar, list, fbSetup, server) {
+  .controller('DesktopCtrl', function ($scope, $wix, $window, desktopCalendar,
+                                       list, server) {
 
     var eventData = [];
 
     /**
      * Calls the appropriate function in List.js to get appropriate style for
-     * the event object
+     * the event object.
      * 
      * @param  {Boolean} last Whether or not this is the last item in the list
      * @return {Object}       Appropriate CSS style for this Event object

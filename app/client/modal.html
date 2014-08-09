@@ -48,7 +48,7 @@
     <!-- build:js({.tmp,app}) scripts/index.js -->
     <script src="../../client/scripts/app.js"></script>
 
-    <!-- This is necessary to pass event ID from server into modal, so modal
+    <!-- This is necessary to pass event ID from server into modal, so the modal
          knows what event to ask the server for later. -->
     <script type="text/javascript">
         angular.module('fbCal').value('eventId', {{event_id}});
@@ -58,6 +58,8 @@
     <script src="../../client/scripts/services/facebook/modalFbLogin.js"></script>
     <script src="../../client/scripts/services/facebook/fbEvents.js"></script>
     <script src="../../client/scripts/services/api.js"></script>
+    <script src="../../client/scripts/services/messages.js"></script>
+    <script src="../../client/scripts/services/processor.js"></script>
     <script src="../../client/scripts/services/wix.js"></script>
     <script src="../../client/scripts/services/server.js"></script>
     <script src="../../client/scripts/controllers/modal.js"></script>
