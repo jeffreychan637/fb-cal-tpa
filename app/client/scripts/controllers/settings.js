@@ -19,6 +19,9 @@ angular.module('fbCal')
      * checkedEventsList - Events that the user has "checked" (She wants it
      *                     on her calendar/list).
      * @type {Array}
+     * numericalSettings - A special list of settings whose values are rounded
+     *                     down to the nearest integer before being saved.
+     * @type {Array}
      * eventChange - Whether or not the change that the user made in
      *               the settings involves adding/deleting an event or
      *               changing the color of an event. If this is true
@@ -29,8 +32,11 @@ angular.module('fbCal')
      */
     $scope.allEventsList = [];
     var checkedEventsList;
-    var eventChange;  
+    var numericalSettings = ['borderWidth', 'modalBorderWidth',
+                             'corners', 'modalCorners'];
+    var eventChange;
     var userId;
+
     
     /**
      * This function watches for when all the facebook events are done being
@@ -127,7 +133,7 @@ angular.module('fbCal')
         if (!found) {
           return;
         }
-      } else if (key === 'corners' || key === 'borderWidth') {
+      } else if (numericalSettings.indexOf(key) >= 0) {
         $scope.settings[key] = Math.ceil(value);
         eventChange = false;
       } else {
