@@ -19,8 +19,8 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
   var url = $window.location.hostname;
 
   url = 'editor.wix.com';
-  compId = 45;
-  instance = 47;
+  // compId = 45;
+  // instance = 47;
 
   /**
    * All the URLs for communicating with the Server.
