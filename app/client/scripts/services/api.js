@@ -22,7 +22,7 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
     corners: '25',
     borderWidth: '5',
     modalCorners: '0',
-    modalBorderWidth: '5'
+    modalBorderWidth: '3'
   };
 
   /**
