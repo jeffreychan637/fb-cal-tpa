@@ -103,6 +103,24 @@ angular.module('fbCal')
     };
 
     /**
+     * This function sets up the user design settings for the modal to most
+     * of the modal elements.
+     *
+     * This function does not apply the settings to the feed elements. The
+     * directives handle that, because at the time this function is run those
+     * feed elements don't exist in the DOM yet.
+     */
+     var setSettings = function() {
+      $('.app').css('border-width', $scope.settings.modalBorderWidth + 'px');
+      $('#header').css('border-width', $scope.settings.modalBorderWidth + 'px');
+      $('.block').css('border-width', $scope.settings.modalBorderWidth + 'px');
+
+      $('.app').css('border-radius', $scope.settings.modalCorners + 'px');
+      $('#header').css('border-radius', $scope.settings.modalCorners + 'px');
+      $('.block').css('border-radius', $scope.settings.modalCorners + 'px');
+     };
+
+    /**
      * Processes all the event info from Facebook (except for the feed). Once
      * processing is done, the loading message disappears and the event details
      * are displayed to the user.
@@ -168,7 +186,7 @@ angular.module('fbCal')
     var processCover = function(coverObject) {
       if (coverObject.cover && coverObject.cover.source) {
         var cover = coverObject.cover;
-        var height = 296 + ($scope.settings.borderWidth * 2);
+        var height = 296 + ($scope.settings.modalBorderWidth * 2);
         var cssClass = {'background-image' : 'url(' + cover.source + ')',
                         'height' : height + 'px',
                         'background-position' : cover.offset_x + '% ' +
@@ -783,6 +801,7 @@ angular.module('fbCal')
             }, function(response) {});
           eventInfo = response.event_data;
           $scope.settings = response.settings;
+          setSettings();
           processEventInfo();
         }, function() {
           $scope.showModal('load');

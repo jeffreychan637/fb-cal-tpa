@@ -148,7 +148,7 @@
       <!-- Loading Event Feed Message Block -->
       <div class="row" ng-hide="displayFeed || feedFailed">
          <div class="col-sm-4 col-sm-offset-4">
-          <div class="block">
+          <div class="block" modal-border-width modal-corners="-1">
             <h4 class="text-center load-feed">Loading Event Feed...</h4>
             </div>
         </div>
@@ -157,7 +157,7 @@
       <!-- Loading Event Feed Failed Message Block -->
       <div class="row" ng-show="feedFailed">
          <div class="col-sm-4 col-sm-offset-4">
-          <div class="block">
+          <div class="block" modal-border-width modal-corners="-1">
             <h4 class="text-center load-feed">Could not load Event Feed</h4>
             </div>
         </div>
@@ -167,7 +167,7 @@
       <div ng-repeat="status in feed" ng-show="displayFeed" class="animate-repeat">
         <div class="row">
           <div class="col-sm-10 col-sm-offset-1">
-            <div class="block" ng-mouseover="status.hoverOver = true" ng-mouseleave="status.hoverOver = false">
+            <div class="block" ng-mouseover="status.hoverOver = true" ng-mouseleave="status.hoverOver = false" modal-border-width modal-corners>
               <button type="button" class="close" ng-click="interactWithFb('deletePost', $index, undefined)" ng-show="status.appPosted && status.hoverOver"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
               <blockquote><strong>{{status.name}}</strong> posted <em><span ng-bind-html="status.message"></span></em>
                 <br>
@@ -190,7 +190,7 @@
                 <span ng-if="status.description">{{status.description}}</span>
               </blockquote>
             </div>
-            <div class="block add-on" ng-show="status.comment && settings.commenting">
+            <div class="block add-on" ng-show="status.comment && settings.commenting" modal-border-width modal-corners="{{$index}}">
               <form class="input-group" ng-if="status.like && status.comment">
                 <span class="input-group-btn">
                   <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)" ng-hide="status.userLiked">
@@ -214,7 +214,7 @@
             </div>
 
             <!-- Comments to Statuses Block -->
-            <div class="block add-on" ng-if="status.comments && status.comments.length > 0">
+            <div class="block add-on" ng-if="status.comments && status.comments.length > 0" modal-border-width modal-corners>
               <div ng-repeat="comment in status.comments" ng-mouseover="comment.hoverOver = true" ng-mouseleave="comment.hoverOver = false">
                 <button type="button" class="close" ng-click="interactWithFb('deleteComment', comment.id, $index)" ng-show="comment.appPosted && comment.hoverOver"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
@@ -234,7 +234,7 @@
       <!-- Get More Feed Message Block -->
       <div class="row">
          <div class="col-sm-4 col-sm-offset-4">
-          <div class="block" ng-if="moreFeedMessage">
+          <div class="block" ng-if="moreFeedMessage" modal-border-width modal-corners="-1">
             <h4 class="text-center load-posts" ng-click="showMoreFeed()">{{moreFeedMessage}}</h4>
             </div>
         </div>
