@@ -224,29 +224,22 @@
           <li wix-label="Body Font">
             <div wix-param="modalBodyColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-14'}"></div>
             <div wix-param="modalBodyFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
-            <div wix-ctrl="Tooltip" wix-options="{placement:'right', text:'In month mode, this is the font of the current month shown. In list mode, this is font of the events and their times.'}">
-              <strong>
-                <a class="uilib-text question">
-                  ?
-                </a>
-              </strong>
-            </div>
           </li>
           <li wix-label="Button Font">
             <div wix-param="modalButtonColor" wix-ctrl="ColorPicker" wix-options="{startWithColor: 'color-14'}"></div>
             <div wix-param="modalButtonFont" wix-ctrl="FontStylePicker" wix-options="{value: 'Body-M'}"></div>
           </li>
+          <li wix-label="Buttons">
+            <div wix-param="modalButtons" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-2', startWithOpacity:100}"></div>
+          </li>
+          <li wix-label="Blocks">
+              <div wix-param="modalBlocks" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-2', startWithOpacity:100}"></div>
+          </li>
           <li wix-label="Background">
               <div wix-param="modalBackground" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-1', startWithOpacity:100}"></div>
           </li>
-          <li wix-label="Blocks">
-              <div wix-param="modalBlocks" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-1', startWithOpacity:100}"></div>
-          </li>
           <li wix-label="Border">
             <div wix-param="modalBorder" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
-          </li>
-          <li wix-label="Buttons">
-            <div wix-param="modalButtons" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor: 'color-5', startWithOpacity:100}"></div>
           </li>
           <li wix-label="Border Width">
             <div  wix-model="modalBorderWidth" wix-ctrl="Slider" wix-options="{minValue: 0, maxValue: 20, preLabel: '0', postLabel: '20', toolTip: true}">
