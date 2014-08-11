@@ -141,6 +141,12 @@ blockquote {
   margin-left: 2.5em;
 }
 
+@media all and (max-width: 475px) {
+  .sub-text {
+    margin-left: 0;
+  }
+}
+
 .link {
   color: white;
 }
