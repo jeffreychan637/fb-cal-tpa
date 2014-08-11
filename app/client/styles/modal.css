@@ -221,15 +221,12 @@ textarea {
 }
 
 .post-btn {
-  min-height: 54px;
+  min-height: 52px;
 }
 
 .btn {
   color: #ff4c4c !important;
-}
-
-.btn:focus {
-  outline: none;
+  outline: none !important;
 }
 
 .load-feed {
