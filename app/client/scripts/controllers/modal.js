@@ -115,7 +115,6 @@ angular.module('fbCal')
       $('#header').css('border-width', $scope.settings.modalBorderWidth + 'px');
       $('.block').css('border-width', $scope.settings.modalBorderWidth + 'px');
 
-      $('.app').css('border-radius', $scope.settings.modalCorners + 'px');
       $('#header').css('border-radius', $scope.settings.modalCorners + 'px');
       $('.block').css('border-radius', $scope.settings.modalCorners + 'px');
      };
