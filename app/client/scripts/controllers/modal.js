@@ -192,8 +192,8 @@ angular.module('fbCal')
                                                 cover.offset_y + '%'
                        };
         $('#header').css(cssClass);
-        $('#title').addClass('dark-background');
-        $('#host').addClass('dark-background');
+        $('#heading').addClass('dark-background');
+        // $('heading').css({'border-radius': $scope.settings.modalCorners + 'px'});
       }
     };
 
@@ -654,7 +654,6 @@ angular.module('fbCal')
       }
       var modal = processor.processModal(type);
       $scope.messageTitle = modal.messageTitle;
-      $('#messageTitle').css(modal.css);
       $scope.messageBody = modal.messageBody;
       $scope.modalButton = modal.modalButton;
       $scope.showLink = modal.showLink;
@@ -678,7 +677,6 @@ angular.module('fbCal')
       $scope.postError = false;
       $scope.permissionError = false;
       $scope.messageTitle = solveModal.title;
-      $('#messageTitle').css({'color' : '#09F'});
       $scope.messageBody = solveModal.message;
       if (curErrorType === 'declined permission') {
         getDeniedPermission();

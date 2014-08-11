@@ -19,7 +19,113 @@
     <link rel="stylesheet" href="../../client/styles/styles.css">
     <link rel="stylesheet" href="../../client/styles/modal.css">
     <!-- endbuild -->
-    <style wix-style></style>
+    {% raw %}
+    <style wix-style>
+      .loading {
+        color: {{style.modalTitleColor color-14}};
+      }
+      .app {
+        border-color: {{style.modalBorder color-5}};
+        background-color: {{style.modalBackground color-1}};
+      }
+      #header {
+        border-color: {{style.modalBorder color-5}};
+        background-color: {{style.modalBlocks color-2}};
+      }
+      .heading {
+        color: {{style.modalTitleColor color-14}};
+        {{style.modalTitleFont Heading-L}};
+      }
+      .heading:hover {
+        color: {{style.modalTitleColor color-14}};
+        {{style.modalTitleFont Heading-L}};
+      }
+      .sub-heading {
+        color: {{style.modalTitleColor color-14}};
+      }
+      .sub-heading:hover {
+        color: {{style.modalTitleColor color-14}};
+      }
+      .host {
+        color: {{style.modalTitleColor color-14}};
+      }
+      .info-blocks {
+        color: {{style.modalBodyColor color-14}};
+      }
+      .info-blocks:hover {
+        color: {{style.modalBodyColor color-14}};
+      }
+      .btn {
+        color: {{style.modalButtonColor color-14}} !important;
+        {{style.modalButtonFont Body-M}};
+        background-color: {{style.modalButtons color-2}} !important;
+        border-color: {{style.modalButtonColor color-14}} !important; 
+      }
+      .dropdown-menu {
+        color: {{style.modalButtonColor color-14}} !important;
+        {{style.modalButtonFont Body-M}};
+        background-color: {{style.modalButtons color-2}} !important;
+      }
+      .dropdown-menu > li > a {
+        color: {{style.modalButtonColor color-14}} !important;
+        {{style.modalButtonFont Body-M}};
+        background-color: {{style.modalButtons color-2}} !important;
+      }
+      .block {
+        border-color: {{style.modalBorder color-5}};
+        background-color: {{style.modalBlocks color-2}};
+      }
+      #description {
+        color: {{style.modalBodyColor color-14}};
+        {{style.modalBodyFont Body-M}};
+      }
+      .form-control {
+        color: {{style.modalBodyColor color-14}};
+      }
+      .form-control:focus {
+        border-color: {{style.modalButtonColor color-14}};
+      }
+      blockquote {
+        border-left-color: {{style.modalBodyColor color-14}};
+        color: {{style.modalBodyColor color-14}};
+        {{style.modalBodyFont Body-M}};
+      }
+      .link {
+        color: {{style.modalBodyColor color-14}};
+        {{style.modalBodyFont Body-M}};
+      }
+      .link:hover {
+        color: {{style.modalBodyColor color-14}};
+        {{style.modalBodyFont Body-M}};
+      }
+      .load-feed {
+        color: {{style.modalBodyColor color-14}};
+        {{style.modalBodyFont Body-M}};
+      }
+      .load-posts {
+        color: {{style.modalBodyColor color-14}};
+        {{style.modalBodyFont Body-M}};
+      }
+      .modal-content {
+        border-color: {{style.modalBorder color-5}};
+        background-color: {{style.modalBlocks color-2}};
+      }
+      .modal-header {
+        border-bottom-color: {{style.modalBodyColor color-14}};;
+      }
+      .modal-title {
+        color: {{style.modalTitleColor color-14}};
+        {{style.modalTitleFont Heading-L}};
+      }
+      .modal-body {
+        color: {{style.modalBodyColor color-14}};
+        {{style.modalBodyFont Body-M}};
+      }
+      .modal-footer {
+        border-top-color: {{style.modalBodyColor color-14}};;
+      }
+    </style>
+    {% endraw %}
   </head>
   <body ng-app="fbCal">
     <!--[if lt IE 8]>

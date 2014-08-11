@@ -317,7 +317,6 @@ angular.module('fbCal').factory('processor', function ($sanitize, $sce, messages
      */
     var processModal = function(type) {
       var modal = { messageTitle : '',
-                    css : {'color' : '#09F'},
                     messageBody : '',
                     modalButton : '',
                     showLink : false,
@@ -325,7 +324,6 @@ angular.module('fbCal').factory('processor', function ($sanitize, $sce, messages
                   };
       if (errorTypes.indexOf(type) >= 0) {
         modal.messageTitle = messages.errorModal.title;
-        modal.css = messages.errorModal.css;
         modal.messageBody = messages.errorModal.message;
         modal.modalButton = messages.errorModal.modalButton;
       } else if (type === 'link') {
