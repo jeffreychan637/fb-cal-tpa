@@ -39,7 +39,6 @@ angular.module('fbCal').factory('messages', function () {
    * @type {Object}
    */
   var errorModal = {title: 'Oh no!',
-                    css: {'color' : 'red'},
                     message: 'Something terrible happened. Please try again or reload the page.',
                     modalButton: 'Try Again'
                    };

@@ -49,3 +49,24 @@ angular.module('fbCal')
           }
         };
       });
+
+angular.module('fbCal')
+  .directive('modalBorderWidth', function() {
+        return {
+          link: function(scope, element) {
+            scope.$watch(function() {
+                if (scope.settings) {
+                  return scope.settings.modalBorderWidth;
+                } else {
+                  return false;
+                }
+              },
+              function() {
+                if (scope.settings) {
+                  element.css('border-width',
+                              scope.settings.modalBorderWidth + 'px');
+                }
+              });
+          }
+        };
+      });

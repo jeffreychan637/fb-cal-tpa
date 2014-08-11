@@ -25,3 +25,45 @@ angular.module('fbCal')
           }
         };
       });
+
+angular.module('fbCal')
+  .directive('modalCorners', function() {
+        return {
+          link: function(scope, element, attr) {
+            scope.$watch(function() {
+                if (scope.settings) {
+                  return scope.settings.modalCorners;
+                } else {
+                  return false;
+                }
+              },
+              function() {
+                if (scope.settings && scope.feed) {
+                  if (attr.modalCorners === "-1") {
+                    element.css('border-radius',
+                                scope.settings.modalCorners + 'px');
+                  } else if (attr.modalCorners) {
+                    if (scope.feed[attr.modalCorners]) {
+                      if (!scope.feed[attr.modalCorners].comments.length) {
+                        element.css('border-bottom-left-radius',
+                                    scope.settings.modalCorners + 'px');
+                         element.css('border-bottom-right-radius',
+                                      scope.settings.modalCorners + 'px');
+                      }
+                    }
+                  } else if (element.hasClass('add-on')) {
+                    element.css('border-bottom-left-radius',
+                                scope.settings.modalCorners + 'px');
+                    element.css('border-bottom-right-radius',
+                                scope.settings.modalCorners + 'px');
+                  } else if (element.hasClass('block')) {
+                    element.css('border-top-left-radius',
+                                scope.settings.modalCorners + 'px');
+                    element.css('border-top-right-radius',
+                                scope.settings.modalCorners + 'px');
+                  }
+                }
+              });
+          }
+        };
+      });

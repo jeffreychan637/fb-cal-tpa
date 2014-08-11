@@ -21,6 +21,8 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
     hostedBy: true,
     corners: '25',
     borderWidth: '5',
+    modalCorners: '0',
+    modalBorderWidth: '3'
   };
 
   /**

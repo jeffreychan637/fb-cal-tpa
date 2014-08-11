@@ -6,16 +6,18 @@
     
     <!-- Cover Photo and Title Area -->
     <div class="page-header" id="header">
-      <h1 id="title" class="title"><a ng-href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
-      <h5 id="host" class="host" ng-if="settings.hostedBy">
-        <em>Hosted by <strong><a ng-href="https://www.facebook.com/{{ownerId}}" target="blank">{{owner}}</a></strong></em>
-      </h5>
+      <div id="heading">
+        <h1 id="title" class="title"><a class="heading" ng-href="https://www.facebook.com/events/{{id}}" target="blank">{{name}}</a></h1>
+        <h5 id="host" class="host" ng-if="settings.hostedBy">
+          <em>Hosted by <strong><a class="sub-heading" ng-href="https://www.facebook.com/{{ownerId}}" target="blank">{{owner}}</a></strong></em>
+        </h5>
+      </div>
     </div>
 
     <div class="container-fluid">
 
       <!-- Left Column -->
-      <div class="row">
+      <div class="row info-blocks">
         <div class="col-sm-6 left-col">
 
           <!-- RSVP and Share Block -->
@@ -109,12 +111,12 @@
             <div class="block" id="location">
               <h4 class="main-text">
                 <span class="icon-location icon" data-icon="b"></span>
-                <a href="https://maps.google.com/?q={{location}}" target="blank">
+                <a href="https://maps.google.com/?q={{location}}" target="blank" class="info-blocks">
                   {{location}}
                 </a>
               </h4>
               <h6 class="sub-text" ng-if="venue">
-                <a href="https://maps.google.com/?q={{location}}" target="blank">{{venue}}</a>
+                <a href="https://maps.google.com/?q={{location}}" target="blank" class="info-blocks">{{venue}}</a>
               </h6>
             </div>
           </div>
@@ -125,7 +127,7 @@
       <div class="row">
         <div class="col-sm-12 middle-col">
           <div class="block">
-            <span ng-bind-html="description" ng-if="displayDescription">
+            <span id="description" ng-bind-html="description" ng-if="displayDescription">
             </span>
           </div>
         </div>
@@ -148,7 +150,7 @@
       <!-- Loading Event Feed Message Block -->
       <div class="row" ng-hide="displayFeed || feedFailed">
          <div class="col-sm-4 col-sm-offset-4">
-          <div class="block">
+          <div class="block" modal-border-width modal-corners="-1">
             <h4 class="text-center load-feed">Loading Event Feed...</h4>
             </div>
         </div>
@@ -157,7 +159,7 @@
       <!-- Loading Event Feed Failed Message Block -->
       <div class="row" ng-show="feedFailed">
          <div class="col-sm-4 col-sm-offset-4">
-          <div class="block">
+          <div class="block" modal-border-width modal-corners="-1">
             <h4 class="text-center load-feed">Could not load Event Feed</h4>
             </div>
         </div>
@@ -167,13 +169,13 @@
       <div ng-repeat="status in feed" ng-show="displayFeed" class="animate-repeat">
         <div class="row">
           <div class="col-sm-10 col-sm-offset-1">
-            <div class="block" ng-mouseover="status.hoverOver = true" ng-mouseleave="status.hoverOver = false">
+            <div class="block" ng-mouseover="status.hoverOver = true" ng-mouseleave="status.hoverOver = false" modal-border-width modal-corners>
               <button type="button" class="close" ng-click="interactWithFb('deletePost', $index, undefined)" ng-show="status.appPosted && status.hoverOver"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
               <blockquote><strong>{{status.name}}</strong> posted <em><span ng-bind-html="status.message"></span></em>
                 <br>
                 {{status.time}}
-                <a class="push-left" ng-show="status.like && !status.comment && settings.commenting && !status.userliked" ng-click="interactWithFb('like', $index, undefined)">Like</a>
-                 <a class="push-left" ng-show="status.like && !status.comment && settings.commenting && status.userliked" ng-click="interactWithFb('unlike', $index, undefined)">Unlike</a>
+                <a class="push-left link" ng-show="status.like && !status.comment && settings.commenting && !status.userliked" ng-click="interactWithFb('like', $index, undefined)">Like</a>
+                 <a class="push-left link" ng-show="status.like && !status.comment && settings.commenting && status.userliked" ng-click="interactWithFb('unlike', $index, undefined)">Unlike</a>
                 <span class="push-left" ng-show="status.numberLikes">
                   {{status.numberLikes}} Likes
                 </span>
@@ -181,7 +183,7 @@
                   {{status.numberShares}} Shares
                 </span>
                 <img ng-if="status.picture" ng-src="{{status.picture}}" class="center-block img-thumbnail img-responsive">
-                <a ng-href="{{status.link}}" target="blank" ng-if="status.link">{{status.link}}</a>
+                <a class="link" ng-href="{{status.link}}" target="blank" ng-if="status.link">{{status.link}}</a>
                 <br ng-if="status.linkName">
                 <span ng-if="status.linkName">{{status.linkName}}</span>
                 <br ng-if="status.caption">
@@ -190,7 +192,9 @@
                 <span ng-if="status.description">{{status.description}}</span>
               </blockquote>
             </div>
-            <div class="block add-on" ng-show="status.comment && settings.commenting">
+
+            <!-- Commenting on and Liking Statuses Block -->
+            <div id="status{{$index}}" class="block add-on" ng-show="status.comment && settings.commenting" modal-border-width modal-corners="{{$index}}">
               <form class="input-group" ng-if="status.like && status.comment">
                 <span class="input-group-btn">
                   <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)" ng-hide="status.userLiked">
@@ -214,18 +218,18 @@
             </div>
 
             <!-- Comments to Statuses Block -->
-            <div class="block add-on" ng-if="status.comments && status.comments.length > 0">
+            <div class="block add-on" ng-if="status.comments && status.comments.length > 0" modal-border-width modal-corners>
               <div ng-repeat="comment in status.comments" ng-mouseover="comment.hoverOver = true" ng-mouseleave="comment.hoverOver = false">
                 <button type="button" class="close" ng-click="interactWithFb('deleteComment', comment.id, $index)" ng-show="comment.appPosted && comment.hoverOver"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <blockquote><strong>{{comment.name}}</strong> replied <em><span ng-bind-html="comment.message"></span></em>
                   <br>
                   {{comment.time}}
-                  <a class="push-left" ng-show="settings.commenting && !comment.userLiked" ng-click="interactWithFb('likeComment', comment.id, $index)">Like</a>
-                  <a class="push-left" ng-show="settings.commenting && comment.userLiked" ng-click="interactWithFb('unlikeComment', comment.id, $index)">Unlike</a>
+                  <a class="push-left link" ng-show="settings.commenting && !comment.userLiked" ng-click="interactWithFb('likeComment', comment.id, $index)">Like</a>
+                  <a class="push-left link" ng-show="settings.commenting && comment.userLiked" ng-click="interactWithFb('unlikeComment', comment.id, $index)">Unlike</a>
                   <span class="push-left" ng-show="comment.numberLikes">{{comment.numberLikes}} Likes</span>
                 </blockquote>
               </div>
-              <a class="push-left" ng-if="status.repliesMessage" ng-click="showMoreReplies($index)">{{status.repliesMessage}}</a>
+              <a class="push-left link" ng-if="status.repliesMessage" ng-click="showMoreReplies($index)">{{status.repliesMessage}}</a>
             </div>
           </div>
         </div>
@@ -234,7 +238,7 @@
       <!-- Get More Feed Message Block -->
       <div class="row">
          <div class="col-sm-4 col-sm-offset-4">
-          <div class="block" ng-if="moreFeedMessage">
+          <div class="block" ng-if="moreFeedMessage" modal-border-width modal-corners="-1">
             <h4 class="text-center load-posts" ng-click="showMoreFeed()">{{moreFeedMessage}}</h4>
             </div>
         </div>
@@ -253,7 +257,7 @@
         <div class="modal-body">
           <p>
             {{messageBody}}
-            <a class="share-link" ng-show="showLink" ng-href="https://www.facebook.com/events/{{id}}" target="blank">
+            <a class="share-link link" ng-show="showLink" ng-href="https://www.facebook.com/events/{{id}}" target="blank">
               https://www.facebook.com/events/{{id}}
             </a>
           </p>

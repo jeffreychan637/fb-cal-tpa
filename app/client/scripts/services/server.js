@@ -10,18 +10,15 @@
 
 angular.module('fbCal').factory('server', function ($log, $http, $wix, api, 
                                                     $window, $q) {
-  
-  /**
-   * IN PRODUCTION MODE, CHANGE HEADER URLS TO $window.location.hostname INSTEAD
-   * OF editor.wix.com
-   */
-  
+
   /**
    * The Wix IDs needed for verification on the server
    */
   var compId = $wix.Utils.getOrigCompId() || $wix.Utils.getCompId();
   var instance = api.getInstance();
+  var url = $window.location.hostname;
 
+  url = 'editor.wix.com';
   compId = 45;
   instance = 47;
 
@@ -95,7 +92,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
     if (from === 'widget') {
       return {'X-Wix-Instance' : instance};
     } else {
-      return {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'};
+      return {'X-Wix-Instance' : instance, 'URL' : url};
     }
   };
 
@@ -276,7 +273,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
     $http({
             method: 'PUT',
             url: getURL('post', dataType),
-            headers: {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'},
+            headers: {'X-Wix-Instance' : instance, 'URL' : url},
             timeout: 10000,
             data: data
           }).success(function (message, status) {
@@ -303,7 +300,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
     $http({
             method: 'PUT',
             url: logoutURL,
-            headers: {'X-Wix-Instance' : instance, 'URL' : 'editor.wix.com'},
+            headers: {'X-Wix-Instance' : instance, 'URL' : url},
             timeout: 10000,
             data: {}
           }).success(function (message, status) {
