@@ -32,7 +32,7 @@ angular.module('fbCal').factory('api', function ($wix, $location, $log) {
    * @return {String} The unparsed instance
    */
   var getInstance = function() {
-    var instanceId;
+    var instanceId = false;
     var url = $location.absUrl();
     var instanceRegexp = /.*instance=([\[\]a-zA-Z0-9\.\-_]*?)(&|$|#).*/g;
     var instance = instanceRegexp.exec(url);
