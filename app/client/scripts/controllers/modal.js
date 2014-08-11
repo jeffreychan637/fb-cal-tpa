@@ -542,6 +542,7 @@ angular.module('fbCal')
                   $scope.showMoreReplies(index);
                   var comment = processor.processComments(response);
                   comment.appPosted = true;
+                  $('#status' + index).css('border-radius', '0');
                   if ($scope.$$phase) {
                     $scope.feed[index].comments.push(comment);
                   } else {

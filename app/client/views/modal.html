@@ -190,7 +190,9 @@
                 <span ng-if="status.description">{{status.description}}</span>
               </blockquote>
             </div>
-            <div class="block add-on" ng-show="status.comment && settings.commenting" modal-border-width modal-corners="{{$index}}">
+
+            <!-- Commenting on and Liking Statuses Block -->
+            <div id="status{{$index}}" class="block add-on" ng-show="status.comment && settings.commenting" modal-border-width modal-corners="{{$index}}">
               <form class="input-group" ng-if="status.like && status.comment">
                 <span class="input-group-btn">
                   <button class="btn btn-default comment-btn" type="button" ng-click="interactWithFb('like', $index, undefined)" ng-hide="status.userLiked">

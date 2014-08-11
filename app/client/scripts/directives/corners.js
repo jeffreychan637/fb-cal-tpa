@@ -38,7 +38,6 @@ angular.module('fbCal')
                 }
               },
               function() {
-                //what happens when visitor adds comment to post with no comments?
                 if (scope.settings && scope.feed) {
                   if (attr.modalCorners === "-1") {
                     element.css('border-radius',
