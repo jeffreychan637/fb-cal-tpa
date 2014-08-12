@@ -16,11 +16,6 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
    */
   var compId = $wix.Utils.getOrigCompId() || $wix.Utils.getCompId();
   var instance = api.getInstance();
-  var url = $window.location.hostname;
-
-  url = 'editor.wix.com';
-  // compId = 45;
-  // instance = 47;
 
   /**
    * All the URLs for communicating with the Server.
@@ -40,9 +35,9 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
    * @type {Object}
    */
   var defaultSettingsWidget = {settings : api.defaults,
-                               fb_event_data : [], active : true};
+                               fb_event_data : [], active : false};
   var defaultSettingsSettings = {settings : api.defaults, events : [],
-                                 active : true, name: "", user_id: ""};
+                                 active : false, name: "", user_id: ""};
 
   /**
    * Returns the appropriate URL based on the type of request and who is
@@ -79,20 +74,6 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
       return defaultSettingsWidget;
     } else {
       return defaultSettingsSettings;
-    }
-  };
-
-  /**
-   * Returns the appriate header based on who is requesting.
-   * 
-   * @param  {String} from   Who is making the request (Server or Widget)
-   * @return {Object}        The appropriate header
-   */
-  var getHeader = function(from) {
-    if (from === 'widget') {
-      return {'X-Wix-Instance' : instance};
-    } else {
-      return {'X-Wix-Instance' : instance, 'URL' : url};
     }
   };
 
@@ -139,7 +120,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
     $http({
            method: 'GET',
            url: getURL('get', from),
-           headers: getHeader(from),
+           headers: {'X-Wix-Instance' : instance},
            timeout: 15000
           }).success(function (data, status) {
             if (status === 200) {
@@ -176,7 +157,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
     $http({
            method: 'GET',
            url: getAllEventsURL,
-           headers: getHeader('settings'),
+           headers: {'X-Wix-Instance' : instance},
            timeout: 15000
           }).success(function (data, status) {
             if (status === 200) {
@@ -273,7 +254,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
     $http({
             method: 'PUT',
             url: getURL('post', dataType),
-            headers: {'X-Wix-Instance' : instance, 'URL' : url},
+            headers: {'X-Wix-Instance' : instance},
             timeout: 10000,
             data: data
           }).success(function (message, status) {
@@ -300,7 +281,7 @@ angular.module('fbCal').factory('server', function ($log, $http, $wix, api,
     $http({
             method: 'PUT',
             url: logoutURL,
-            headers: {'X-Wix-Instance' : instance, 'URL' : url},
+            headers: {'X-Wix-Instance' : instance},
             timeout: 10000,
             data: {}
           }).success(function (message, status) {
