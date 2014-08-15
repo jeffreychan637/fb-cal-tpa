@@ -76,7 +76,7 @@ Here you will find a quick summary of what each file's purpose is. Note that eac
 - **bin, include, lib** - Directories created by virtualenv where Python packages are stored. **The version of Python used for this app is 2.7**.
 - **node_modules, package.json** - Used for the gruntfile to minimize this app's code. It is unnecessary for the app and can be deleted once the app is minimized.
 - **Procfile** - File for Heroku to figure out what to do to start app
-- **Wireframes, README.md, LICENSE** - Self-explanatory. Change the License as desired.
+- **Wireframes, README.md, developerLetter.md, LICENSE** - Self-explanatory. Change the License as desired.
 - **app** - This is where the app and all its essential files live.
   - **--init--.py** - Defines the Flask server the app is running on.
     - **bower.json** - Details the Javascript packages the app is using. The dev dependencies are not necessary to the app obviously.
