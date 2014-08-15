@@ -8,8 +8,9 @@ __author__ = "Jeffrey Chan"
 
 """This goes through all the files in client and adds them a list called
 extra_files. Passed into the run function, the server knows to watch all
-the files in the client folder for changes. This is extremely useful when
-developing the app, but should be removed when the app is in production.
+the files in the client folder for changes and restart the server after
+detecting a change. This is extremely useful when developing the app, but
+should not be done on the production server where files should never change.
 """
 if "HEROKU" not in environ:
     extra_dirs = ['app/client']
@@ -25,6 +26,7 @@ if "HEROKU" not in environ:
 
 """This starts the Flask server"""
 if "HEROKU" in environ:
-    flask_app.run()
+    port = int(environ.get('PORT', 5000))
+    flask_app.run(host='0.0.0.0', port=port)
 else:
     flask_app.run(debug=True, extra_files=extra_files)

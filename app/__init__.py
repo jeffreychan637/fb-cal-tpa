@@ -8,8 +8,8 @@ __author__ = "Jeffrey Chan"
 class MyFlask(Flask):
     """This is a class based on the Flask class. The only difference is that
     in this class all the front end files are not cached. This is highly useful
-    when developing but should be removed from production code where just the
-    Flask class is works great.
+    when developing but this should not be used on the production server where
+    just the Flask class works great.
     """
     def get_send_file_max_age(self, name):
         if name.lower().endswith('.js'):
@@ -21,7 +21,8 @@ class MyFlask(Flask):
         return Flask.get_send_file_max_age(self, name)
 
 if "HEROKU" in environ:
-    flask_app = Flask(__name__)
+    flask_app = Flask(__name__, static_folder="client", 
+                                template_folder="client")
 else:
     flask_app = MyFlask(__name__, static_folder="client", 
                                   template_folder="client")

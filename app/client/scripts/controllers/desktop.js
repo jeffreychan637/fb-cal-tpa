@@ -71,6 +71,32 @@ angular.module('fbCal')
        * }
        */
       eventData = response.fb_event_data;
+      eventData = [{
+                    "description": "my world", 
+                    "end_time": "2014-08-23T22:00:00-0700", 
+                    "is_date_only": false, 
+                    "location": "Wix Lounge 2601 Mission St", 
+                    "name": "Hello world", 
+                    "owner": {
+                      "id": "671074532971418", 
+                      "name": "Jeffrey Chan"
+                    }, 
+                    "privacy": "SECRET", 
+                    "start_time": "2014-08-22T19:00:00-0700", 
+                    "timezone": "America/Los_Angeles", 
+                    "updated_time": "2014-08-08T20:31:34+0000", 
+                    "venue": {
+                      "id": "448387708535198", 
+                      "city": "San Francisco", 
+                      "country": "United States", 
+                      "latitude": 37.755068, 
+                      "longitude": -122.418026, 
+                      "state": "CA", 
+                      "street": "2601 Mission St", 
+                      "zip": "94110"
+                    }, 
+                    "id": "734465196626285"
+                  }];
       if ($scope.settings.view === "Month") {
         desktopCalendar.setup(eventData);
       } else {
