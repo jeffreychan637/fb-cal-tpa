@@ -84,7 +84,6 @@ angular.module('fbCal').factory('desktopCalendar', function ($wix, $rootScope) {
       processedEvents[i].id = events[i].id;
       processedEvents[i].title = events[i].name;
       processedEvents[i].url = '#';
-      //Deal with weird times and events with no end times
       processedEvents[i].start = moment(events[i].start_time)._d.getTime();
       if (events[i].end_time) {
         processedEvents[i].end = moment(events[i].end_time)._d.getTime();
@@ -97,8 +96,6 @@ angular.module('fbCal').factory('desktopCalendar', function ($wix, $rootScope) {
         processedEvents[i].color = '#0088CB';
       }
     }
-    console.log('hello');
-    console.log(processedEvents);
     return processedEvents;
   };
 

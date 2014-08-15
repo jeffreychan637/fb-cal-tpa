@@ -489,7 +489,6 @@ if(!String.prototype.formatNum) {
 			}
 			e.start_hour = convert_to_12_hours_format(s);
 			e.end_hour = convert_to_12_hours_format(f);
-			console.log(e);
 			data.events.push(e);
 		});
 	};
